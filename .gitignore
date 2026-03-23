@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+opencode.json
+
+AGENT.md
+.opencode/
+.agents/
+skills-lock.json
+public_openapi_schema.json
+venv/
+.env
+__pycache__
