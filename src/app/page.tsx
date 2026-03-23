@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import Calculator from "@/components/landing/Calculator";
 import FAQ from "@/components/landing/FAQ";
 import FinalCTA from "@/components/landing/FinalCTA";
@@ -12,7 +14,9 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <HeroSection />
-      <Calculator />
+      <Suspense fallback={null}>
+        <Calculator />
+      </Suspense>
       <HowItWorks />
       <SocialProof />
       <FAQ />
