@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/engine.py": {
-      "runtime": "vercel-python3.11"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/engine",
