@@ -139,7 +139,7 @@ export function StepUserData({
 
         <div className="space-y-2">
           <Label htmlFor="birth-time" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
-            Hora de nascimento
+            Hora de nascimento (opcional)
           </Label>
           <Input id="birth-time" type="time" value={time} onChange={(event) => setTime(event.target.value)} className="bg-muted" />
         </div>

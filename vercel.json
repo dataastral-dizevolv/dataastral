@@ -7,6 +7,10 @@
     {
       "source": "/api/ephemerides",
       "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/sky-now",
+      "destination": "/api/engine.py"
     }
   ]
 }

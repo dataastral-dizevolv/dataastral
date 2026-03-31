@@ -114,7 +114,7 @@ export default function HeroSection() {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="flex justify-center lg:col-span-5"
         >
-          <div className={prefersReducedMotion ? "" : "animate-rotate-slow"}>
+          <div>
             <ZodiacWheel size={380} />
           </div>
         </motion.div>

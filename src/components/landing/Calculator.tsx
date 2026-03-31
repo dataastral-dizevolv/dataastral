@@ -148,15 +148,15 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
       const response = await fetch("/api/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          theme: themeToUse,
-          question: questionToUse,
-          birthDate: input.date,
-          birthTime: input.time,
-          birthLocation: input.birthLocation,
-          birthTimezone: input.birthTimezone,
-          birthLat: input.birthLat,
-          birthLng: input.birthLng,
+          body: JSON.stringify({
+            theme: themeToUse,
+            question: questionToUse,
+            birthDate: input.date,
+            birthTime: input.time?.trim() ?? "",
+            birthLocation: input.birthLocation,
+            birthTimezone: input.birthTimezone,
+            birthLat: input.birthLat,
+            birthLng: input.birthLng,
           placeQuery: input.placeQuery,
         }),
       });
