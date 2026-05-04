@@ -6,7 +6,6 @@ import useSWR from "swr";
 import { DataTable } from "@/components/admin/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { EngineAuditLogItem } from "@/types/admin";
 
@@ -114,24 +113,25 @@ export default function AdminLogsPage() {
   const totalPages = Math.max(1, Math.ceil((data?.total ?? 0) / PAGE_SIZE));
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 md:px-8 md:py-8">
+    <div className="w-full space-y-6 px-4 py-6 md:px-8 md:py-8">
       <section className="space-y-1">
         <h1 className="font-display text-4xl tracking-tight">Logs de Atendimento</h1>
         <p className="text-sm text-muted-foreground">Histórico legível das previsões processadas pelo motor.</p>
       </section>
 
-      <Card className="border border-border py-0 shadow-none">
-        <CardHeader className="p-5">
-          <CardTitle className="font-display text-2xl tracking-tight">Execuções recentes</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 p-5 pt-0">
-          <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border p-3">
+      <section className="space-y-4 border-t border-border/50 pt-4">
+        <header className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Monitoramento</p>
+          <h2 className="font-display text-2xl tracking-tight">Execuções recentes</h2>
+        </header>
+        <div className="space-y-4 border-b border-border/50 pb-4">
+          <div className="flex flex-wrap items-end gap-3 border-b border-border/50 pb-3">
             <div>
-              <p className="mb-1 text-xs text-muted-foreground">Início</p>
+              <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">Início</p>
               <Input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
             </div>
             <div>
-              <p className="mb-1 text-xs text-muted-foreground">Fim</p>
+              <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">Fim</p>
               <Input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
             </div>
             <Button
@@ -161,7 +161,7 @@ export default function AdminLogsPage() {
             </Button>
           </div>
 
-          {isLoading ? <div className="h-16 animate-pulse rounded-lg bg-muted" /> : null}
+          {isLoading ? <div className="h-16 animate-pulse rounded-md bg-muted/30" /> : null}
 
           <DataTable
             rows={logs}
@@ -204,7 +204,7 @@ export default function AdminLogsPage() {
             ]}
           />
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 border-t border-border/50 pt-3">
             <p className="text-sm text-muted-foreground">
               Página {page} de {totalPages}
             </p>
@@ -217,8 +217,8 @@ export default function AdminLogsPage() {
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

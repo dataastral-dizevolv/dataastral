@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AdminDashboardMetrics } from "@/types/admin";
 
@@ -44,7 +43,7 @@ function RangeTooltip({ active, payload, label, metricLabel }: { active?: boolea
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg">
+    <div className="border border-border bg-background px-3 py-2">
       <p className="text-xs text-muted-foreground">Data: {label}</p>
       <p className="text-sm text-foreground">{metricLabel}: {formatInteger(payload[0]?.value ?? 0)}</p>
     </div>
@@ -82,36 +81,30 @@ export default function AdminDashboardPage() {
   const hasSalesActivity = salesChartData.some((item) => item.count > 0);
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 md:px-8 md:py-8">
-      <section className="space-y-1">
+    <div className="w-full space-y-8 px-4 py-6 md:px-8 md:py-8">
+      <section className="space-y-1 border-b border-border/70 pb-4">
         <h1 className="font-display text-4xl tracking-tight">Inteligência de Operação</h1>
         <p className="text-sm text-muted-foreground">Indicadores de receita, crescimento de base e performance comercial.</p>
       </section>
 
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Card className="border border-border py-0 shadow-none">
-          <CardContent className="p-5">
+      <section className="grid grid-cols-1 gap-4 border-b border-border/70 pb-6 sm:grid-cols-3">
+        <div className="space-y-2 border-b border-border/70 pb-4 sm:border-b-0 sm:border-r sm:pr-4">
             <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">Receita Bruta</p>
             <p className="mt-2 font-display text-3xl tracking-tight">{isLoading ? "..." : formatCurrency(data?.grossRevenue ?? 0)}</p>
             <p className="mt-1 text-xs text-muted-foreground">{formatDelta(data?.deltas.revenuePercent ?? null)}</p>
-          </CardContent>
-        </Card>
+        </div>
 
-        <Card className="border border-border py-0 shadow-none">
-          <CardContent className="p-5">
+        <div className="space-y-2 border-b border-border/70 pb-4 sm:border-b-0 sm:border-r sm:pr-4">
             <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">Volume de Vendas</p>
             <p className="mt-2 font-display text-3xl tracking-tight">{isLoading ? "..." : formatInteger(data?.salesVolume ?? 0)}</p>
             <p className="mt-1 text-xs text-muted-foreground">{formatDelta(data?.deltas.salesPercent ?? null)}</p>
-          </CardContent>
-        </Card>
+        </div>
 
-        <Card className="border border-border py-0 shadow-none">
-          <CardContent className="p-5">
+        <div className="space-y-2">
             <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">Créditos em Circulação</p>
             <p className="mt-2 font-display text-3xl tracking-tight">{isLoading ? "..." : formatInteger(data?.creditsInCirculation ?? 0)}</p>
             <p className="mt-1 text-xs text-muted-foreground">{formatDelta(data?.deltas.creditsPercent ?? null)}</p>
-          </CardContent>
-        </Card>
+        </div>
       </section>
 
       <div className="flex justify-end">
@@ -128,19 +121,19 @@ export default function AdminDashboardPage() {
       </div>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="border border-border py-0 shadow-none">
-          <CardHeader className="p-5">
-            <CardTitle className="font-display text-2xl tracking-tight">Crescimento de Base</CardTitle>
-          </CardHeader>
-          <CardContent className="relative p-5 pt-0">
+        <section className="space-y-4 border-b border-border/70 pb-6 lg:border-b-0 lg:border-r lg:pr-4">
+          <header className="border-b border-border/70 pb-3">
+            <h2 className="font-display text-2xl tracking-tight">Crescimento de Base</h2>
+          </header>
+          <div className="relative">
             {isLoading ? (
-              <div className="h-72 animate-pulse rounded-lg bg-muted" />
+              <div className="h-72 animate-pulse rounded-md bg-muted/30" />
             ) : !hasSignupActivity ? (
-              <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 text-center text-sm text-muted-foreground">
+              <div className="flex h-72 items-center justify-center border border-dashed border-border px-6 text-center text-sm text-muted-foreground">
                 Nenhuma atividade registrada neste período.
               </div>
             ) : (
-              <div className="h-72 w-full rounded-xl border border-border bg-muted/20 p-3">
+              <div className="h-72 w-full border border-border p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={signupChartData} margin={{ top: 12, right: 10, left: 0, bottom: 4 }}>
                     <defs>
@@ -158,22 +151,22 @@ export default function AdminDashboardPage() {
                 </ResponsiveContainer>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
-        <Card className="border border-border py-0 shadow-none">
-          <CardHeader className="p-5">
-            <CardTitle className="font-display text-2xl tracking-tight">Performance de Vendas</CardTitle>
-          </CardHeader>
-          <CardContent className="relative p-5 pt-0">
+        <section className="space-y-4">
+          <header className="border-b border-border/70 pb-3">
+            <h2 className="font-display text-2xl tracking-tight">Performance de Vendas</h2>
+          </header>
+          <div className="relative">
             {isLoading ? (
-              <div className="h-72 animate-pulse rounded-lg bg-muted" />
+              <div className="h-72 animate-pulse rounded-md bg-muted/30" />
             ) : !hasSalesActivity ? (
-              <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 text-center text-sm text-muted-foreground">
+              <div className="flex h-72 items-center justify-center border border-dashed border-border px-6 text-center text-sm text-muted-foreground">
                 Nenhuma atividade registrada neste período.
               </div>
             ) : (
-              <div className="h-72 w-full rounded-xl border border-border bg-muted/20 p-3">
+              <div className="h-72 w-full border border-border p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesChartData} margin={{ top: 12, right: 10, left: 0, bottom: 4 }}>
                     <CartesianGrid stroke="hsl(var(--border) / 0.35)" strokeDasharray="2 4" vertical={false} />
@@ -185,8 +178,8 @@ export default function AdminDashboardPage() {
                 </ResponsiveContainer>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </section>
 
       {isValidating && !isLoading ? (

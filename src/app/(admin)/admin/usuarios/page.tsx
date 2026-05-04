@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/admin/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { AdminUserRow } from "@/types/admin";
@@ -111,18 +110,18 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 md:px-8 md:py-8">
-      <section className="space-y-1">
+    <div className="w-full space-y-8 px-4 py-6 md:px-8 md:py-8">
+      <section className="space-y-1 border-b border-border/70 pb-4">
         <h1 className="font-display text-4xl tracking-tight">Usuários</h1>
         <p className="text-sm text-muted-foreground">Gestão de acessos, perfil astral e créditos.</p>
       </section>
 
-      <Card className="border border-border py-0 shadow-none">
-        <CardHeader className="p-5">
-          <CardTitle className="font-display text-2xl tracking-tight">Base de usuários</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 p-5 pt-0">
-          <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border p-3">
+      <section className="space-y-4">
+        <header className="border-b border-border/70 pb-3">
+          <h2 className="font-display text-2xl tracking-tight">Base de usuários</h2>
+        </header>
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-end gap-3 border-b border-border/70 pb-4">
             <div>
               <p className="mb-1 text-xs text-muted-foreground">Início</p>
               <Input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
@@ -158,7 +157,7 @@ export default function AdminUsersPage() {
             </Button>
           </div>
 
-          {isLoading ? <div className="h-16 animate-pulse rounded-lg bg-muted" /> : null}
+          {isLoading ? <div className="h-16 animate-pulse rounded-md bg-muted/30" /> : null}
 
           <DataTable
             rows={users}
@@ -218,7 +217,7 @@ export default function AdminUsersPage() {
             ]}
           />
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 border-t border-border/70 pt-3">
             <p className="text-sm text-muted-foreground">
               Página {page} de {totalPages}
             </p>
@@ -231,8 +230,8 @@ export default function AdminUsersPage() {
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       <Dialog open={Boolean(deactivatingUser)} onOpenChange={(open) => (!open ? setDeactivatingUser(null) : null)}>
         <DialogContent>
