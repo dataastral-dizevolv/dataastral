@@ -29,7 +29,7 @@ export function StepResult({ selectedQuestion, prediction, eventDate, remainingC
         <p className="mt-1 font-body text-xs text-iris-secondary">com base no seu mapa natal</p>
         {eventDate ? <p className="mt-1 font-mono-iris text-[11px] uppercase tracking-wider text-iris-muted">Data do evento: {eventDate}</p> : null}
         {remainingCredits !== null ? (
-          <p className="mt-1 font-mono-iris text-[11px] uppercase tracking-wider text-iris-muted">Créditos restantes: {remainingCredits}</p>
+          <p aria-live="polite" className="mt-1 font-mono-iris text-[11px] uppercase tracking-wider text-iris-muted">Créditos restantes: {remainingCredits}</p>
         ) : null}
       </div>
 

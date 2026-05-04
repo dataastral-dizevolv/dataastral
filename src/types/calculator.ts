@@ -1,5 +1,7 @@
 export type CalcStep = 1 | 2 | 3;
 export type CalcState = "flow" | "loading" | "result";
+export type CalculatorQuestionType = "select" | "text" | "checkbox";
+export type DynamicAnswerValue = string | string[];
 
 export interface ThemeOption {
   id: "amor" | "carreira" | "financas" | "saude" | "familia" | "viagens";
@@ -23,8 +25,12 @@ export interface LocationData {
 
 export interface PredictSuccessResponse {
   prediction: string;
+  prediction_text?: string;
+  audio_text?: string;
+  whatsapp_text?: string;
   eventDate?: string;
   eventDateIso?: string;
+  predictionId?: string;
   remainingCredits: number;
   cached?: boolean;
   engineCode?: string;
@@ -41,6 +47,7 @@ export interface PredictErrorResponse {
 export interface GeneratePredictionInput {
   date: string;
   time: string;
+  gender?: "homem" | "mulher" | "nao_binario";
   placeQuery: string;
   birthLocation: string;
   birthTimezone: string | null;
@@ -50,4 +57,21 @@ export interface GeneratePredictionInput {
   targetBirthTime?: string;
   targetBirthTimezone?: string | null;
   conflictDate?: string;
+  dynamicAnswers?: Record<string, DynamicAnswerValue>;
+}
+
+export interface CalculatorQuestionOption {
+  value: string;
+  label: string;
+}
+
+export interface CalculatorQuestion {
+  id: number;
+  category: "amor" | "carreira" | "financas" | "saude" | "familia" | "viagens";
+  label: string;
+  fieldName: string;
+  type: CalculatorQuestionType;
+  options: CalculatorQuestionOption[];
+  order: number;
+  isRequired: boolean;
 }

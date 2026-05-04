@@ -12,6 +12,7 @@ interface PredictRequestBody {
   question?: string;
   birthDate?: string;
   birthTime?: string;
+  gender?: string | null;
   birthLocation?: string;
   birthTimezone?: string | null;
   birthLat?: number | null;
@@ -21,16 +22,23 @@ interface PredictRequestBody {
   targetBirthTime?: string;
   targetBirthTimezone?: string | null;
   conflictDate?: string;
+  dynamicAnswers?: Record<string, unknown>;
 }
 
 interface StoredPrediction {
+  id: string;
   prediction_text: string;
+  audio_text?: string | null;
+  whatsapp_text?: string | null;
   event_date: string | null;
   birth_data: Record<string, unknown>;
 }
 
 interface EngineFunctionSuccessResponse {
   prediction: string;
+  prediction_text?: string;
+  audio_text?: string;
+  whatsapp_text?: string;
   eventDate: string;
   eventDateIso: string;
   code?: string;
@@ -44,6 +52,20 @@ interface EngineFunctionSuccessResponse {
 interface EngineFunctionErrorResponse {
   error?: string;
   code?: string;
+}
+
+interface PredictApiResponse {
+  prediction: string;
+  prediction_text: string;
+  audio_text: string;
+  whatsapp_text: string;
+  eventDate: string;
+  eventDateIso: string;
+  remainingCredits: number;
+  cached: boolean;
+  engineCode?: string;
+  requestId: string;
+  predictionId?: string;
 }
 
 const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
@@ -120,9 +142,15 @@ function stableStringify(input: unknown): string {
 }
 
 function buildBirthData(body: PredictRequestBody, birthDate: string, birthTime: string, birthTimezone: string) {
+  const dynamicAnswers =
+    body.dynamicAnswers && typeof body.dynamicAnswers === "object" && !Array.isArray(body.dynamicAnswers)
+      ? body.dynamicAnswers
+      : null;
+
   return {
     birthDate,
     birthTime,
+    gender: body.gender || null,
     birthTimezone,
     birthLocation: body.birthLocation || null,
     birthLat: typeof body.birthLat === "number" && Number.isFinite(body.birthLat) ? body.birthLat : null,
@@ -132,6 +160,7 @@ function buildBirthData(body: PredictRequestBody, birthDate: string, birthTime: 
     targetBirthTime: body.targetBirthTime || null,
     targetBirthTimezone: body.targetBirthTimezone || null,
     conflictDate: body.conflictDate || null,
+    dynamicAnswers,
   };
 }
 
@@ -289,7 +318,7 @@ export async function POST(request: NextRequest) {
 
   const { data: cachedRows, error: cacheError } = await serviceClient
     .from("user_predictions")
-    .select("prediction_text, event_date, birth_data")
+    .select("id, prediction_text, event_date, birth_data")
     .eq("user_id", authUser.id)
     .eq("theme", theme)
     .eq("question", question)
@@ -328,12 +357,16 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       prediction: cachedPrediction.prediction_text,
+      prediction_text: cachedPrediction.prediction_text,
+      audio_text: cachedPrediction.prediction_text,
+      whatsapp_text: cachedPrediction.prediction_text,
       eventDate: cachedPrediction.event_date || "",
       eventDateIso: "",
       remainingCredits,
       cached: true,
       requestId,
-    });
+      predictionId: cachedPrediction.id,
+    } satisfies PredictApiResponse);
 
     authResponse.cookies.getAll().forEach((cookie) => {
       response.cookies.set(cookie);
@@ -342,38 +375,15 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const { data: remainingAfterDebit, error: debitError } = await serviceClient.rpc("consume_profile_credit", {
-    p_user_id: authUser.id,
-    p_description: `Uso de crédito na calculadora (${theme})`,
-  });
-
-  if (debitError) {
-    await writeAuditLog({
-      success: false,
-      engineCode: "CREDIT_DEBIT_FAILED",
-      technicalDetails: {
-        cache: false,
-        debitErrorCode: debitError.code ?? "NO_CODE",
-        debitErrorMessage: debitError.message,
-      },
-    });
-
-    return errorResponse(
-      500,
-      "CREDIT_DEBIT_FAILED",
-      `consume_profile_credit falhou: ${debitError.code ?? "NO_CODE"} ${debitError.message}`,
-    );
-  }
-
-  if (remainingAfterDebit === null) {
-    const remainingCredits = await getRemainingCredits();
-
+  const creditsBeforeExecution = await getRemainingCredits();
+  if (creditsBeforeExecution <= 0) {
     await writeAuditLog({
       success: false,
       engineCode: "INSUFFICIENT_CREDITS",
       technicalDetails: {
         cache: false,
-        remainingCredits,
+        stage: "precheck",
+        remainingCredits: creditsBeforeExecution,
       },
     });
 
@@ -381,30 +391,11 @@ export async function POST(request: NextRequest) {
       {
         error: INSUFFICIENT_CREDITS_ERROR,
         code: "INSUFFICIENT_CREDITS",
-        remainingCredits,
+        remainingCredits: creditsBeforeExecution,
         requestId,
       },
       { status: 402 },
     );
-  }
-
-  let debitApplied = true;
-
-  async function refundIfNeeded() {
-    if (!debitApplied) {
-      return;
-    }
-
-    const { error: refundError } = await serviceClient.rpc("add_profile_credits", {
-      p_user_id: authUser.id,
-      p_amount: 1,
-      p_type: "bonus",
-      p_description: "Estorno por falha ao gerar previsão",
-    });
-
-    if (!refundError) {
-      debitApplied = false;
-    }
   }
 
   const edgeRequestPayload = {
@@ -412,11 +403,15 @@ export async function POST(request: NextRequest) {
     question,
     birthDate,
     birthTime,
+    gender: body.gender || null,
     birthTimezone,
     ...(body.targetBirthDate ? { targetBirthDate: body.targetBirthDate } : {}),
     ...(body.targetBirthTime ? { targetBirthTime: body.targetBirthTime } : {}),
     ...(body.targetBirthTimezone ? { targetBirthTimezone: body.targetBirthTimezone } : {}),
     ...(body.conflictDate ? { conflictDate: body.conflictDate } : {}),
+    ...(body.dynamicAnswers && typeof body.dynamicAnswers === "object" && !Array.isArray(body.dynamicAnswers)
+      ? { dynamicAnswers: body.dynamicAnswers }
+      : {}),
   };
 
   console.info("[predict] Sending payload to edge", {
@@ -427,7 +422,9 @@ export async function POST(request: NextRequest) {
   const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000"}/api/engine`;
 
   let enginePrediction: {
-    explanation: string;
+    predictionText: string;
+    audioText: string;
+    whatsappText: string;
     date: string;
     dateIso: string;
     code?: string;
@@ -471,19 +468,24 @@ export async function POST(request: NextRequest) {
 
     const edgeSuccessPayload = edgePayload as EngineFunctionSuccessResponse;
 
-    if (!edgeSuccessPayload.prediction) {
+    const predictionText = (edgeSuccessPayload.prediction_text ?? edgeSuccessPayload.prediction ?? "").trim();
+    const audioText = (edgeSuccessPayload.audio_text ?? predictionText).trim();
+    const whatsappText = (edgeSuccessPayload.whatsapp_text ?? predictionText).trim();
+
+    if (!predictionText) {
       throw new Error("PREDICTION_ENGINE_FAILED: Resposta inválida da edge function (prediction ausente).");
     }
 
     enginePrediction = {
-      explanation: edgeSuccessPayload.prediction,
+      predictionText,
+      audioText: audioText || predictionText,
+      whatsappText: whatsappText || predictionText,
       date: edgeSuccessPayload.eventDate,
       dateIso: edgeSuccessPayload.eventDateIso,
       code: edgeSuccessPayload.code,
     };
   } catch (error) {
     const details = error instanceof Error ? error.message : String(error);
-    await refundIfNeeded();
     const [codeFromDetails] = details.split(":");
     const code = codeFromDetails && codeFromDetails.length > 0 ? codeFromDetails : "PREDICTION_ENGINE_FAILED";
 
@@ -492,18 +494,19 @@ export async function POST(request: NextRequest) {
       engineCode: code,
       technicalDetails: {
         cache: false,
+        stage: "engine",
         details,
         enginePayload: enginePayloadForAudit,
-        refundAttempted: true,
+        creditsDebited: false,
       },
     });
 
     return errorResponse(500, code, details);
   }
 
-  const interpretedPrediction = enginePrediction.explanation;
+  const interpretedPrediction = enginePrediction.predictionText;
 
-  const { error: insertPredictionError } = await serviceClient.from("user_predictions").insert({
+  const { data: insertedPrediction, error: insertPredictionError } = await serviceClient.from("user_predictions").insert({
     user_id: authUser.id,
     theme,
     question,
@@ -514,11 +517,9 @@ export async function POST(request: NextRequest) {
     target_birth_time: body.targetBirthTime || null,
     target_birth_timezone: body.targetBirthTimezone || null,
     conflict_date: body.conflictDate || null,
-  });
+  }).select("id").single();
 
   if (insertPredictionError) {
-    await refundIfNeeded();
-
     await writeAuditLog({
       success: false,
       engineCode: "PREDICTION_PERSIST_FAILED",
@@ -527,7 +528,7 @@ export async function POST(request: NextRequest) {
         stage: "user_predictions",
         details: `${insertPredictionError.code ?? "NO_CODE"} ${insertPredictionError.message}`,
         enginePayload: enginePayloadForAudit,
-        refundAttempted: true,
+        creditsDebited: false,
       },
     });
 
@@ -538,7 +539,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error: insertHistoryError } = await serviceClient.from("user_prediction_history").insert({
+  const { data: insertedHistory, error: insertHistoryError } = await serviceClient.from("user_prediction_history").insert({
     user_id: authUser.id,
     theme,
     question,
@@ -551,11 +552,10 @@ export async function POST(request: NextRequest) {
     target_birth_time: body.targetBirthTime || null,
     target_birth_timezone: body.targetBirthTimezone || null,
     conflict_date: body.conflictDate || null,
-  });
+  }).select("id").single();
 
   if (insertHistoryError) {
-    await refundIfNeeded();
-
+    await serviceClient.from("user_predictions").delete().eq("id", insertedPrediction.id).eq("user_id", authUser.id);
     await writeAuditLog({
       success: false,
       engineCode: "PREDICTION_PERSIST_FAILED",
@@ -564,7 +564,8 @@ export async function POST(request: NextRequest) {
         stage: "user_prediction_history",
         details: `${insertHistoryError.code ?? "NO_CODE"} ${insertHistoryError.message}`,
         enginePayload: enginePayloadForAudit,
-        refundAttempted: true,
+        rollbackPredictionId: insertedPrediction.id,
+        creditsDebited: false,
       },
     });
 
@@ -575,15 +576,70 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const { data: remainingAfterDebit, error: debitError } = await serviceClient.rpc("consume_profile_credit", {
+    p_user_id: authUser.id,
+    p_description: `Uso de crédito na calculadora (${theme})`,
+  });
+
+  if (debitError || remainingAfterDebit === null) {
+    const rollbackResults = await Promise.all([
+      serviceClient.from("user_predictions").delete().eq("id", insertedPrediction.id).eq("user_id", authUser.id),
+      serviceClient.from("user_prediction_history").delete().eq("id", insertedHistory.id).eq("user_id", authUser.id),
+    ]);
+    const rollbackPredictionError = rollbackResults[0].error;
+    const rollbackHistoryError = rollbackResults[1].error;
+    const remainingCredits = await getRemainingCredits();
+
+    await writeAuditLog({
+      success: false,
+      engineCode: debitError ? "CREDIT_DEBIT_FAILED" : "INSUFFICIENT_CREDITS",
+      technicalDetails: {
+        cache: false,
+        stage: "credit_confirmation",
+        debitErrorCode: debitError?.code ?? "NO_CODE",
+        debitErrorMessage: debitError?.message ?? null,
+        remainingCredits,
+        rollbackPredictionId: insertedPrediction.id,
+        rollbackHistoryId: insertedHistory.id,
+        rollbackPredictionError: rollbackPredictionError ? `${rollbackPredictionError.code ?? "NO_CODE"} ${rollbackPredictionError.message}` : null,
+        rollbackHistoryError: rollbackHistoryError ? `${rollbackHistoryError.code ?? "NO_CODE"} ${rollbackHistoryError.message}` : null,
+      },
+    });
+
+    if (remainingAfterDebit === null) {
+      return NextResponse.json(
+        {
+          error: INSUFFICIENT_CREDITS_ERROR,
+          code: "INSUFFICIENT_CREDITS",
+          remainingCredits,
+          requestId,
+        },
+        { status: 402 },
+      );
+    }
+
+    return errorResponse(
+      500,
+      "CREDIT_DEBIT_FAILED",
+      `consume_profile_credit falhou: ${debitError?.code ?? "NO_CODE"} ${debitError?.message ?? "erro desconhecido"}`,
+      "Falha ao confirmar consumo de crédito.",
+      { remainingCredits },
+    );
+  }
+
   const response = NextResponse.json({
     prediction: interpretedPrediction,
+    prediction_text: interpretedPrediction,
+    audio_text: enginePrediction.audioText,
+    whatsapp_text: enginePrediction.whatsappText,
     eventDate: enginePrediction.date,
     eventDateIso: enginePrediction.dateIso,
     remainingCredits: remainingAfterDebit,
     cached: false,
     engineCode: enginePrediction.code,
     requestId,
-  });
+    predictionId: insertedPrediction?.id,
+  } satisfies PredictApiResponse);
 
   authResponse.cookies.getAll().forEach((cookie) => {
     response.cookies.set(cookie);
@@ -594,6 +650,11 @@ export async function POST(request: NextRequest) {
     engineCode: enginePrediction.code ?? "ASPECT_FOUND",
     technicalDetails: {
       cache: false,
+      stage: "completed",
+      creditsDebited: true,
+      remainingCredits: remainingAfterDebit,
+      predictionId: insertedPrediction.id,
+      historyId: insertedHistory.id,
       enginePayload: enginePayloadForAudit,
       transitPlanet: enginePayloadForAudit?.transitPlanet,
       natalPlanet: enginePayloadForAudit?.natalPlanet,

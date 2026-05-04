@@ -15,8 +15,9 @@ import { StepUserData } from "@/components/calculator/StepUserData";
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { themeToCategory } from "@/lib/calculator-categories";
 import { createClient } from "@/lib/supabase/client";
-import type { CalcState, CalcStep, GeneratePredictionInput, PredictErrorResponse, PredictSuccessResponse, ThemeId } from "@/types/calculator";
+import type { CalcState, CalcStep, CalculatorQuestion, GeneratePredictionInput, PredictErrorResponse, PredictSuccessResponse, ThemeId } from "@/types/calculator";
 
 const PENDING_PREDICTION_STORAGE_KEY = "pending_prediction_payload";
 
@@ -39,6 +40,9 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
   const [step, setStep] = useState<CalcStep>(1);
   const [selectedTheme, setSelectedTheme] = useState<ThemeId | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
+  const [themeQuestions, setThemeQuestions] = useState<string[]>([]);
+  const [themeQuestionsLoading, setThemeQuestionsLoading] = useState(false);
+  const [themeQuestionsError, setThemeQuestionsError] = useState<string | null>(null);
   const [resultPrediction, setResultPrediction] = useState<string | null>(null);
   const [resultEventDate, setResultEventDate] = useState<string | null>(null);
   const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
@@ -46,6 +50,9 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
   const [submitErrorCode, setSubmitErrorCode] = useState<string | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authNextPath, setAuthNextPath] = useState("/calculadora?resumePrediction=1#calculadora");
+  const [dynamicQuestions, setDynamicQuestions] = useState<CalculatorQuestion[]>([]);
+  const [dynamicQuestionsLoading, setDynamicQuestionsLoading] = useState(false);
+  const [dynamicQuestionsError, setDynamicQuestionsError] = useState<string | null>(null);
   const isInApp = context === "app";
 
   function buildAuthNextPath() {
@@ -153,11 +160,13 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
             question: questionToUse,
             birthDate: input.date,
             birthTime: input.time?.trim() ?? "",
+            gender: input.gender ?? null,
             birthLocation: input.birthLocation,
             birthTimezone: input.birthTimezone,
             birthLat: input.birthLat,
             birthLng: input.birthLng,
-          placeQuery: input.placeQuery,
+            placeQuery: input.placeQuery,
+            dynamicAnswers: input.dynamicAnswers ?? null,
         }),
       });
 
@@ -191,14 +200,13 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
       setResultPrediction(successPayload.prediction);
       setResultEventDate(successPayload.eventDate ?? null);
       setRemainingCredits(successPayload.remainingCredits);
+      setState("result");
 
-      await Promise.all([
+      void Promise.all([
         mutate(DASHBOARD_ME_KEY),
         mutate((key) => typeof key === "string" && key.startsWith("/api/credits/transactions")),
         mutate((key) => typeof key === "string" && key.startsWith("/api/predictions/history")),
       ]);
-
-      setState("result");
     } catch {
       setSubmitError("Falha de conexão ao gerar a previsão.");
       setSubmitErrorCode(null);
@@ -273,11 +281,81 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
     };
   }, [clearResumeQueryParam, handleGenerate, searchParams]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      if (!selectedTheme) {
+        setThemeQuestions([]);
+        setThemeQuestionsError(null);
+        setThemeQuestionsLoading(false);
+        setDynamicQuestions([]);
+        setDynamicQuestionsLoading(false);
+        setDynamicQuestionsError(null);
+        return;
+      }
+
+      setThemeQuestionsLoading(true);
+      setDynamicQuestionsLoading(true);
+
+      try {
+        const category = themeToCategory(selectedTheme);
+        const [promptResponse, dynamicResponse] = await Promise.all([
+          fetch(`/api/calculator/questions?category=${encodeURIComponent(category)}&kind=prompt`, { credentials: "include" }),
+          fetch(`/api/calculator/questions?category=${encodeURIComponent(category)}&kind=dynamic`, { credentials: "include" }),
+        ]);
+
+        const promptPayload = (await promptResponse.json()) as { items?: CalculatorQuestion[]; error?: string };
+        const dynamicPayload = (await dynamicResponse.json()) as { items?: CalculatorQuestion[]; error?: string };
+
+        if (!promptResponse.ok) {
+          throw new Error(promptPayload.error ?? "Falha ao carregar perguntas do tema.");
+        }
+
+        if (!dynamicResponse.ok) {
+          throw new Error(dynamicPayload.error ?? "Falha ao carregar perguntas dinâmicas.");
+        }
+
+        if (!cancelled) {
+          const nextThemeQuestions = (promptPayload.items ?? []).map((item) => item.label);
+          setThemeQuestions(nextThemeQuestions);
+          setThemeQuestionsError(null);
+
+          setDynamicQuestions(dynamicPayload.items ?? []);
+          setDynamicQuestionsError(null);
+
+          setSelectedQuestion((current) => (current && nextThemeQuestions.includes(current) ? current : null));
+        }
+      } catch {
+        if (!cancelled) {
+          setThemeQuestions([]);
+          setThemeQuestionsError("Não foi possível carregar as perguntas deste tema agora.");
+          setDynamicQuestions([]);
+          setDynamicQuestionsError("Não foi possível carregar perguntas extras agora.");
+        }
+      } finally {
+        if (!cancelled) {
+          setThemeQuestionsLoading(false);
+          setDynamicQuestionsLoading(false);
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedTheme, step]);
+
   function reset() {
     setState("flow");
     setStep(1);
     setSelectedTheme(null);
     setSelectedQuestion(null);
+    setThemeQuestions([]);
+    setThemeQuestionsError(null);
+    setThemeQuestionsLoading(false);
     setSubmitError(null);
     setSubmitErrorCode(null);
     setResultPrediction(null);
@@ -301,8 +379,29 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
                 {state === "flow" ? (
                   <motion.div key={`step-${step}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
                     {step === 1 ? <StepTheme selectedTheme={selectedTheme} onSelectTheme={setSelectedTheme} onContinue={() => { setStep(2); setSelectedQuestion(null); }} /> : null}
-                    {step === 2 && selectedTheme ? <StepQuestion selectedTheme={selectedTheme} selectedQuestion={selectedQuestion} onBack={() => setStep(1)} onSelectQuestion={setSelectedQuestion} onContinue={() => setStep(3)} /> : null}
-                    {step === 3 && selectedQuestion ? <StepUserData selectedQuestion={selectedQuestion} onBack={() => setStep(2)} onGenerate={handleGenerate} submitError={submitError} submitErrorCode={submitErrorCode} /> : null}
+                    {step === 2 && selectedTheme ? (
+                      <StepQuestion
+                        questions={themeQuestions}
+                        loading={themeQuestionsLoading}
+                        loadError={themeQuestionsError}
+                        selectedQuestion={selectedQuestion}
+                        onBack={() => setStep(1)}
+                        onSelectQuestion={setSelectedQuestion}
+                        onContinue={() => setStep(3)}
+                      />
+                    ) : null}
+                    {step === 3 && selectedQuestion ? (
+                      <StepUserData
+                        selectedQuestion={selectedQuestion}
+                        dynamicQuestions={dynamicQuestions}
+                        dynamicQuestionsLoading={dynamicQuestionsLoading}
+                        dynamicQuestionsError={dynamicQuestionsError}
+                        onBack={() => setStep(2)}
+                        onGenerate={handleGenerate}
+                        submitError={submitError}
+                        submitErrorCode={submitErrorCode}
+                      />
+                    ) : null}
                   </motion.div>
                 ) : null}
 

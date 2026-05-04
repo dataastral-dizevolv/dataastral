@@ -60,7 +60,7 @@
   --border: 48 30% 93% / 0.08;
   --input: 48 30% 93% / 0.08;
   --ring: 265 60% 68%;
-  --radius: 0.5rem;
+  --radius: 0.375rem;
 
   --iris-bg-primary: 234 33% 5%;
   --iris-bg-secondary: 234 25% 9%;
@@ -162,13 +162,11 @@
   }
 
   .shadow-iris-card {
-    box-shadow:
-      0 1px 3px rgb(0 0 0 / 40%),
-      0 0 0 1px rgb(255 255 255 / 4%);
+    box-shadow: none;
   }
 
   .shadow-iris-glow {
-    box-shadow: 0 0 40px hsl(var(--iris-accent-glow));
+    box-shadow: none;
   }
 
   .eyebrow {

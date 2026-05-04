@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 
-import { Download, Headphones, Loader2, MessageCircle, Volume2 } from "lucide-react";
+import { Download, Loader2, MessageCircle, Play, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ interface PrevisaoDrawerProps {
   aberto: boolean;
   onFechar: () => void;
   data: string | null;
+  predictionId?: string | null;
   eventos: EphemerisEvent[];
   previsao: string | null;
   missingBirthData?: boolean;
@@ -91,13 +92,15 @@ export function PrevisaoDrawer({
   aberto,
   onFechar,
   data,
+  predictionId = null,
   eventos,
   previsao,
   missingBirthData = false,
 }: PrevisaoDrawerProps) {
-  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioLoadingKey, setAudioLoadingKey] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRequestLockRef = useRef(false);
 
   const dataFormatada = formatarDataCabecalho(data);
   const temaInsight = useMemo(() => {
@@ -111,14 +114,6 @@ export function PrevisaoDrawer({
 
     return `${eventos[0].titulo} e mais ${eventos.length - 1} evento(s)`;
   }, [eventos]);
-
-  useEffect(() => {
-    return () => {
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-    };
-  }, [audioUrl]);
 
   function compartilharWhatsapp() {
     if (!previsao || !data) {
@@ -139,42 +134,59 @@ export function PrevisaoDrawer({
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
-  async function ouvirAudio() {
-    if (!previsao) {
-      toast.error("Sem previsão para gerar áudio.");
+  async function reproduzirNarracao(input: { cacheKey: string; predictionId?: string | null; eventId?: string; eventDate?: string; text: string }) {
+    if (audioRequestLockRef.current || audioLoadingKey !== null) {
       return;
     }
 
-    setAudioLoading(true);
+    const cleanText = input.text.trim();
+    if (!cleanText) {
+      toast.error("Não há conteúdo narrativo para este item.");
+      return;
+    }
+
+    audioRequestLockRef.current = true;
+    setAudioLoadingKey(input.cacheKey);
 
     try {
-      const response = await fetch("/api/export/audio", {
+      const response = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: previsao }),
+        body: JSON.stringify({
+          predictionId: input.predictionId,
+          eventId: input.eventId,
+          eventDate: input.eventDate,
+          audio_text: cleanText,
+          text: cleanText,
+        }),
       });
 
       if (!response.ok) {
-        const payload = (await response.json().catch(() => ({}))) as { error?: string };
+        const payload = (await response.json().catch(() => ({}))) as { error?: string; code?: string };
         toast.error(payload.error ?? "Não foi possível gerar áudio agora.");
         return;
       }
 
-      const blob = await response.blob();
-      const nextAudioUrl = URL.createObjectURL(blob);
+      const payload = (await response.json()) as { audioUrl?: string; cached?: boolean };
+      if (!payload.audioUrl) {
+        toast.error("Resposta inválida do serviço de narração.");
+        return;
+      }
 
-      setAudioUrl((current) => {
-        if (current) {
-          URL.revokeObjectURL(current);
-        }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
 
-        return nextAudioUrl;
-      });
-      toast.success("Áudio gerado com sucesso.");
+      const audio = new Audio(payload.audioUrl);
+      audioRef.current = audio;
+      await audio.play();
+      toast.success("Narração pronta.");
     } catch {
       toast.error("Falha de conexão ao gerar áudio.");
     } finally {
-      setAudioLoading(false);
+      audioRequestLockRef.current = false;
+      setAudioLoadingKey(null);
     }
   }
 
@@ -293,11 +305,19 @@ export function PrevisaoDrawer({
                   type="button"
                   variant="ghost"
                   className="w-full border border-iris-accent/40 text-iris-accent hover:bg-iris-accent/10 hover:text-iris-accent"
-                  onClick={() => void ouvirAudio()}
-                  disabled={!previsao || audioLoading}
+                  onClick={() =>
+                    void reproduzirNarracao({
+                      cacheKey: `daily-${data ?? "sem_data"}`,
+                      predictionId,
+                      eventId: `daily_${data ?? "sem_data"}`,
+                      eventDate: data ?? new Date().toISOString().slice(0, 10),
+                      text: previsao ?? "",
+                    })
+                  }
+                  disabled={!previsao || audioLoadingKey !== null}
                 >
-                  {audioLoading ? <Loader2 className="size-4 animate-spin" /> : <Headphones className="size-4" />}
-                  {audioLoading ? "Gerando..." : "Ouvir Áudio"}
+                  {audioLoadingKey === `daily-${data ?? "sem_data"}` ? <Loader2 className="size-4 animate-spin" /> : <Volume2 className="size-4" />}
+                  {audioLoadingKey === `daily-${data ?? "sem_data"}` ? "Gerando..." : "Ouvir Áudio"}
                 </Button>
 
                 <Button
@@ -311,16 +331,6 @@ export function PrevisaoDrawer({
                   {pdfLoading ? "Gerando..." : "Gerar PDF"}
                 </Button>
               </div>
-
-              {audioUrl ? (
-                <div className="rounded-lg border border-iris-accent/20 bg-background/70 p-3">
-                  <div className="mb-2 flex items-center gap-2 text-sm text-iris-accent">
-                    <Volume2 className="size-4" />
-                    Áudio do insight pronto
-                  </div>
-                  <audio controls src={audioUrl} className="w-full" preload="none" />
-                </div>
-              ) : null}
             </div>
 
             <div className="space-y-3 border-t border-border pt-5">
@@ -331,8 +341,28 @@ export function PrevisaoDrawer({
                     <div key={`${evento.id}-linha`} className="space-y-3">
                       <div className="flex items-start gap-3">
                         <span style={estiloTipo[evento.tipo].dot} className="mt-1 size-2 rounded-full" />
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium text-foreground">{evento.titulo}</p>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium text-foreground">{evento.titulo}</p>
+                            <Button
+                              type="button"
+                              size="icon-sm"
+                              variant="ghost"
+                              className="h-7 w-7 border border-iris-accent/35 text-iris-accent hover:bg-iris-accent/10 hover:text-iris-accent"
+                              onClick={() =>
+                                void reproduzirNarracao({
+                                  cacheKey: evento.id,
+                                  eventId: evento.id,
+                                  eventDate: evento.data,
+                                  text: evento.descricao,
+                                })
+                              }
+                              disabled={audioLoadingKey !== null}
+                              aria-label={`Ouvir narração do evento ${evento.titulo}`}
+                            >
+                              {audioLoadingKey === evento.id ? <Loader2 className="size-3.5 animate-spin" /> : <Play className="size-3.5" />}
+                            </Button>
+                          </div>
                           <p className="text-sm leading-6 text-muted-foreground">{evento.descricao}</p>
                         </div>
                       </div>

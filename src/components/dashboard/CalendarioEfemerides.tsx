@@ -176,6 +176,15 @@ export function CalendarioEfemerides() {
     return eventosDoDia.map((evento) => evento.descricao).join("\n\n");
   }, [diaSelecionado, eventos, historico]);
 
+  const predictionIdDiaSelecionado = useMemo(() => {
+    if (!diaSelecionado) {
+      return null;
+    }
+
+    const item = (historico ?? []).find((entry) => entry.eventDateIso?.slice(0, 10) === diaSelecionado);
+    return item?.id ?? null;
+  }, [diaSelecionado, historico]);
+
   function abrirDrawerData(data: string) {
     setDiaSelecionado(data);
     setDrawerAberto(true);
@@ -317,6 +326,7 @@ export function CalendarioEfemerides() {
         aberto={drawerAberto}
         onFechar={() => setDrawerAberto(false)}
         data={diaSelecionado}
+        predictionId={predictionIdDiaSelecionado}
         eventos={eventosDiaSelecionado}
         previsao={previsaoDiaSelecionado}
         missingBirthData={faltamDadosNatais}

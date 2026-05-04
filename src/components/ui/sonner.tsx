@@ -10,7 +10,7 @@ export function Toaster(props: ToasterProps) {
       toastOptions={{
         classNames: {
           toast:
-            "border border-border bg-card text-card-foreground rounded-xl shadow-none",
+            "border border-border bg-card text-card-foreground rounded-md shadow-none",
           title: "font-body text-sm",
           description: "font-body text-sm text-muted-foreground",
         },

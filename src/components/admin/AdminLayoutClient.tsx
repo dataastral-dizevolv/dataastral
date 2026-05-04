@@ -22,7 +22,6 @@ export function AdminLayoutClient({ userName, userEmail, children }: AdminLayout
       <aside className="hidden w-64 shrink-0 border-r border-border md:block">
         <AdminSidebar userName={userName} userEmail={userEmail} />
       </aside>
-      <div className="hidden w-px shrink-0 bg-gradient-to-b from-transparent via-iris-accent/20 to-transparent md:block" />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center gap-3 border-b border-border px-4 md:hidden">

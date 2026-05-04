@@ -50,7 +50,7 @@ export function AdminSidebar({ userName, userEmail, onNavigate }: AdminSidebarPr
   }
 
   return (
-    <aside className="flex h-full w-full flex-col bg-card">
+    <aside className="flex h-full w-full flex-col bg-background">
       <div className="px-5 py-6">
         <Link href="/admin/dashboard" onClick={onNavigate} className="inline-flex items-center gap-2 font-display text-2xl italic tracking-tight text-iris-accent">
           ✦ Iris Admin
@@ -67,10 +67,10 @@ export function AdminSidebar({ userName, userEmail, onNavigate }: AdminSidebarPr
               key={item.href}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 text-sm transition-colors ${
+              className={`flex items-center gap-3 rounded-md border-l-2 px-3 py-2.5 text-sm transition-colors ${
                 ativo
-                  ? "border-l-primary bg-primary/10 text-iris-accent"
-                  : "border-l-transparent text-iris-secondary hover:bg-muted/30 hover:text-foreground"
+                  ? "border-l-primary font-medium text-foreground"
+                  : "border-l-transparent text-iris-secondary hover:text-foreground"
               }`}
             >
               <Icone size={20} weight="thin" />
@@ -81,12 +81,12 @@ export function AdminSidebar({ userName, userEmail, onNavigate }: AdminSidebarPr
       </nav>
 
       <div className="mt-auto px-3 pb-4">
-        <div className="mb-4 h-px w-full bg-gradient-to-r from-iris-accent/30 via-border to-transparent" />
-        <div className="mb-3 rounded-xl border border-iris-accent/25 p-3">
+        <div className="mb-4 h-px w-full bg-border/80" />
+        <div className="mb-3 rounded-md border border-border p-3">
           <p className="font-mono-iris text-[0.6rem] uppercase tracking-widest text-iris-accent">Área Restrita</p>
           <p className="mt-1 text-sm text-foreground">Administração central do motor e usuários.</p>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border border-border p-3">
+        <div className="flex items-center gap-3 rounded-md border border-border p-3">
           <Avatar>
             <AvatarFallback className="bg-muted text-foreground">{getIniciais(userName)}</AvatarFallback>
           </Avatar>

@@ -1,9 +1,9 @@
-import { QUESTIONS } from "@/lib/calculator-data";
 import { Button } from "@/components/ui/button";
-import type { ThemeId } from "@/types/calculator";
 
 interface StepQuestionProps {
-  selectedTheme: ThemeId;
+  questions: string[];
+  loading: boolean;
+  loadError: string | null;
   selectedQuestion: string | null;
   onBack: () => void;
   onSelectQuestion: (question: string) => void;
@@ -11,7 +11,9 @@ interface StepQuestionProps {
 }
 
 export function StepQuestion({
-  selectedTheme,
+  questions,
+  loading,
+  loadError,
   selectedQuestion,
   onBack,
   onSelectQuestion,
@@ -28,7 +30,21 @@ export function StepQuestion({
       </div>
 
       <div className="space-y-3">
-        {QUESTIONS[selectedTheme].map((question) => {
+        {loading ? (
+          <div className="space-y-2">
+            <div className="h-11 animate-pulse rounded-xl border border-iris/50 bg-muted/30" />
+            <div className="h-11 animate-pulse rounded-xl border border-iris/50 bg-muted/30" />
+            <div className="h-11 animate-pulse rounded-xl border border-iris/50 bg-muted/30" />
+          </div>
+        ) : null}
+
+        {!loading && loadError ? <p className="text-xs text-amber-300">{loadError}</p> : null}
+
+        {!loading && !loadError && questions.length === 0 ? (
+          <p className="text-xs text-iris-muted">Nenhuma pergunta disponível para este tema no momento.</p>
+        ) : null}
+
+        {!loading && !loadError && questions.map((question) => {
           const selected = selectedQuestion === question;
 
           return (
@@ -45,7 +61,7 @@ export function StepQuestion({
         })}
       </div>
 
-      <Button type="button" disabled={!selectedQuestion} onClick={onContinue} className="w-full font-body text-xs uppercase tracking-wider">
+      <Button type="button" disabled={!selectedQuestion || loading || Boolean(loadError)} onClick={onContinue} className="w-full font-body text-xs uppercase tracking-wider">
         Continuar
       </Button>
     </div>

@@ -41,3 +41,31 @@ export interface AdminDashboardMetrics {
     creditsPercent: number | null;
   };
 }
+
+export type AdminCalculatorQuestionType = "select" | "text" | "checkbox";
+
+export interface AdminCalculatorQuestion {
+  id: number;
+  category: "amor" | "carreira" | "financas" | "saude" | "familia" | "viagens";
+  label: string;
+  fieldName: string;
+  type: AdminCalculatorQuestionType;
+  options: Array<{ value: string; label: string }>;
+  order: number;
+  isRequired: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface AdminCreditPackage {
+  id: string;
+  label: string;
+  credits: number;
+  priceCents: number;
+  stripePriceId: string | null;
+  badge: string | null;
+  isActive: boolean;
+  order: number;
+}

@@ -8,6 +8,7 @@ import os
 import requests
 import math
 import importlib
+import re
 
 try:
     import kerykeion
@@ -851,7 +852,7 @@ def fetch_rules(theme):
         "theme_id": f"eq.{theme}",
         "active": "eq.true",
         "order": "priority.asc,id.asc",
-        "select": "id,theme_id,transit_planet_id,natal_planets,aspect_angle,search_days,orb,template_text,priority,synastry_mode,retrograde_logic,requires_conflict_date",
+        "select": "id,theme_id,transit_planet_id,natal_planets,aspect_angle,search_days,orb,template_text,template_audio,template_whatsapp,priority,synastry_mode,retrograde_logic,requires_conflict_date",
     }
     headers = {
         "apikey": service_role_key,
@@ -887,13 +888,53 @@ def fetch_calendar_rules():
     return response.json()
 
 
+TEMPLATE_KEY_PATTERN = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}")
+TEMPLATE_DYNAMIC_KEY_PATTERN = re.compile(r"^[a-z][a-z0-9_]{1,62}$")
+
+
+def stringify_template_value(value):
+    if value is None:
+        return ""
+
+    if isinstance(value, (list, tuple, set)):
+        parts = [str(item).strip() for item in value if str(item).strip() != ""]
+        return ", ".join(parts)
+
+    return str(value)
+
+
+def build_template_context(body, static_context):
+    context = {**static_context}
+    dynamic_answers = body.get("dynamicAnswers")
+
+    if not isinstance(dynamic_answers, dict):
+        return context
+
+    for key, value in dynamic_answers.items():
+        if not isinstance(key, str):
+            continue
+
+        normalized_key = key.strip()
+        if not TEMPLATE_DYNAMIC_KEY_PATTERN.match(normalized_key):
+            continue
+
+        if normalized_key in context:
+            continue
+
+        context[normalized_key] = stringify_template_value(value)
+
+    return context
+
+
 def render_template(template, context):
-    return (
-        template.replace("{transit_planet}", str(context.get("transit_planet", "")))
-        .replace("{natal_planet}", str(context.get("natal_planet", "")))
-        .replace("{aspect}", str(context.get("aspect", "")))
-        .replace("{aspect_angle}", str(context.get("aspect_angle", "")))
-    )
+    if not isinstance(template, str):
+        return ""
+
+    def replacer(match):
+        key = match.group(1)
+        return stringify_template_value(context.get(key, ""))
+
+    return TEMPLATE_KEY_PATTERN.sub(replacer, template)
 
 
 def parse_birth_date(date_string):
@@ -1068,10 +1109,19 @@ def date_label_to_iso(label):
 
 
 def run_engine(body):
+    gender = body.get("gender")
+    if isinstance(gender, str):
+        gender = gender.strip().lower() or None
+    else:
+        gender = None
+
     rules = fetch_rules(body["theme"])
     if not rules:
         return {
             "prediction": "Este tema ainda não possui regras cadastradas no motor.",
+            "prediction_text": "Este tema ainda não possui regras cadastradas no motor.",
+            "audio_text": "Este tema ainda não possui regras cadastradas no motor.",
+            "whatsapp_text": "Este tema ainda não possui regras cadastradas no motor.",
             "eventDate": "Tema em calibração",
             "eventDateIso": "",
             "code": "NO_RULES_FOR_THEME",
@@ -1132,6 +1182,8 @@ def run_engine(body):
         orb = float(rule.get("orb"))
         search_days = int(rule.get("search_days"))
         template_text = rule.get("template_text", "")
+        template_audio = rule.get("template_audio") or template_text
+        template_whatsapp = rule.get("template_whatsapp") or template_text
 
         if synastry_mode and target_natal is None:
             continue
@@ -1153,8 +1205,8 @@ def run_engine(body):
                 continue
 
             event_date_iso = return_event["dateIso"]
-            prediction = render_template(
-                template_text,
+            template_context = build_template_context(
+                body,
                 {
                     "transit_planet": PLANET_LABELS.get(2, "Mercúrio"),
                     "natal_planet": PLANET_LABELS.get(2, "Mercúrio"),
@@ -1162,9 +1214,24 @@ def run_engine(body):
                     "aspect_angle": 0,
                 },
             )
+            prediction = render_template(
+                template_text,
+                template_context,
+            )
+            audio_text = render_template(
+                template_audio,
+                template_context,
+            )
+            whatsapp_text = render_template(
+                template_whatsapp,
+                template_context,
+            )
 
             return {
                 "prediction": prediction,
+                "prediction_text": prediction,
+                "audio_text": audio_text,
+                "whatsapp_text": whatsapp_text,
                 "eventDate": format_date_label(event_date_iso),
                 "eventDateIso": event_date_iso,
                 "code": "RETROGRADE_RETURN_FOUND",
@@ -1172,6 +1239,9 @@ def run_engine(body):
                 "natalPlanet": PLANET_LABELS.get(2, "Mercúrio"),
                 "aspectAngle": 0,
                 "orbDelta": None,
+                "technicalDetails": {
+                    "gender": gender,
+                },
             }
 
         natal_to_use = target_natal if synastry_mode else user_natal
@@ -1187,8 +1257,8 @@ def run_engine(body):
             continue
 
         event_date_iso = date_label_to_iso(event["data"])
-        prediction = render_template(
-            template_text,
+        template_context = build_template_context(
+            body,
             {
                 "transit_planet": PLANET_LABELS.get(transit_planet_id, f"Planeta {transit_planet_id}"),
                 "natal_planet": event.get("planeta_natal", ""),
@@ -1196,9 +1266,24 @@ def run_engine(body):
                 "aspect_angle": aspect_angle,
             },
         )
+        prediction = render_template(
+            template_text,
+            template_context,
+        )
+        audio_text = render_template(
+            template_audio,
+            template_context,
+        )
+        whatsapp_text = render_template(
+            template_whatsapp,
+            template_context,
+        )
 
         return {
             "prediction": prediction,
+            "prediction_text": prediction,
+            "audio_text": audio_text,
+            "whatsapp_text": whatsapp_text,
             "eventDate": event.get("data", ""),
             "eventDateIso": event_date_iso,
             "code": "ASPECT_FOUND",
@@ -1211,11 +1296,15 @@ def run_engine(body):
                 "natalPlanet": event.get("planeta_natal", ""),
                 "aspectAngle": event.get("aspect_angle"),
                 "orbDelta": event.get("orb_delta"),
+                "gender": gender,
             },
         }
 
     return {
         "prediction": "Tente outra pergunta.",
+        "prediction_text": "Tente outra pergunta.",
+        "audio_text": "Tente outra pergunta.",
+        "whatsapp_text": "Tente outra pergunta.",
         "eventDate": "Nenhum trânsito relevante encontrado.",
         "eventDateIso": "",
         "code": "NO_RELEVANT_ASPECT_FOUND",

@@ -9,7 +9,14 @@ export interface CreditTransactionItem {
 }
 
 export interface BuyCreditsResponse {
-  credits: number;
-  addedCredits: number;
   packageId: string;
+  checkoutUrl: string;
+}
+
+export interface CreditPackageItem {
+  id: string;
+  label: string;
+  credits: number;
+  priceCents: number;
+  badge: string | null;
 }

@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Coins } from "lucide-react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { toast } from "sonner";
 
-import { DASHBOARD_ME_KEY, useDashboardUser } from "@/components/dashboard/DashboardUserContext";
+import { useDashboardUser } from "@/components/dashboard/DashboardUserContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CREDIT_PACKAGES } from "@/lib/credits/packages";
-import type { BuyCreditsResponse, CreditTransactionItem } from "@/types/credits";
+import type { BuyCreditsResponse, CreditPackageItem, CreditTransactionItem } from "@/types/credits";
 
 const CREDIT_TRANSACTIONS_KEY = "/api/credits/transactions?limit=30";
+const CREDIT_PACKAGES_KEY = "/api/credits/packages";
 
 const fetcher = async <T,>(url: string): Promise<T> => {
   const response = await fetch(url, { credentials: "include" });
@@ -36,12 +36,15 @@ function formatTransactionType(type: CreditTransactionItem["type"]) {
 
 export default function FinanceiroPage() {
   const { user } = useDashboardUser();
-  const { mutate } = useSWRConfig();
   const [buyingPackageId, setBuyingPackageId] = useState<string | null>(null);
 
   const { data: transactions, isLoading } = useSWR<CreditTransactionItem[]>(CREDIT_TRANSACTIONS_KEY, fetcher, {
     revalidateOnFocus: true,
     dedupingInterval: 5000,
+  });
+  const { data: creditPackages, isLoading: loadingPackages } = useSWR<CreditPackageItem[]>(CREDIT_PACKAGES_KEY, fetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 10000,
   });
 
   async function handleBuy(packageId: string) {
@@ -57,16 +60,17 @@ export default function FinanceiroPage() {
       const payload = (await response.json()) as BuyCreditsResponse | { error?: string };
 
       if (!response.ok) {
-        toast.error((payload as { error?: string }).error ?? "Falha ao simular compra.");
+        toast.error((payload as { error?: string }).error ?? "Falha ao iniciar compra.");
         return;
       }
 
-      await Promise.all([
-        mutate(DASHBOARD_ME_KEY),
-        mutate(CREDIT_TRANSACTIONS_KEY),
-      ]);
+      const checkoutUrl = (payload as BuyCreditsResponse).checkoutUrl;
+      if (!checkoutUrl) {
+        toast.error("Checkout indisponível no momento.");
+        return;
+      }
 
-      toast.success(`Compra simulada: +${(payload as BuyCreditsResponse).addedCredits} crédito(s).`);
+      window.location.href = checkoutUrl;
     } catch {
       toast.error("Falha de conexão ao processar compra.");
     } finally {
@@ -88,9 +92,10 @@ export default function FinanceiroPage() {
         </Card>
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {CREDIT_PACKAGES.map((item) => {
-            const isPopular = item.id === "popular";
-            const isBestValue = item.id === "value";
+          {(creditPackages ?? []).map((item) => {
+            const normalizedId = item.id.toLowerCase();
+            const isPopular = normalizedId === "popular";
+            const isBestValue = normalizedId === "value";
             const disabled = buyingPackageId !== null;
 
             return (
@@ -110,7 +115,7 @@ export default function FinanceiroPage() {
                     ) : null}
                   </div>
                   <CardTitle className="font-display text-3xl tracking-tight">{item.credits} Crédito{item.credits > 1 ? "s" : ""}</CardTitle>
-                  <CardDescription>{item.savingsLabel ?? "Preço base"}</CardDescription>
+                  <CardDescription>{item.label}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 p-6 pt-0">
                   <p className="text-2xl font-semibold text-foreground">{formatCurrency(item.priceCents)}</p>
@@ -127,6 +132,12 @@ export default function FinanceiroPage() {
               </Card>
             );
           })}
+
+          {!loadingPackages && (creditPackages?.length ?? 0) === 0 ? (
+            <Card className="md:col-span-3">
+              <CardContent className="p-6 text-sm text-muted-foreground">Nenhum pacote ativo no momento.</CardContent>
+            </Card>
+          ) : null}
         </section>
 
         <Card className="border border-border py-0 shadow-none">
