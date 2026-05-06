@@ -76,9 +76,9 @@ export function StepTheme({ selectedTheme, onSelectTheme, onContinue }: StepThem
               type="button"
               variant="outline"
               onClick={() => onSelectTheme(theme.id)}
-              className={`h-auto flex-col gap-2.5 rounded-xl p-4 text-center ${selected ? "border-iris-accent bg-muted shadow-iris-glow" : "border-iris hover:border-iris-accent/50 hover:bg-muted/30"}`}
+              className={`h-auto flex-col gap-2.5 rounded-md p-4 text-center ${selected ? "border-foreground bg-muted text-foreground" : "border-iris hover:border-foreground/40 hover:bg-muted/30"}`}
             >
-              <span className={selected ? "text-iris-accent" : "text-iris-secondary"}>{icon}</span>
+              <span className={selected ? "text-foreground" : "text-iris-secondary"}>{icon}</span>
               <span className={`text-xs leading-tight ${selected ? "text-foreground" : "text-iris-secondary"}`}>{theme.name}</span>
             </Button>
           );

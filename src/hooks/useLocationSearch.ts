@@ -79,24 +79,36 @@ export function useLocationSearch(options?: UseLocationSearchOptions) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(options?.initialLocation ?? null);
 
   useEffect(() => {
-    if (selectedLocation && placeQuery !== selectedLocation.displayName) {
-      setSelectedLocation(null);
+    if (!selectedLocation || placeQuery === selectedLocation.displayName) {
+      return;
     }
+
+    const clearSelectionTimer = window.setTimeout(() => {
+      setSelectedLocation(null);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(clearSelectionTimer);
+    };
   }, [placeQuery, selectedLocation]);
 
   useEffect(() => {
     const query = placeQuery.trim();
 
     if (query.length < 2) {
-      setLocationResults([]);
-      setLocationOpen(false);
-      setLocationLoading(false);
-      return;
+      const resetTimer = window.setTimeout(() => {
+        setLocationResults([]);
+        setLocationOpen(false);
+        setLocationLoading(false);
+      }, 0);
+
+      return () => {
+        window.clearTimeout(resetTimer);
+      };
     }
 
     const controller = new AbortController();
-
-    const timer = setTimeout(async () => {
+    const timer = window.setTimeout(async () => {
       try {
         setLocationLoading(true);
 
@@ -200,7 +212,7 @@ export function useLocationSearch(options?: UseLocationSearchOptions) {
     }, 500);
 
     return () => {
-      clearTimeout(timer);
+      window.clearTimeout(timer);
       controller.abort();
     };
   }, [placeQuery]);

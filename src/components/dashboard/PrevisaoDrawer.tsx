@@ -286,7 +286,7 @@ export function PrevisaoDrawer({
               </div>
             )}
 
-            <div className="space-y-3 rounded-xl border border-iris-accent/30 bg-muted/20 p-4">
+            <div className="space-y-3 border-t border-b border-border py-4">
               <h3 className="font-display text-xl tracking-tight text-foreground">Compartilhar Insight</h3>
               <p className="text-sm text-muted-foreground">Transforme sua previsão em texto, áudio ou PDF com um clique.</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -366,7 +366,6 @@ export function PrevisaoDrawer({
                           <p className="text-sm leading-6 text-muted-foreground">{evento.descricao}</p>
                         </div>
                       </div>
-                      <div className="h-px bg-border" />
                     </div>
                   ))}
                 </div>

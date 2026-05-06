@@ -136,17 +136,11 @@ export default function AdminDashboardPage() {
               <div className="h-72 w-full border border-border p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={signupChartData} margin={{ top: 12, right: 10, left: 0, bottom: 4 }}>
-                    <defs>
-                      <linearGradient id="signupAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(228 82% 62%)" stopOpacity={0.36} />
-                        <stop offset="95%" stopColor="hsl(228 82% 62%)" stopOpacity={0.04} />
-                      </linearGradient>
-                    </defs>
                     <CartesianGrid stroke="hsl(var(--border) / 0.35)" strokeDasharray="2 4" vertical={false} />
                     <XAxis dataKey="label" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} axisLine={false} tickLine={false} />
                     <YAxis allowDecimals={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
                     <Tooltip content={<RangeTooltip metricLabel="Novos Usuários" />} />
-                    <Area type="monotone" dataKey="count" stroke="hsl(228 82% 62%)" fill="url(#signupAreaGradient)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="count" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.14)" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>

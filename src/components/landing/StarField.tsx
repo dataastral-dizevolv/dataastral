@@ -23,7 +23,7 @@ function renderStars(start: number, count: number, minRadius: number, maxRadius:
     const radius = minRadius + (maxRadius - minRadius) * ratio;
     const opacity = minOpacity + (maxOpacity - minOpacity) * (((index * 7) % count) / Math.max(count - 1, 1));
 
-    return <circle key={`star-${start + index}`} cx={x} cy={y} r={radius} fill={`hsl(265 60% 90% / ${opacity.toFixed(3)})`} />;
+    return <circle key={`star-${start + index}`} cx={x} cy={y} r={radius} fill={`hsl(0 0% 90% / ${opacity.toFixed(3)})`} />;
   });
 }
 

@@ -7,7 +7,6 @@ import { Loader2, MapPin, Search } from "lucide-react";
 import { useOptionalDashboardUser } from "@/components/dashboard/DashboardUserContext";
 import { useLocationSearch } from "@/hooks/useLocationSearch";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +50,7 @@ const GENDER_OPTIONS: Array<{ value: GenderOption; label: string }> = [
   { value: "mulher", label: "Mulher" },
   { value: "nao_binario", label: "Nao-binario" },
 ];
+const SHOW_DYNAMIC_QUESTIONS = false;
 
 function pad2(value: number) {
   return String(value).padStart(2, "0");
@@ -138,8 +138,8 @@ function WheelColumn({
   return (
     <div className="relative flex-1">
       <p className="mb-2 text-center font-mono-iris text-[11px] uppercase tracking-wider text-iris-secondary">{title}</p>
-      <div className="pointer-events-none absolute inset-x-1 top-1/2 z-10 h-10 -translate-y-1/2 rounded-xl border border-iris-accent/35 bg-background/40" />
-      <div className="h-44 snap-y snap-mandatory overflow-y-auto rounded-xl border border-iris/50 bg-background/40 p-1 backdrop-blur-sm sm:h-48">
+      <div className="pointer-events-none absolute inset-x-1 top-1/2 z-10 h-10 -translate-y-1/2 rounded-md border border-foreground/20 bg-background/70" />
+      <div className="h-44 snap-y snap-mandatory overflow-y-auto rounded-md border border-iris/50 bg-muted/30 p-1 sm:h-48">
         <div className="h-20" />
         {options.map((option) => {
           const isSelected = option.value === selectedValue;
@@ -264,23 +264,25 @@ export function StepUserData({
       return;
     }
 
-    for (const question of dynamicQuestions) {
-      if (!question.isRequired) {
-        continue;
-      }
+    if (SHOW_DYNAMIC_QUESTIONS) {
+      for (const question of dynamicQuestions) {
+        if (!question.isRequired) {
+          continue;
+        }
 
-      const answer = dynamicAnswers[question.fieldName] ?? (question.type === "checkbox" ? [] : "");
-      if (question.type === "checkbox") {
-        if (!Array.isArray(answer) || answer.length === 0) {
+        const answer = dynamicAnswers[question.fieldName] ?? (question.type === "checkbox" ? [] : "");
+        if (question.type === "checkbox") {
+          if (!Array.isArray(answer) || answer.length === 0) {
+            setFormError(`A pergunta "${question.label}" é obrigatória.`);
+            return;
+          }
+          continue;
+        }
+
+        if (typeof answer !== "string" || answer.trim().length === 0) {
           setFormError(`A pergunta "${question.label}" é obrigatória.`);
           return;
         }
-        continue;
-      }
-
-      if (typeof answer !== "string" || answer.trim().length === 0) {
-        setFormError(`A pergunta "${question.label}" é obrigatória.`);
-        return;
       }
     }
 
@@ -305,9 +307,11 @@ export function StepUserData({
     setLocationError(null);
     const payloadDynamicAnswers: Record<string, DynamicAnswerValue> = {};
 
-    for (const question of dynamicQuestions) {
-      const current = dynamicAnswers[question.fieldName];
-      payloadDynamicAnswers[question.fieldName] = current ?? (question.type === "checkbox" ? [] : "");
+    if (SHOW_DYNAMIC_QUESTIONS) {
+      for (const question of dynamicQuestions) {
+        const current = dynamicAnswers[question.fieldName];
+        payloadDynamicAnswers[question.fieldName] = current ?? (question.type === "checkbox" ? [] : "");
+      }
     }
 
     await onGenerate({
@@ -367,9 +371,9 @@ export function StepUserData({
                   key={option.value}
                   type="button"
                   onClick={() => setGender(option.value)}
-                  className={`min-h-10 rounded-xl border px-3 py-2 text-xs font-body tracking-wide transition-colors ${
+                  className={`min-h-10 rounded-md border px-3 py-2 text-xs font-body tracking-wide transition-colors ${
                     selected
-                      ? "border-iris-accent bg-iris-accent/20 text-foreground"
+                      ? "border-foreground bg-muted text-foreground"
                       : "border-iris bg-muted/70 text-iris-secondary hover:text-foreground"
                   }`}
                 >
@@ -389,7 +393,7 @@ export function StepUserData({
             <button
               type="button"
               onClick={openDateWheel}
-              className="block h-10 w-full rounded-xl border border-iris bg-muted/70 px-3 text-left text-sm text-foreground sm:hidden"
+              className="block h-10 w-full rounded-md border border-iris bg-muted/70 px-3 text-left text-sm text-foreground sm:hidden"
             >
               {formatDateForDisplay(date)}
             </button>
@@ -403,7 +407,7 @@ export function StepUserData({
             <button
               type="button"
               onClick={openTimeWheel}
-              className="block h-10 w-full rounded-xl border border-iris bg-muted/70 px-3 text-left text-sm text-foreground sm:hidden"
+              className="block h-10 w-full rounded-md border border-iris bg-muted/70 px-3 text-left text-sm text-foreground sm:hidden"
             >
               {formatTimeForDisplay(time)}
             </button>
@@ -439,7 +443,7 @@ export function StepUserData({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
-                className="z-30 mt-1 max-h-80 overflow-y-auto rounded-xl border border-iris bg-muted p-1"
+                className="z-30 mt-1 max-h-80 overflow-y-auto rounded-md border border-iris bg-muted p-1"
               >
                 {locationResults.map((locationOption) => (
                   <button
@@ -462,16 +466,16 @@ export function StepUserData({
           {locationError ? <p className="text-[11px] text-red-300">{locationError}</p> : null}
         </div>
 
-        {dynamicQuestionsLoading ? (
-          <div className="space-y-3 rounded-2xl border border-white/20 bg-white/[0.04] p-4 backdrop-blur-md">
+        {SHOW_DYNAMIC_QUESTIONS && dynamicQuestionsLoading ? (
+          <div className="space-y-3 border-b border-iris/40 pb-4">
             <div className="h-4 w-32 animate-pulse rounded bg-muted/40" />
-            <div className="h-10 animate-pulse rounded-xl bg-muted/40" />
-            <div className="h-10 animate-pulse rounded-xl bg-muted/40" />
+            <div className="h-10 animate-pulse rounded-md bg-muted/40" />
+            <div className="h-10 animate-pulse rounded-md bg-muted/40" />
           </div>
         ) : null}
 
-        {!dynamicQuestionsLoading && dynamicQuestions.length > 0 ? (
-          <div className="space-y-4 rounded-2xl border border-white/20 bg-white/[0.04] p-4 backdrop-blur-md">
+        {SHOW_DYNAMIC_QUESTIONS && !dynamicQuestionsLoading && dynamicQuestions.length > 0 ? (
+          <div className="space-y-4 border-b border-iris/40 pb-4">
             <div>
               <p className="mb-1 font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">Personalização</p>
               <p className="text-xs text-iris-muted">Suas respostas ajudam a adaptar o texto final da previsão.</p>
@@ -494,7 +498,7 @@ export function StepUserData({
                       }))
                     }
                     placeholder="Digite sua resposta"
-                    className="rounded-xl border-white/25 bg-white/[0.05] placeholder:text-iris-muted backdrop-blur-sm"
+                    className="rounded-md border-iris bg-muted placeholder:text-iris-muted"
                   />
                 ) : null}
 
@@ -507,7 +511,7 @@ export function StepUserData({
                         [question.fieldName]: event.target.value,
                       }))
                     }
-                    className="h-10 w-full rounded-xl border border-white/25 bg-background px-3 text-sm text-foreground backdrop-blur-sm"
+                    className="h-10 w-full rounded-md border border-iris bg-background px-3 text-sm text-foreground"
                     style={nativeSelectStyle}
                   >
                     <option value="" style={nativeSelectStyle}>Selecione uma opção</option>
@@ -529,7 +533,7 @@ export function StepUserData({
                       return (
                         <label
                           key={`${question.fieldName}-${option.value}`}
-                          className="flex items-center gap-2 rounded-xl border border-amber-100/25 bg-white/[0.05] px-3 py-2 text-sm backdrop-blur-sm"
+                          className="flex items-center gap-2 rounded-md border border-iris bg-muted/40 px-3 py-2 text-sm"
                         >
                           <input
                             type="checkbox"
@@ -559,7 +563,7 @@ export function StepUserData({
           </div>
         ) : null}
 
-        {!dynamicQuestionsLoading && dynamicQuestionsError ? <p className="text-[11px] text-amber-300">{dynamicQuestionsError}</p> : null}
+        {SHOW_DYNAMIC_QUESTIONS && !dynamicQuestionsLoading && dynamicQuestionsError ? <p className="text-[11px] text-amber-300">{dynamicQuestionsError}</p> : null}
 
         <Button type="submit" className="w-full font-body text-xs uppercase tracking-wider">
           Gerar minha previsao
@@ -568,14 +572,12 @@ export function StepUserData({
         {formError ? <p className="text-[11px] text-red-300">{formError}</p> : null}
 
         {submitError ? (
-          <Card className="rounded-xl border-red-500/50 bg-red-500/10">
-            <CardContent className="space-y-3 p-4">
-              <p className="text-sm text-red-200">{submitError}</p>
-              {submitErrorCode === "INSUFFICIENT_CREDITS" ? (
-                <Button className="w-full font-body text-xs uppercase tracking-wider">Comprar creditos</Button>
-              ) : null}
-            </CardContent>
-          </Card>
+          <div className="space-y-3 rounded-md border border-red-500/50 bg-red-500/10 p-4">
+            <p className="text-sm text-red-200">{submitError}</p>
+            {submitErrorCode === "INSUFFICIENT_CREDITS" ? (
+              <Button className="w-full font-body text-xs uppercase tracking-wider">Comprar creditos</Button>
+            ) : null}
+          </div>
         ) : null}
 
         <p className="text-center font-mono-iris text-[11px] text-iris-muted">
@@ -584,7 +586,7 @@ export function StepUserData({
       </form>
 
       <Dialog open={dateWheelOpen} onOpenChange={setDateWheelOpen}>
-        <DialogContent className="max-w-[calc(100%-1rem)] rounded-2xl border border-iris bg-background/95 p-4 backdrop-blur-md sm:max-w-xl sm:p-5" showCloseButton={false}>
+        <DialogContent className="max-w-[calc(100%-1rem)] rounded-md border border-iris bg-background p-4 sm:max-w-xl sm:p-5" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle className="font-display text-base text-foreground">Escolha sua data de nascimento</DialogTitle>
           </DialogHeader>
@@ -632,7 +634,7 @@ export function StepUserData({
       </Dialog>
 
       <Dialog open={timeWheelOpen} onOpenChange={setTimeWheelOpen}>
-        <DialogContent className="max-w-[calc(100%-1rem)] rounded-2xl border border-iris bg-background/95 p-4 backdrop-blur-md sm:max-w-md sm:p-5" showCloseButton={false}>
+        <DialogContent className="max-w-[calc(100%-1rem)] rounded-md border border-iris bg-background p-4 sm:max-w-md sm:p-5" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle className="font-display text-base text-foreground">Escolha sua hora de nascimento</DialogTitle>
           </DialogHeader>

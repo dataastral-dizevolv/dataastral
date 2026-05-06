@@ -26,10 +26,10 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-iris-primary/80 border-b border-iris backdrop-blur-xl" : "bg-transparent"
+        scrolled ? "bg-background border-b border-border/70" : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6 lg:px-16">
+      <div className="flex h-16 w-full items-center justify-between px-6 lg:px-16">
         <a href="#" className="font-display text-xl italic tracking-tight text-iris-accent">
           DATA ASTRAL
         </a>
@@ -60,7 +60,7 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 border-b border-iris bg-iris-secondary px-6 py-6 md:hidden"
+          className="flex flex-col gap-4 border-b border-border/70 bg-background px-6 py-6 md:hidden"
         >
           {links.map((item) => (
             <a

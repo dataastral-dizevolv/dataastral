@@ -122,8 +122,13 @@ const ZodiacWheel = ({ size = 400, className = "", animate = true }: ZodiacWheel
 
   useEffect(() => {
     if (!animate || isLoading) {
-      setVisiblePlanets(planets.length);
-      return;
+      const syncTimeout = window.setTimeout(() => {
+        setVisiblePlanets(planets.length);
+      }, 0);
+
+      return () => {
+        window.clearTimeout(syncTimeout);
+      };
     }
 
     let nextVisible = 0;
@@ -179,7 +184,7 @@ const ZodiacWheel = ({ size = 400, className = "", animate = true }: ZodiacWheel
         return "hsl(43, 80%, 60%)";
       case "Moon":
       case "Venus":
-        return "hsl(280, 20%, 85%)";
+        return "hsl(0, 0%, 83%)";
       case "Mercury":
         return "hsl(182, 62%, 62%)";
       case "Jupiter":
@@ -187,7 +192,7 @@ const ZodiacWheel = ({ size = 400, className = "", animate = true }: ZodiacWheel
       case "Saturn":
         return "hsl(30, 55%, 48%)";
       case "Pluto":
-        return "hsl(276, 45%, 42%)";
+        return "hsl(220, 8%, 46%)";
       default:
         return "hsl(190, 52%, 60%)";
     }
@@ -244,14 +249,7 @@ const ZodiacWheel = ({ size = 400, className = "", animate = true }: ZodiacWheel
       className={className}
       aria-label="Roda zodiacal"
     >
-      {/* Background gradient */}
-      <defs>
-        <radialGradient id="wheelBg">
-          <stop offset="0%" stopColor="hsl(265, 20%, 11%)" />
-          <stop offset="100%" stopColor="hsl(265, 30%, 5%)" />
-        </radialGradient>
-      </defs>
-      <circle cx={cx} cy={cy} r={outerR} fill="url(#wheelBg)" />
+      <circle cx={cx} cy={cy} r={outerR} fill="hsl(220, 14%, 7%)" />
 
       <g transform={`rotate(${rotationAngle} ${cx} ${cy})`}>
         {/* House lines and numbers */}

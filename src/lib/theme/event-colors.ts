@@ -22,9 +22,9 @@ export const EVENT_TYPE_COLORS: Record<
     activeText: "#0B0B10",
   },
   portal: {
-    primary: "#8E44AD",
-    surface: "#1E0B33",
-    text: "#C084FC",
+    primary: "#6B7280",
+    surface: "#1A1A24",
+    text: "#D1D5DB",
     activeText: "#0B0B10",
   },
   neutro: {

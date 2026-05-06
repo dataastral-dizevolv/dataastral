@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { useDashboardUser } from "@/components/dashboard/DashboardUserContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BuyCreditsResponse, CreditPackageItem, CreditTransactionItem } from "@/types/credits";
 
 const CREDIT_TRANSACTIONS_KEY = "/api/credits/transactions?limit=30";
@@ -70,7 +69,7 @@ export default function FinanceiroPage() {
         return;
       }
 
-      window.location.href = checkoutUrl;
+      window.location.assign(checkoutUrl);
     } catch {
       toast.error("Falha de conexão ao processar compra.");
     } finally {
@@ -80,18 +79,16 @@ export default function FinanceiroPage() {
 
   return (
     <main className="bg-background px-4 py-6 md:px-8 md:py-8">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <Card className="border border-border py-0 shadow-none">
-          <CardHeader className="space-y-2 p-6">
+      <div className="w-full space-y-8">
+        <section className="space-y-2 border-b border-border/70 pb-4">
             <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-accent">Módulo</p>
-            <CardTitle className="font-display text-3xl tracking-tight">Financeiro</CardTitle>
-            <CardDescription>
+            <h1 className="font-display text-3xl tracking-tight">Financeiro</h1>
+            <p className="text-sm text-muted-foreground">
               Saldo atual: <span className="font-semibold text-foreground">{user.credits} crédito(s)</span>
-            </CardDescription>
-          </CardHeader>
-        </Card>
+            </p>
+        </section>
 
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <section className="grid grid-cols-1 gap-4 border-b border-border/70 pb-6 md:grid-cols-3">
           {(creditPackages ?? []).map((item) => {
             const normalizedId = item.id.toLowerCase();
             const isPopular = normalizedId === "popular";
@@ -99,25 +96,25 @@ export default function FinanceiroPage() {
             const disabled = buyingPackageId !== null;
 
             return (
-              <Card
+              <section
                 key={item.id}
-                className={`relative border py-0 shadow-none ${
-                  isBestValue ? "border-emerald-500/50" : isPopular ? "border-iris-accent/50" : "border-border"
+                className={`space-y-4 border-b pb-4 md:pb-5 ${
+                  isBestValue ? "border-emerald-500/50" : isPopular ? "border-iris-accent/50" : "border-border/70"
                 }`}
               >
-                <CardHeader className="space-y-2 p-6">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">Pacote</p>
                     {item.badge ? (
                       <Badge className={isBestValue ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600" : ""}>
                         {item.badge}
                       </Badge>
-                    ) : null}
+                      ) : null}
                   </div>
-                  <CardTitle className="font-display text-3xl tracking-tight">{item.credits} Crédito{item.credits > 1 ? "s" : ""}</CardTitle>
-                  <CardDescription>{item.label}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 p-6 pt-0">
+                  <h2 className="font-display text-3xl tracking-tight">{item.credits} Crédito{item.credits > 1 ? "s" : ""}</h2>
+                  <p className="text-sm text-muted-foreground">{item.label}</p>
+                </div>
+                <div className="space-y-4">
                   <p className="text-2xl font-semibold text-foreground">{formatCurrency(item.priceCents)}</p>
                   <Button
                     type="button"
@@ -128,25 +125,23 @@ export default function FinanceiroPage() {
                   >
                     {buyingPackageId === item.id ? "Processando..." : "Comprar"}
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </section>
             );
           })}
 
           {!loadingPackages && (creditPackages?.length ?? 0) === 0 ? (
-            <Card className="md:col-span-3">
-              <CardContent className="p-6 text-sm text-muted-foreground">Nenhum pacote ativo no momento.</CardContent>
-            </Card>
+            <div className="border-b border-border/70 py-4 text-sm text-muted-foreground md:col-span-3">Nenhum pacote ativo no momento.</div>
           ) : null}
         </section>
 
-        <Card className="border border-border py-0 shadow-none">
-          <CardHeader className="p-6">
-            <CardTitle className="font-display text-2xl tracking-tight">Histórico de Créditos</CardTitle>
-            <CardDescription>Últimas movimentações de compra, uso e bônus.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 p-6 pt-0">
-            {isLoading ? <div className="h-20 animate-pulse rounded-lg bg-muted" /> : null}
+        <section className="space-y-4">
+          <header className="border-b border-border/70 pb-3">
+            <h2 className="font-display text-2xl tracking-tight">Histórico de Créditos</h2>
+            <p className="text-sm text-muted-foreground">Últimas movimentações de compra, uso e bônus.</p>
+          </header>
+          <div className="space-y-3">
+            {isLoading ? <div className="h-20 animate-pulse bg-muted/30" /> : null}
 
             {!isLoading && (transactions?.length ?? 0) === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhuma movimentação registrada ainda.</p>
@@ -156,9 +151,9 @@ export default function FinanceiroPage() {
               const positive = item.amount > 0;
 
               return (
-                <div key={item.id} className="flex items-start justify-between gap-3 rounded-xl border border-border p-3">
+                <div key={item.id} className="flex items-start justify-between gap-3 border-b border-border/70 py-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className={`mt-0.5 rounded-full p-1.5 ${positive ? "bg-emerald-500/10" : "bg-iris-accent/10"}`}>
+                    <div className={`mt-0.5 p-1.5 ${positive ? "bg-emerald-500/10" : "bg-iris-accent/10"}`}>
                       {positive ? (
                         <ArrowDownLeft className="size-4 text-emerald-600" />
                       ) : (
@@ -179,8 +174,8 @@ export default function FinanceiroPage() {
                 </div>
               );
             })}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </div>
     </main>
   );

@@ -7,7 +7,6 @@ import useSWR from "swr";
 import { useDashboardUser } from "@/components/dashboard/DashboardUserContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTodayRelevantEvent } from "@/lib/astrology/ephemerides";
 import { EVENT_TYPE_COLORS } from "@/lib/theme/event-colors";
 import type { EphemerisEvent, PredictionHistoryItem, PredictionHistoryWithCountResponse } from "@/types/dashboard";
@@ -96,57 +95,42 @@ export default function DashboardHomePage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 md:px-8 md:py-8">
-      <section className="space-y-1">
+    <div className="w-full space-y-8 px-4 py-6 md:px-8 md:py-8">
+      <section className="space-y-1 border-b border-border/70 pb-4">
         <h1 className="font-display text-4xl tracking-tight">
           {getSaudacao()}, {user.nome}
         </h1>
         <p className="text-sm text-muted-foreground">Aqui está o resumo do seu dia</p>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {resumoCards.map((item, index) => {
+      <section className="grid grid-cols-1 gap-3 border-b border-border/70 pb-6 sm:grid-cols-2 xl:grid-cols-4">
+        {resumoCards.map((item) => {
           const Icon = item.icon;
           return (
-            <Card
-              key={item.label}
-              className="relative overflow-hidden border border-iris-accent/40 bg-card py-0 shadow-iris-glow"
-            >
-              <div
-                style={{
-                  background: "radial-gradient(ellipse at top right, hsl(265 60% 68% / 0.07), transparent 70%)",
-                }}
-                className="pointer-events-none absolute inset-0 rounded-lg"
-              />
-              <CardContent className="space-y-2 p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">
-                    {item.label}
-                  </p>
-                  <Icon className={`size-4 ${item.iconClassName}`} />
-                </div>
-                <p className="font-display text-2xl tracking-tight text-foreground">
-                  {item.valor}
+            <div key={item.label} className="space-y-2 border-b border-border/70 pb-4 sm:pb-5 xl:border-b-0 xl:border-r xl:pr-4 xl:last:border-r-0">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+                  {item.label}
                 </p>
-              </CardContent>
-            </Card>
+                <Icon className={`size-4 ${item.iconClassName}`} />
+              </div>
+              <p className="font-display text-2xl tracking-tight text-foreground">
+                {item.valor}
+              </p>
+            </div>
           );
         })}
       </section>
 
-      <Card className="relative overflow-hidden border border-iris-accent bg-card py-0 shadow-iris-glow">
-        <CardHeader className="space-y-3 p-5">
-          <div
-            className="pointer-events-none absolute inset-0 rounded-lg"
-            style={{ background: "radial-gradient(ellipse at top right, hsl(265 60% 68% / 0.06), transparent 60%)" }}
-          />
+      <section className="space-y-3 border-b border-border/70 pb-6">
+        <div className="space-y-3">
           <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-accent">
             ✦ Hoje no céu
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="font-display text-3xl tracking-tight">
+            <h2 className="font-display text-3xl tracking-tight">
               {carregandoEventos ? "Carregando efemérides..." : eventoHoje?.titulo ?? "Sem destaque para hoje"}
-            </CardTitle>
+            </h2>
             {eventoHoje ? (
               <Badge
                 style={{
@@ -160,7 +144,7 @@ export default function DashboardHomePage() {
               </Badge>
             ) : null}
           </div>
-          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+          <p className="text-sm leading-6 text-muted-foreground">
             {carregandoEventos
               ? "Estamos processando os aspectos do dia para montar seu panorama astrológico."
               : eventoHoje?.descricao ?? "Sem aspectos relevantes para hoje no seu calendário atual."}
@@ -168,22 +152,22 @@ export default function DashboardHomePage() {
           <Button asChild variant="outline" className="w-fit">
             <Link href="/calendario">Ver no Calendário</Link>
           </Button>
-        </CardHeader>
-      </Card>
+        </div>
+      </section>
 
-      <Card className="border border-iris-accent/35 bg-card py-0 shadow-iris-glow">
-        <CardHeader className="p-5">
-          <CardTitle className="font-display text-2xl tracking-tight">Histórico recente</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 p-5 pt-0">
-          {carregandoHistorico ? <div className="h-16 animate-pulse rounded-md bg-muted" /> : null}
+      <section className="space-y-4 border-b border-border/70 pb-6">
+        <header className="border-b border-border/70 pb-3">
+          <h2 className="font-display text-2xl tracking-tight">Histórico recente</h2>
+        </header>
+        <div className="space-y-3">
+          {carregandoHistorico ? <div className="h-16 animate-pulse bg-muted/30" /> : null}
           {!carregandoHistorico && (historico?.length ?? 0) === 0 ? (
             <p className="text-sm text-muted-foreground">Você ainda não possui previsões salvas.</p>
           ) : null}
           {historico.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg border border-iris-accent/20 p-3 transition-colors hover:border-iris-accent/40 hover:bg-muted/20"
+              className="border-b border-border/70 py-3 transition-colors hover:bg-muted/10"
             >
               <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">
                 {new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.createdAt))}
@@ -191,8 +175,8 @@ export default function DashboardHomePage() {
               <p className="mt-1 text-sm text-foreground">{item.question}</p>
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       <section className="space-y-3">
         <h2 className="font-display text-2xl tracking-tight">Acesso rápido</h2>

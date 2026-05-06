@@ -8,7 +8,6 @@ import { toast } from "sonner";
 
 import { DASHBOARD_ME_KEY, useDashboardUser } from "@/components/dashboard/DashboardUserContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocationSearch } from "@/hooks/useLocationSearch";
@@ -136,21 +135,19 @@ export default function PerfilPage() {
 
   return (
     <main className="bg-background px-4 py-6 md:px-8 md:py-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <Card className="border border-border py-0 shadow-none">
-          <CardHeader className="space-y-2 p-6">
+      <div className="w-full space-y-8">
+        <section className="space-y-2 border-b border-border/70 pb-4">
             <p className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-accent">Módulo</p>
-            <CardTitle className="font-display text-3xl tracking-tight">Perfil</CardTitle>
-            <CardDescription>Configure sua identidade astral para acelerar a calculadora e personalizar o calendário.</CardDescription>
-          </CardHeader>
-        </Card>
+            <h1 className="font-display text-3xl tracking-tight">Perfil</h1>
+            <p className="text-sm text-muted-foreground">Configure sua identidade astral para acelerar a calculadora e personalizar o calendário.</p>
+        </section>
 
         <form onSubmit={handleSave} className="space-y-6">
-          <Card className="border border-border py-0 shadow-none">
-            <CardHeader className="p-6">
-              <CardTitle className="font-display text-2xl tracking-tight">Informações de Conta</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 p-6 pt-0 md:grid-cols-2">
+          <section className="space-y-4 border-b border-border/70 pb-6">
+            <header className="border-b border-border/70 pb-3">
+              <h2 className="font-display text-2xl tracking-tight">Informações de Conta</h2>
+            </header>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="full-name" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
                   Nome
@@ -171,15 +168,15 @@ export default function PerfilPage() {
                 </Label>
                 <Input id="email" type="email" value={user.email} readOnly disabled className="bg-muted" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          <Card className="border border-border py-0 shadow-none">
-            <CardHeader className="p-6">
-              <CardTitle className="font-display text-2xl tracking-tight">Meu Mapa Natal</CardTitle>
-              <CardDescription>Salve seus dados de nascimento para preenchimento automático.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 p-6 pt-0">
+          <section className="space-y-4 border-b border-border/70 pb-6">
+            <header className="space-y-1 border-b border-border/70 pb-3">
+              <h2 className="font-display text-2xl tracking-tight">Meu Mapa Natal</h2>
+              <p className="text-sm text-muted-foreground">Salve seus dados de nascimento para preenchimento automático.</p>
+            </header>
+            <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="birth-date" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
@@ -236,7 +233,7 @@ export default function PerfilPage() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 6 }}
-                      className="z-30 mt-1 max-h-80 overflow-y-auto rounded-xl border border-iris bg-muted p-1"
+                      className="z-30 mt-1 max-h-80 overflow-y-auto border border-iris bg-background p-1"
                     >
                       {locationResults.map((locationOption) => (
                         <button
@@ -246,7 +243,7 @@ export default function PerfilPage() {
                             void handleSelectLocation(locationOption);
                             setLocationError(null);
                           }}
-                          className="flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-background/70"
+                          className="flex w-full items-start gap-2 px-3 py-2 text-left transition-colors hover:bg-muted/10"
                         >
                           <MapPin className="mt-0.5 size-3.5 text-iris-accent" />
                           <span className="text-xs leading-relaxed text-foreground">{locationOption.displayName}</span>
@@ -258,8 +255,8 @@ export default function PerfilPage() {
 
                 {locationError ? <p className="text-[11px] text-red-300">{locationError}</p> : null}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           <div className="flex justify-end">
             <Button type="submit" disabled={saving} className="min-w-44">

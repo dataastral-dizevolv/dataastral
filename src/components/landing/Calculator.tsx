@@ -13,7 +13,6 @@ import { Stepper } from "@/components/calculator/Stepper";
 import { StepTheme } from "@/components/calculator/StepTheme";
 import { StepUserData } from "@/components/calculator/StepUserData";
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
-import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { themeToCategory } from "@/lib/calculator-categories";
 import { createClient } from "@/lib/supabase/client";
@@ -29,9 +28,10 @@ interface PendingPredictionPayload {
 
 interface CalculatorProps {
   context?: "landing" | "app";
+  layout?: "section" | "embedded";
 }
 
-export default function Calculator({ context = "landing" }: CalculatorProps) {
+export default function Calculator({ context = "landing", layout = "section" }: CalculatorProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -109,6 +109,56 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
 
     setSubmitError(null);
     setSubmitErrorCode(null);
+
+    if (!isInApp) {
+      setSelectedTheme(themeToUse);
+      setSelectedQuestion(questionToUse);
+      setState("loading");
+
+      try {
+        const response = await fetch("/api/predict-public", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            theme: themeToUse,
+            question: questionToUse,
+            birthDate: input.date,
+            birthTime: input.time?.trim() ?? "",
+            gender: input.gender ?? null,
+            birthLocation: input.birthLocation,
+            birthTimezone: input.birthTimezone,
+            birthLat: input.birthLat,
+            birthLng: input.birthLng,
+            placeQuery: input.placeQuery,
+            dynamicAnswers: input.dynamicAnswers ?? null,
+          }),
+        });
+
+        const payload = (await response.json()) as PredictSuccessResponse | PredictErrorResponse;
+
+        if (!response.ok) {
+          const errorPayload = payload as PredictErrorResponse;
+          setSubmitError(errorPayload.error || "Não foi possível gerar sua previsão agora. Tente novamente em instantes.");
+          setSubmitErrorCode(errorPayload.code ?? null);
+          setState("flow");
+          setStep(3);
+          return;
+        }
+
+        const successPayload = payload as PredictSuccessResponse;
+        setResultPrediction(successPayload.prediction);
+        setResultEventDate(successPayload.eventDate ?? null);
+        setRemainingCredits(null);
+        setState("result");
+        return;
+      } catch {
+        setSubmitError("Falha de conexão ao gerar a previsão.");
+        setSubmitErrorCode(null);
+        setState("flow");
+        setStep(3);
+        return;
+      }
+    }
 
     const supabase = createClient();
     let user: { id: string } | null = null;
@@ -213,7 +263,7 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
       setState("flow");
       setStep(3);
     }
-  }, [mutate, pathname, router, selectedQuestion, selectedTheme]);
+  }, [isInApp, mutate, pathname, router, selectedQuestion, selectedTheme]);
 
   useEffect(() => {
     const shouldResume = searchParams.get("resumePrediction") === "1";
@@ -364,16 +414,17 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
   }
 
   return (
-    <section id="calculadora" className="bg-background py-24 lg:py-32">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-16">
-        <div className="mb-12 text-center">
-          <p className="eyebrow mb-3">{isInApp ? "CALCULADORA ASTRAL" : "EXPERIMENTE GRATUITAMENTE"}</p>
-          <h2 className="mb-3 font-display text-3xl text-foreground lg:text-4xl">Descubra o que os astros dizem</h2>
-          <p className="mx-auto max-w-md font-body text-iris-secondary">Escolha um tema, faça uma pergunta e receba sua previsão baseada em efemérides reais.</p>
-        </div>
-        <div className="mx-auto max-w-[680px]">
-          <Card className="rounded-2xl border-iris bg-card p-0 shadow-iris-card">
-            <CardContent className="p-6 sm:p-8 lg:p-10">
+    <section id="calculadora" className={layout === "embedded" ? "bg-background" : "bg-background py-24 lg:py-32"}>
+      <div className={layout === "embedded" ? "w-full" : "w-full px-6 lg:px-16"}>
+        {layout === "section" ? (
+          <div className="mb-12 text-center">
+            <p className="eyebrow mb-3">{isInApp ? "CALCULADORA ASTRAL" : "EXPERIMENTE GRATUITAMENTE"}</p>
+            <h2 className="mb-3 font-display text-3xl text-foreground lg:text-4xl">Descubra o que os astros dizem</h2>
+            <p className="font-body text-iris-secondary">Escolha um tema, faça uma pergunta e receba sua previsão baseada em efemérides reais.</p>
+          </div>
+        ) : null}
+        <div className={layout === "embedded" ? "w-full border-b border-border/70 pb-4" : "mx-auto w-full max-w-4xl border-b border-border/70 pb-10"}>
+            <div className={layout === "embedded" ? "p-0" : "p-6 sm:p-8 lg:p-10"}>
               <Stepper currentStep={step} state={state} />
               <AnimatePresence mode="wait">
                 {state === "flow" ? (
@@ -421,13 +472,12 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
                   </motion.div>
                 ) : null}
               </AnimatePresence>
-            </CardContent>
-          </Card>
+            </div>
         </div>
       </div>
 
       <Dialog open={authModalOpen} onOpenChange={setAuthModalOpen}>
-        <DialogContent className="max-w-md rounded-2xl border border-iris bg-card p-6">
+        <DialogContent className="max-w-md border border-iris p-6">
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-foreground">Entre para gerar sua previsão</DialogTitle>
             <DialogDescription className="text-sm text-iris-secondary">
@@ -438,13 +488,13 @@ export default function Calculator({ context = "landing" }: CalculatorProps) {
           <div className="grid gap-3 sm:grid-cols-2">
             <Link
               href={`/login?next=${encodeURIComponent(authNextPath)}`}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-iris px-4 font-body text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-muted"
+              className="inline-flex h-10 items-center justify-center border border-iris px-4 font-body text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-muted"
             >
               Fazer login
             </Link>
             <Link
               href={`/cadastro?next=${encodeURIComponent(authNextPath)}`}
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-foreground px-4 font-body text-xs uppercase tracking-wider text-background transition-opacity hover:opacity-90"
+              className="inline-flex h-10 items-center justify-center bg-foreground px-4 font-body text-xs uppercase tracking-wider text-background transition-opacity hover:opacity-90"
             >
               Criar conta
             </Link>

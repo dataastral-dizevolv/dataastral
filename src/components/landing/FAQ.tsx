@@ -28,15 +28,15 @@ const faqs = [
 export default function FAQ() {
   return (
     <section className="bg-background py-24 lg:py-32">
-      <div className="mx-auto max-w-[680px] px-6 lg:px-16">
-        <h2 className="mb-12 text-center font-display text-3xl text-foreground lg:text-4xl">Perguntas frequentes</h2>
+      <div className="w-full px-6 lg:px-16">
+        <h2 className="mb-12 border-b border-border/70 pb-4 text-center font-display text-3xl text-foreground lg:text-4xl">Perguntas frequentes</h2>
 
         <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((faq, index) => (
             <AccordionItem
               key={index}
               value={`faq-${index}`}
-              className="rounded-xl border border-iris px-5 transition-colors data-[state=open]:border-iris-accent"
+              className="border-b border-iris px-5 transition-colors data-[state=open]:border-iris-accent"
             >
               <AccordionTrigger className="py-4 font-body text-sm text-foreground hover:no-underline">{faq.q}</AccordionTrigger>
               <AccordionContent className="pb-4 font-body text-sm leading-relaxed text-iris-secondary">{faq.a}</AccordionContent>

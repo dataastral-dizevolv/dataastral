@@ -6,7 +6,6 @@ import { motion, useInView } from "framer-motion";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 const plans = [
   {
@@ -43,11 +42,11 @@ export default function Pricing() {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="planos" className="bg-card py-24 lg:py-32">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-16">
-        <h2 className="mb-16 text-center font-display text-3xl text-foreground lg:text-4xl">Escolha seu plano</h2>
+    <section id="planos" className="bg-background py-24 lg:py-32">
+      <div className="w-full px-6 lg:px-16">
+        <h2 className="mb-16 border-b border-border/70 pb-4 text-center font-display text-3xl text-foreground lg:text-4xl">Escolha seu plano</h2>
 
-        <div ref={ref} className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-3">
+        <div ref={ref} className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -55,8 +54,7 @@ export default function Pricing() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: index * 0.12 }}
             >
-              <Card className={`relative h-full ${plan.highlighted ? "border-iris-accent shadow-iris-glow" : "border-iris shadow-iris-card"}`}>
-                <CardContent className="space-y-4 p-7">
+              <div className={`relative h-full space-y-4 border-b pb-7 ${plan.highlighted ? "border-iris-accent" : "border-iris"}`}>
                   {plan.highlighted && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Mais popular</Badge>}
 
                   <p className="font-mono-iris text-[10px] tracking-widest text-iris-secondary">{plan.eyebrow}</p>
@@ -81,8 +79,7 @@ export default function Pricing() {
                   >
                     {plan.cta}
                   </Button>
-                </CardContent>
-              </Card>
+              </div>
             </motion.div>
           ))}
         </div>

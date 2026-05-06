@@ -13,7 +13,6 @@ import useSWR from "swr";
 import { FiltroEventos } from "@/components/dashboard/FiltroEventos";
 import { PrevisaoDrawer } from "@/components/dashboard/PrevisaoDrawer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { EVENT_TYPE_COLORS } from "@/lib/theme/event-colors";
 import type { EphemerisEvent, EphemerisEventType, PredictionHistoryItem } from "@/types/dashboard";
 
@@ -246,9 +245,9 @@ export function CalendarioEfemerides() {
         <FiltroEventos filtroAtivo={filtroAtivo} onChange={setFiltroAtivo} />
       </header>
 
-      <Card className="border border-border bg-card p-4 shadow-none">
+      <div className="space-y-4 border-b border-border/70 pb-6">
         {erroEventos ? (
-          <div className="mb-3 rounded-xl border border-border bg-muted/30 p-4">
+          <div className="mb-3 border border-border bg-muted/10 p-4">
             <p className="text-sm text-destructive">
               {faltamDadosNatais
                 ? "Para ver seu calendário personalizado, complete seus dados de nascimento no Perfil."
@@ -310,7 +309,7 @@ export function CalendarioEfemerides() {
             marker.style.height = "6px";
             marker.style.borderRadius = "9999px";
             marker.style.backgroundColor = EVENT_TYPE_COLORS.portal.primary;
-            marker.style.boxShadow = "0 0 0 2px hsl(var(--card))";
+            marker.style.border = "2px solid hsl(var(--background))";
 
             const frame = info.el as HTMLElement;
             frame.style.position = "relative";
@@ -320,7 +319,7 @@ export function CalendarioEfemerides() {
         {carregandoEventos ? (
           <div className="mt-4 h-9 w-56 animate-pulse rounded-md bg-muted" />
         ) : null}
-      </Card>
+      </div>
 
       <PrevisaoDrawer
         aberto={drawerAberto}

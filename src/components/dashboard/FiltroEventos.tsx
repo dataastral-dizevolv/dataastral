@@ -66,7 +66,7 @@ export function FiltroEventos({ filtroAtivo, onChange }: FiltroEventosProps) {
             size="sm"
             onClick={() => onChange(filtro.id)}
             style={style}
-            className={`rounded-full px-4 font-mono-iris text-[0.65rem] uppercase tracking-widest transition-colors ${
+            className={`rounded-sm px-4 font-mono-iris text-[0.65rem] uppercase tracking-widest transition-colors ${
               colorConfig ? "" : ativo ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground bg-transparent"
             }`}
           >

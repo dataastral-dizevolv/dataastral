@@ -7,7 +7,6 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
@@ -127,23 +126,15 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <Card className="relative w-full max-w-md border border-iris-accent bg-iris-secondary/80 py-0 shadow-iris-card backdrop-blur-xl">
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at top right, hsl(var(--iris-accent-glow)), transparent 55%)",
-        }}
-      />
-
-      <CardHeader className="relative gap-4 px-7 pt-7">
+    <section className="w-full max-w-md space-y-6 border-b border-border/70 pb-6">
+      <header className="space-y-2 border-b border-border/70 pb-4">
         <div className="space-y-2">
-          <h1 className="font-display text-3xl tracking-tight text-iris-primary">{content.title}</h1>
-          <p className="text-sm text-iris-secondary">{content.description}</p>
+          <h1 className="font-display text-3xl tracking-tight text-foreground">{content.title}</h1>
+          <p className="text-sm text-muted-foreground">{content.description}</p>
         </div>
-      </CardHeader>
+      </header>
 
-      <CardContent className="relative space-y-5 px-7 pb-7">
+      <div className="space-y-5">
         <Button
           type="button"
           variant="outline"
@@ -157,7 +148,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
         <div className="relative flex items-center justify-center">
           <span className="absolute inset-x-0 h-px bg-border" />
-          <span className="relative bg-iris-secondary px-3 font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
+          <span className="relative bg-background px-3 font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
             ou por email
           </span>
         </div>
@@ -168,7 +159,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               <Label htmlFor="nome" className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
                 Nome completo
               </Label>
-              <Input id="nome" name="nome" required placeholder="Seu nome" className="h-10 rounded-xl" />
+              <Input id="nome" name="nome" required placeholder="Seu nome" className="h-10" />
             </div>
           ) : null}
 
@@ -176,14 +167,14 @@ export function AuthForm({ mode }: AuthFormProps) {
             <Label htmlFor="email" className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
               Email
             </Label>
-            <Input id="email" name="email" type="email" required placeholder="voce@email.com" className="h-10 rounded-xl" />
+            <Input id="email" name="email" type="email" required placeholder="voce@email.com" className="h-10" />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="senha" className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
               Senha
             </Label>
-            <Input id="senha" name="senha" type="password" required placeholder="••••••••" className="h-10 rounded-xl" />
+            <Input id="senha" name="senha" type="password" required placeholder="••••••••" className="h-10" />
           </div>
 
           {mode === "cadastro" ? (
@@ -200,7 +191,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 type="password"
                 required
                 placeholder="Repita a senha"
-                className="h-10 rounded-xl"
+                className="h-10"
               />
             </div>
           ) : null}
@@ -220,7 +211,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             {content.switchAction}
           </Link>
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

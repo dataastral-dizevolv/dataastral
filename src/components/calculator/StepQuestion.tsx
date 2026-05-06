@@ -32,9 +32,9 @@ export function StepQuestion({
       <div className="space-y-3">
         {loading ? (
           <div className="space-y-2">
-            <div className="h-11 animate-pulse rounded-xl border border-iris/50 bg-muted/30" />
-            <div className="h-11 animate-pulse rounded-xl border border-iris/50 bg-muted/30" />
-            <div className="h-11 animate-pulse rounded-xl border border-iris/50 bg-muted/30" />
+            <div className="h-11 animate-pulse rounded-md border border-iris/50 bg-muted/30" />
+            <div className="h-11 animate-pulse rounded-md border border-iris/50 bg-muted/30" />
+            <div className="h-11 animate-pulse rounded-md border border-iris/50 bg-muted/30" />
           </div>
         ) : null}
 
@@ -53,7 +53,7 @@ export function StepQuestion({
               type="button"
               variant="outline"
               onClick={() => onSelectQuestion(question)}
-              className={`h-auto w-full justify-start rounded-xl p-4 text-left ${selected ? "border-iris-accent bg-muted shadow-iris-glow" : "border-iris hover:border-iris-accent/50 hover:bg-muted/30"}`}
+              className={`h-auto w-full justify-start rounded-md p-4 text-left ${selected ? "border-foreground bg-muted text-foreground" : "border-iris hover:border-foreground/40 hover:bg-muted/30"}`}
             >
               <span className={`text-sm leading-relaxed ${selected ? "text-foreground" : "text-iris-secondary"}`}>{question}</span>
             </Button>

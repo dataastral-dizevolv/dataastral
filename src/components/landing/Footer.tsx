@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="border-t border-iris bg-background py-16">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-16">
+      <div className="w-full px-6 lg:px-16">
         <div className="mb-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-3">
             <span className="font-display text-xl italic text-iris-accent">DATA ASTRAL</span>
