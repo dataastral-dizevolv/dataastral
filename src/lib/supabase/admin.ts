@@ -7,7 +7,7 @@ export function createAdminClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!serviceRoleKey) {
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY não foi configurada.");
+    throw new Error("Configuração de serviço indisponível.");
   }
 
   return createClient(supabaseUrl, serviceRoleKey, {

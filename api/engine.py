@@ -52,11 +52,28 @@ AstrologicalSubjectFactory = _resolve_kerykeion_class("AstrologicalSubjectFactor
 ChartDataFactory = _resolve_kerykeion_class("ChartDataFactory")
 ChartDrawer = _resolve_kerykeion_class("ChartDrawer")
 
-load_dotenv()
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+API_DIR = os.path.dirname(os.path.abspath(__file__))
+
+load_dotenv(os.path.join(ROOT_DIR, ".env.local"), override=False)
+load_dotenv(os.path.join(API_DIR, ".env"), override=False)
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 CORS(app)
+
+
+def get_supabase_admin_env():
+    supabase_url = (os.getenv("SUPABASE_URL") or os.getenv("NEXT_PUBLIC_SUPABASE_URL") or "").strip()
+    service_role_key = (os.getenv("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
+
+    if not supabase_url:
+        raise RuntimeError("Missing Supabase URL. Set SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL.")
+
+    if not service_role_key:
+        raise RuntimeError("Missing SUPABASE_SERVICE_ROLE_KEY.")
+
+    return supabase_url, service_role_key
 
 
 def get_julian_day(year, month, day, hour, minute, timezone_str):
@@ -841,11 +858,7 @@ def jd_to_iso(jd):
 
 
 def fetch_rules(theme):
-    supabase_url = os.environ.get("SUPABASE_URL", "").strip()
-    service_role_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
-
-    if not supabase_url or not service_role_key:
-        raise RuntimeError("SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY ausentes")
+    supabase_url, service_role_key = get_supabase_admin_env()
 
     url = f"{supabase_url}/rest/v1/astrology_rules"
     params = {
@@ -865,11 +878,7 @@ def fetch_rules(theme):
 
 
 def fetch_calendar_rules():
-    supabase_url = os.environ.get("SUPABASE_URL", "").strip()
-    service_role_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
-
-    if not supabase_url or not service_role_key:
-        raise RuntimeError("SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY ausentes")
+    supabase_url, service_role_key = get_supabase_admin_env()
 
     url = f"{supabase_url}/rest/v1/astrology_rules"
     params = {

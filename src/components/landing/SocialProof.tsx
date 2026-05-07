@@ -8,19 +8,19 @@ import { Button } from "@/components/ui/button";
 
 const testimonials = [
   {
-    text: "O relatorio mudou como planejo minha empresa. Os dados sao precisos e profissionais.",
+    text: "O relatório mudou como planejo minha empresa. Os dados são precisos e profissionais.",
     name: "Maria C.",
-    location: "Sao Paulo",
+    location: "São Paulo",
     stars: 5,
   },
   {
-    text: "Uso semanalmente para planejar lancamentos. ROI comprovado. Ferramenta essencial.",
+    text: "Uso semanalmente para planejar lançamentos. ROI comprovado. Ferramenta essencial.",
     name: "Ricardo S.",
     location: "Lisboa",
     stars: 5,
   },
   {
-    text: "A precisao das efemerides e impressionante. Finalmente uma ferramenta seria para astrologos.",
+    text: "A precisão das efemérides é impressionante. Finalmente uma ferramenta séria para astrólogos.",
     name: "Ana L.",
     location: "Porto Alegre",
     stars: 5,
@@ -39,7 +39,7 @@ export default function SocialProof() {
             <div className="w-full border-b border-border/70 pb-8">
               <div className="space-y-4">
                 <div className="h-1 w-16 bg-primary" />
-                <h3 className="font-display text-xl text-foreground">RELATORIO NATAL</h3>
+                <h3 className="font-display text-xl text-foreground">RELATÓRIO NATAL</h3>
                 <div className="h-px bg-primary/20" />
                 <div className="space-y-2">
                   <div className="flex gap-3"><div className="h-3 w-3/4 bg-muted" /></div>
@@ -67,7 +67,7 @@ export default function SocialProof() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-8"
           >
-            <h3 className="font-display text-2xl text-foreground">O que dizem nossos usuarios</h3>
+            <h3 className="font-display text-2xl text-foreground">O que dizem nossos usuários</h3>
             {testimonials.map((testimonial, index) => (
               <div key={index} className="space-y-2 border-l-2 border-primary/30 pl-5">
                 <div className="flex gap-0.5">
