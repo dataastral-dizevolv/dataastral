@@ -18,12 +18,12 @@ export default function FinalCTA() {
         animate={inView ? { opacity: 1, y: 0 } : {}}
         className="w-full space-y-6 border-b border-border/70 px-6 pb-8 text-center lg:px-16"
       >
-        <h2 className="font-display text-3xl text-foreground lg:text-4xl">Faça sua primeira pergunta</h2>
+        <h2 className="font-display text-3xl text-foreground lg:text-4xl">Sua leitura pode ser gerada em segundos</h2>
         <p className="font-body text-iris-secondary">
-          Sem cadastro, sem assinatura. Escolha um tema, faça uma pergunta e receba sua previsão em segundos.
+          Volte ao topo, preencha a calculadora e veja o resultado na hora. Gratis nesta fase e sem login.
         </p>
         <Button asChild className="font-body text-xs uppercase tracking-wider">
-          <a href="#calculadora">Fazer minha pergunta agora</a>
+          <a href="#calculadora">Voltar para a calculadora</a>
         </Button>
       </motion.div>
     </section>

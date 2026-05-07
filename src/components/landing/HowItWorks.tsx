@@ -15,7 +15,7 @@ const steps = [
     num: "02",
     icon: HelpCircle,
     title: "Escolha sua pergunta",
-    desc: "Perguntas objetivas e calibradas para resposta astrológica precisa.",
+    desc: "Escreva sua pergunta com clareza para receber uma leitura personalizada.",
   },
   {
     num: "03",
@@ -27,7 +27,7 @@ const steps = [
     num: "04",
     icon: Sparkles,
     title: "Receba sua previsão",
-    desc: "Análise gerada em segundos. Leia online ou baixe o PDF.",
+    desc: "Resultado exibido na hora, na própria página.",
   },
 ];
 

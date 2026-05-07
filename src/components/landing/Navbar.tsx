@@ -5,8 +5,6 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { Button } from "@/components/ui/button";
-
 const links = [
   { label: "Calculadora", href: "#calculadora" },
   { label: "Como funciona", href: "#como-funciona" },
@@ -15,7 +13,6 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const authNext = "/calculadora?resumePrediction=1#calculadora";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -40,15 +37,9 @@ export default function Navbar() {
               {item.label}
             </a>
           ))}
-        </div>
-
-        <div className="hidden items-center gap-3 md:flex">
-          <Button asChild variant="ghost" className="font-body text-sm text-iris-secondary hover:text-foreground">
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild className="font-body text-xs uppercase tracking-wider">
-            <Link href={`/cadastro?next=${encodeURIComponent(authNext)}`}>Comecar Gratis</Link>
-          </Button>
+          <Link href="/login" className="font-body text-sm text-iris-secondary transition-colors hover:text-foreground">
+            Login
+          </Link>
         </div>
 
         <button className="text-foreground md:hidden" onClick={() => setMobileOpen((open) => !open)} aria-label="Menu">
@@ -72,12 +63,9 @@ export default function Navbar() {
               {item.label}
             </a>
           ))}
-          <Button asChild variant="ghost" onClick={() => setMobileOpen(false)} className="font-body text-sm text-iris-secondary hover:text-foreground">
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild onClick={() => setMobileOpen(false)} className="font-body text-xs uppercase tracking-wider">
-            <Link href={`/cadastro?next=${encodeURIComponent(authNext)}`}>Comecar Gratis</Link>
-          </Button>
+          <Link href="/login" onClick={() => setMobileOpen(false)} className="font-body text-sm text-iris-secondary hover:text-foreground">
+            Login
+          </Link>
         </motion.div>
       )}
     </nav>

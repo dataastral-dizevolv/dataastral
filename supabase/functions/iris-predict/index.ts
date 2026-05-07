@@ -465,9 +465,9 @@ async function runEngine(
     requestId,
     theme: body.theme,
     questionLength: body.question.length,
-    birthDate: body.birthDate,
-    birthTime: body.birthTime ?? "",
-    birthTimezone: body.birthTimezone ?? "",
+    hasBirthDate: Boolean(body.birthDate?.trim()),
+    hasBirthTime: Boolean(body.birthTime?.trim()),
+    hasBirthTimezone: Boolean(body.birthTimezone?.trim()),
     hasSynastryTarget: Boolean(body.targetBirthDate?.trim()),
     hasConflictDate: Boolean(body.conflictDate?.trim()),
   });
@@ -628,9 +628,9 @@ Deno.serve(async (request: Request) => {
     requestId,
     theme: body.theme,
     questionLength: body.question?.trim().length ?? 0,
-    birthDate: body.birthDate,
-    birthTime: body.birthTime ?? "",
-    birthTimezone: body.birthTimezone ?? "",
+    hasBirthDate: Boolean(body.birthDate?.trim()),
+    hasBirthTime: Boolean(body.birthTime?.trim()),
+    hasBirthTimezone: Boolean(body.birthTimezone?.trim()),
     hasSynastryTarget: Boolean(body.targetBirthDate?.trim()),
     hasConflictDate: Boolean(body.conflictDate?.trim()),
   });
@@ -659,8 +659,12 @@ Deno.serve(async (request: Request) => {
     return new Response(JSON.stringify({ ...result, requestId }), { status: 200, headers: { "Content-Type": "application/json" } });
   } catch (error) {
     const code = error instanceof IrisEngineError ? error.code : "ENGINE_UNKNOWN";
-    const details = error instanceof Error ? error.message : String(error);
-    console.error("[iris-predict] Engine execution failed", { requestId, code, details });
-    return new Response(JSON.stringify({ error: "Falha no motor astrológico.", code, details, requestId }), { status: 500, headers: { "Content-Type": "application/json" } });
+    console.error("[iris-predict] Engine execution failed", {
+      requestId,
+      code,
+      operation: "runEngine",
+      hasErrorObject: error instanceof Error,
+    });
+    return new Response(JSON.stringify({ error: "Falha no motor astrológico.", code, requestId }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
 });

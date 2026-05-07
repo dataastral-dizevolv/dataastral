@@ -39,7 +39,55 @@ const copyByMode = {
 const AUTH_MESSAGES = {
   loginFailed: "Não foi possível entrar. Verifique suas credenciais e tente novamente.",
   signupFailed: "Não foi possível criar sua conta agora. Tente novamente em instantes.",
+  googleFailed: "Não foi possível entrar com Google. Tente novamente.",
 };
+
+function getSafeRedirectPath(rawNext: string | null) {
+  if (!rawNext) {
+    return "/dashboard";
+  }
+
+  const value = rawNext.trim();
+
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) {
+    return "/dashboard";
+  }
+
+  try {
+    const url = new URL(value, window.location.origin);
+
+    if (url.origin !== window.location.origin) {
+      return "/dashboard";
+    }
+
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/dashboard";
+  }
+}
+
+function GoogleIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21.35 11.1H12v2.98h5.33c-.23 1.5-1.07 2.77-2.28 3.62v2.4h3.69c2.16-1.99 3.41-4.93 3.41-8.1 0-.69-.06-1.36-.18-2.01Z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 22c2.7 0 4.97-.9 6.63-2.44l-3.69-2.4c-1.03.69-2.35 1.1-3.94 1.1-3.03 0-5.6-2.05-6.52-4.8H.67v2.48A9.996 9.996 0 0 0 12 22Z"
+        fill="#34A853"
+      />
+      <path
+        d="M4.48 13.46A5.997 5.997 0 0 1 4.14 12c0-.51.09-1 .24-1.46V8.06H.67A9.996 9.996 0 0 0 0 12c0 1.61.39 3.14 1.08 4.46l3.4-2.99Z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M12 5.75c1.47 0 2.8.51 3.84 1.5l2.88-2.88C16.97 2.75 14.7 2 12 2 8.07 2 4.67 4.24 2.98 7.54l3.71 2.98c.92-2.76 3.49-4.77 5.31-4.77Z"
+        fill="#EA4335"
+      />
+    </svg>
+  );
+}
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
@@ -73,7 +121,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
 
     const nextPath = new URLSearchParams(window.location.search).get("next");
-    const redirectTo = nextPath?.startsWith("/") ? nextPath : "/dashboard";
+    const redirectTo = getSafeRedirectPath(nextPath);
 
     if (mode === "login") {
       const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -120,9 +168,24 @@ export function AuthForm({ mode }: AuthFormProps) {
     setLoading(false);
   }
 
-  function handleGoogleMock() {
+  async function handleGoogleAuth() {
     setError(null);
-    toast("Login com Google será habilitado em breve.");
+    setLoading(true);
+    const supabase = createClient();
+    const nextPath = new URLSearchParams(window.location.search).get("next");
+    const redirectTo = getSafeRedirectPath(nextPath);
+
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+      },
+    });
+
+    if (oauthError) {
+      setError(AUTH_MESSAGES.googleFailed);
+      setLoading(false);
+    }
   }
 
   return (
@@ -139,17 +202,17 @@ export function AuthForm({ mode }: AuthFormProps) {
           type="button"
           variant="outline"
           className="h-10 w-full border-iris-accent bg-transparent font-body text-sm"
-          onClick={handleGoogleMock}
+          onClick={handleGoogleAuth}
           disabled={loading}
         >
-          {loading ? <Loader2 className="size-4 animate-spin" /> : null}
-          Continuar com Google
+          {loading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+          {mode === "login" ? "Entrar com Google" : "Continuar com Google"}
         </Button>
 
         <div className="relative flex items-center justify-center">
           <span className="absolute inset-x-0 h-px bg-border" />
           <span className="relative bg-background px-3 font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
-            ou por email
+            ou continue com email
           </span>
         </div>
 

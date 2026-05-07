@@ -425,6 +425,9 @@ export default function Calculator({ context = "landing", layout = "section" }: 
         ) : null}
         <div className={layout === "embedded" ? "w-full border-b border-border/70 pb-4" : "mx-auto w-full max-w-4xl border-b border-border/70 pb-10"}>
             <div className={layout === "embedded" ? "p-0" : "p-6 sm:p-8 lg:p-10"}>
+              {layout === "embedded" ? (
+                <p className="mb-4 font-body text-sm text-iris-secondary">Gratis nesta fase. Sem login. Resultado gerado na hora.</p>
+              ) : null}
               <Stepper currentStep={step} state={state} />
               <AnimatePresence mode="wait">
                 {state === "flow" ? (

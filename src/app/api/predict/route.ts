@@ -72,6 +72,23 @@ const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "famil
 const AUTH_REQUIRED_ERROR = "Entre na sua conta para continuar.";
 const INSUFFICIENT_CREDITS_ERROR = "Você não possui créditos suficientes para gerar esta previsão.";
 
+function sanitizeErrorCode(value: string | undefined, fallback: string) {
+  if (!value) {
+    return fallback;
+  }
+
+  const normalized = value.trim().toUpperCase();
+  return /^[A-Z0-9_]{2,64}$/.test(normalized) ? normalized : fallback;
+}
+
+function maskUserId(value: string) {
+  if (value.length <= 10) {
+    return "***";
+  }
+
+  return `${value.slice(0, 6)}***${value.slice(-4)}`;
+}
+
 function getFriendlyErrorMessage(code: string, details: string): string {
   const normalizedCode = code.trim().toUpperCase();
   const normalizedDetails = details.trim().toUpperCase();
@@ -174,21 +191,13 @@ export async function POST(request: NextRequest) {
   const birthTime = body.birthTime?.trim() || "";
   const birthTimezone = typeof body.birthTimezone === "string" ? body.birthTimezone.trim() : "";
 
-  console.info("[predict] Incoming request", {
-    requestId,
-    theme,
-    questionLength: question?.length ?? 0,
-    birthDate,
-    birthTime,
-    birthTimezone,
-  });
+  console.info("[predict] Incoming request", { requestId, theme, hasBody: Object.keys(body).length > 0 });
 
   function errorResponse(
     status: number,
     code: string,
     details: string,
     message?: string,
-    extra?: Record<string, unknown>,
   ) {
     const resolvedMessage = message ?? getFriendlyErrorMessage(code, details);
 
@@ -196,17 +205,15 @@ export async function POST(request: NextRequest) {
       requestId,
       status,
       code,
-      details,
-      ...extra,
+      theme,
+      durationMs: Date.now() - requestStartedAtMs,
     });
 
     return NextResponse.json(
       {
         error: resolvedMessage,
         code,
-        details,
         requestId,
-        ...extra,
       },
       { status },
     );
@@ -255,6 +262,7 @@ export async function POST(request: NextRequest) {
   }
 
   const authUser = user;
+  const maskedUserId = maskUserId(authUser.id);
 
   let adminClient: ReturnType<typeof createAdminClient> | null = null;
   try {
@@ -274,7 +282,11 @@ export async function POST(request: NextRequest) {
   async function writeAuditLog(input: {
     success: boolean;
     engineCode: string;
-    technicalDetails?: Record<string, unknown>;
+    status: number;
+    code: string;
+    engineStatus: "ok" | "failed" | "cache";
+    hasResponse: boolean;
+    responseSize: number;
   }) {
     if (!adminClient) {
       return;
@@ -286,14 +298,18 @@ export async function POST(request: NextRequest) {
       const { error: auditError } = await serviceClient.from("engine_audit_logs").insert({
         user_id: authUser.id,
         theme,
-        question,
+        question: null,
         success: input.success,
         engine_code: input.engineCode,
         execution_time_ms: executionTimeMs,
         technical_details: {
+          status: input.status,
+          code: input.code,
           requestId,
-          cache: false,
-          ...(input.technicalDetails ?? {}),
+          durationMs: executionTimeMs,
+          engineStatus: input.engineStatus,
+          hasResponse: input.hasResponse,
+          responseSize: input.responseSize,
         },
       });
 
@@ -301,13 +317,13 @@ export async function POST(request: NextRequest) {
         console.error("[predict] Failed to insert engine audit log", {
           requestId,
           code: auditError.code,
-          message: auditError.message,
+          userId: maskedUserId,
         });
       }
-    } catch (unexpectedError) {
+    } catch {
       console.error("[predict] Unexpected audit logging failure", {
         requestId,
-        details: unexpectedError instanceof Error ? unexpectedError.message : String(unexpectedError),
+        userId: maskedUserId,
       });
     }
   }
@@ -330,7 +346,7 @@ export async function POST(request: NextRequest) {
     console.error("[predict] Failed to check cache", {
       requestId,
       code: cacheError.code,
-      message: cacheError.message,
+      userId: maskedUserId,
     });
   }
 
@@ -349,10 +365,11 @@ export async function POST(request: NextRequest) {
     await writeAuditLog({
       success: true,
       engineCode: "CACHE_HIT",
-      technicalDetails: {
-        cache: true,
-        source: "user_predictions",
-      },
+      status: 200,
+      code: "CACHE_HIT",
+      engineStatus: "cache",
+      hasResponse: true,
+      responseSize: cachedPrediction.prediction_text.length,
     });
 
     const response = NextResponse.json({
@@ -380,11 +397,11 @@ export async function POST(request: NextRequest) {
     await writeAuditLog({
       success: false,
       engineCode: "INSUFFICIENT_CREDITS",
-      technicalDetails: {
-        cache: false,
-        stage: "precheck",
-        remainingCredits: creditsBeforeExecution,
-      },
+      status: 402,
+      code: "INSUFFICIENT_CREDITS",
+      engineStatus: "failed",
+      hasResponse: false,
+      responseSize: 0,
     });
 
     return NextResponse.json(
@@ -414,9 +431,10 @@ export async function POST(request: NextRequest) {
       : {}),
   };
 
-  console.info("[predict] Sending payload to edge", {
+  console.info("[predict] Sending request to engine", {
     requestId,
-    payload: edgeRequestPayload,
+    theme,
+    userId: maskedUserId,
   });
 
   const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000"}/api/engine`;
@@ -429,7 +447,9 @@ export async function POST(request: NextRequest) {
     dateIso: string;
     code?: string;
   };
-  let enginePayloadForAudit: Record<string, unknown> | null = null;
+  let engineResponseSize = 0;
+  let engineResponseReceived = false;
+  let engineHttpStatus: number | null = null;
 
   try {
     const edgeResponse = await fetch(engineUrl, {
@@ -442,6 +462,9 @@ export async function POST(request: NextRequest) {
     });
 
     const rawEdgeResponse = await edgeResponse.text();
+    engineResponseReceived = rawEdgeResponse.length > 0;
+    engineResponseSize = rawEdgeResponse.length;
+    engineHttpStatus = edgeResponse.status;
     let edgePayload: EngineFunctionSuccessResponse | EngineFunctionErrorResponse = {};
 
     try {
@@ -450,20 +473,22 @@ export async function POST(request: NextRequest) {
       edgePayload = {};
     }
 
-    console.info("[predict] Raw edge response", {
-      requestId,
-      status: edgeResponse.status,
-      ok: edgeResponse.ok,
-      rawEdgeResponse,
-    });
-
-    if (edgePayload && typeof edgePayload === "object") {
-      enginePayloadForAudit = edgePayload as Record<string, unknown>;
-    }
+    console.info("[predict] Engine response metadata", { requestId, status: edgeResponse.status, responseSize: rawEdgeResponse.length, ok: edgeResponse.ok });
 
     if (!edgeResponse.ok) {
       const edgeErrorPayload = edgePayload as EngineFunctionErrorResponse;
-      throw new Error(`${edgeErrorPayload.code ?? "PREDICTION_ENGINE_FAILED"}: ${edgeErrorPayload.error ?? "Falha no motor astrológico (edge function)."}`);
+      const code = sanitizeErrorCode(edgeErrorPayload.code, "PREDICTION_ENGINE_FAILED");
+      await writeAuditLog({
+        success: false,
+        engineCode: code,
+        status: 500,
+        code,
+        engineStatus: "failed",
+        hasResponse: engineResponseReceived,
+        responseSize: engineResponseSize,
+      });
+
+      return errorResponse(500, code, "ENGINE_HTTP_ERROR");
     }
 
     const edgeSuccessPayload = edgePayload as EngineFunctionSuccessResponse;
@@ -484,24 +509,28 @@ export async function POST(request: NextRequest) {
       dateIso: edgeSuccessPayload.eventDateIso,
       code: edgeSuccessPayload.code,
     };
-  } catch (error) {
-    const details = error instanceof Error ? error.message : String(error);
-    const [codeFromDetails] = details.split(":");
-    const code = codeFromDetails && codeFromDetails.length > 0 ? codeFromDetails : "PREDICTION_ENGINE_FAILED";
+  } catch {
+    const code = "PREDICTION_ENGINE_FAILED";
 
     await writeAuditLog({
       success: false,
       engineCode: code,
-      technicalDetails: {
-        cache: false,
-        stage: "engine",
-        details,
-        enginePayload: enginePayloadForAudit,
-        creditsDebited: false,
-      },
+      status: 500,
+      code,
+      engineStatus: "failed",
+      hasResponse: engineResponseReceived,
+      responseSize: engineResponseSize,
     });
 
-    return errorResponse(500, code, details);
+    console.error("[predict] Engine request failed", {
+      requestId,
+      userId: maskedUserId,
+      theme,
+      engineStatus: engineHttpStatus,
+      durationMs: Date.now() - requestStartedAtMs,
+    });
+
+    return errorResponse(500, code, "ENGINE_REQUEST_FAILED");
   }
 
   const interpretedPrediction = enginePrediction.predictionText;
@@ -523,13 +552,11 @@ export async function POST(request: NextRequest) {
     await writeAuditLog({
       success: false,
       engineCode: "PREDICTION_PERSIST_FAILED",
-      technicalDetails: {
-        cache: false,
-        stage: "user_predictions",
-        details: `${insertPredictionError.code ?? "NO_CODE"} ${insertPredictionError.message}`,
-        enginePayload: enginePayloadForAudit,
-        creditsDebited: false,
-      },
+      status: 500,
+      code: "PREDICTION_PERSIST_FAILED",
+      engineStatus: "ok",
+      hasResponse: true,
+      responseSize: engineResponseSize,
     });
 
     return errorResponse(
@@ -559,14 +586,11 @@ export async function POST(request: NextRequest) {
     await writeAuditLog({
       success: false,
       engineCode: "PREDICTION_PERSIST_FAILED",
-      technicalDetails: {
-        cache: false,
-        stage: "user_prediction_history",
-        details: `${insertHistoryError.code ?? "NO_CODE"} ${insertHistoryError.message}`,
-        enginePayload: enginePayloadForAudit,
-        rollbackPredictionId: insertedPrediction.id,
-        creditsDebited: false,
-      },
+      status: 500,
+      code: "PREDICTION_PERSIST_FAILED",
+      engineStatus: "ok",
+      hasResponse: true,
+      responseSize: engineResponseSize,
     });
 
     return errorResponse(
@@ -586,24 +610,17 @@ export async function POST(request: NextRequest) {
       serviceClient.from("user_predictions").delete().eq("id", insertedPrediction.id).eq("user_id", authUser.id),
       serviceClient.from("user_prediction_history").delete().eq("id", insertedHistory.id).eq("user_id", authUser.id),
     ]);
-    const rollbackPredictionError = rollbackResults[0].error;
-    const rollbackHistoryError = rollbackResults[1].error;
+    void rollbackResults;
     const remainingCredits = await getRemainingCredits();
 
     await writeAuditLog({
       success: false,
       engineCode: debitError ? "CREDIT_DEBIT_FAILED" : "INSUFFICIENT_CREDITS",
-      technicalDetails: {
-        cache: false,
-        stage: "credit_confirmation",
-        debitErrorCode: debitError?.code ?? "NO_CODE",
-        debitErrorMessage: debitError?.message ?? null,
-        remainingCredits,
-        rollbackPredictionId: insertedPrediction.id,
-        rollbackHistoryId: insertedHistory.id,
-        rollbackPredictionError: rollbackPredictionError ? `${rollbackPredictionError.code ?? "NO_CODE"} ${rollbackPredictionError.message}` : null,
-        rollbackHistoryError: rollbackHistoryError ? `${rollbackHistoryError.code ?? "NO_CODE"} ${rollbackHistoryError.message}` : null,
-      },
+      status: debitError ? 500 : 402,
+      code: debitError ? "CREDIT_DEBIT_FAILED" : "INSUFFICIENT_CREDITS",
+      engineStatus: "ok",
+      hasResponse: true,
+      responseSize: engineResponseSize,
     });
 
     if (remainingAfterDebit === null) {
@@ -623,7 +640,6 @@ export async function POST(request: NextRequest) {
       "CREDIT_DEBIT_FAILED",
       `consume_profile_credit falhou: ${debitError?.code ?? "NO_CODE"} ${debitError?.message ?? "erro desconhecido"}`,
       "Falha ao confirmar consumo de crédito.",
-      { remainingCredits },
     );
   }
 
@@ -648,19 +664,11 @@ export async function POST(request: NextRequest) {
   await writeAuditLog({
     success: true,
     engineCode: enginePrediction.code ?? "ASPECT_FOUND",
-    technicalDetails: {
-      cache: false,
-      stage: "completed",
-      creditsDebited: true,
-      remainingCredits: remainingAfterDebit,
-      predictionId: insertedPrediction.id,
-      historyId: insertedHistory.id,
-      enginePayload: enginePayloadForAudit,
-      transitPlanet: enginePayloadForAudit?.transitPlanet,
-      natalPlanet: enginePayloadForAudit?.natalPlanet,
-      orbDelta: enginePayloadForAudit?.orbDelta,
-      aspectAngle: enginePayloadForAudit?.aspectAngle,
-    },
+    status: 200,
+    code: enginePrediction.code ?? "ASPECT_FOUND",
+    engineStatus: "ok",
+    hasResponse: true,
+    responseSize: engineResponseSize,
   });
 
   return response;
