@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
@@ -11,21 +11,10 @@ const links = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <nav
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-background border-b border-border/70" : "bg-transparent"
-      }`}
-    >
+    <nav className="sticky inset-x-0 top-0 z-50 border-b border-border/70 bg-background">
       <div className="flex h-16 w-full items-center justify-between px-6 lg:px-16">
         <a href="#" className="font-display text-xl italic tracking-tight text-iris-accent">
           DATA ASTRAL

@@ -11,7 +11,7 @@ export default function HeroSection() {
   return (
     <section className="relative flex min-h-[64vh] items-center overflow-hidden bg-background lg:min-h-[68vh]">
       <StarField />
-      <div className="relative z-10 grid w-full grid-cols-1 items-start gap-5 border-b border-border/70 px-6 pt-20 pb-6 lg:grid-cols-12 lg:gap-7 lg:px-16 lg:pt-16 lg:pb-6">
+      <div className="relative z-10 grid w-full grid-cols-1 items-start gap-5 border-b border-border/70 px-6 pt-20 pb-6 lg:grid-cols-12 lg:gap-7 lg:px-16 lg:pt-20 lg:pb-6">
         <div className="space-y-4 lg:col-span-5 lg:pt-1">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}

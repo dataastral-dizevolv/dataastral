@@ -414,7 +414,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
   }
 
   return (
-    <section id="calculadora" className={layout === "embedded" ? "bg-background" : "bg-background py-24 lg:py-32"}>
+    <section id="calculadora" className={layout === "embedded" ? "scroll-mt-24 bg-background" : "scroll-mt-24 bg-background py-24 lg:py-32"}>
       <div className={layout === "embedded" ? "w-full" : "w-full px-6 lg:px-16"}>
         {layout === "section" ? (
           <div className="mb-12 text-center">
