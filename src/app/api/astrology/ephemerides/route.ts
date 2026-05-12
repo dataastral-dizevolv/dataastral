@@ -13,6 +13,7 @@ interface EphemeridesError {
 }
 
 export async function GET(request: NextRequest) {
+  const requestId = crypto.randomUUID();
   const supabase = await createClient();
   const {
     data: { user },
@@ -60,27 +61,49 @@ export async function GET(request: NextRequest) {
 
   const pythonBaseUrl = process.env.PYTHON_ENGINE_URL?.replace(/\/api\/engine$/, "") ??
     (process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000");
+  const internalEngineToken = process.env.ENGINE_INTERNAL_TOKEN?.trim() || "";
+  const isProduction = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
 
-  const response = await fetch(`${pythonBaseUrl}/api/ephemerides`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      year,
-      month,
-      birthDate: profile.birth_date,
-      birthTime: profile.birth_time,
-      birthTimezone: profile.birth_timezone,
-    }),
-  });
+  if (isProduction && !internalEngineToken) {
+    return NextResponse.json(
+      { error: "Serviço temporariamente indisponível.", code: "ENGINE_NOT_CONFIGURED", requestId },
+      { status: 500 },
+    );
+  }
+
+  let response: Response;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20_000);
+    response = await fetch(`${pythonBaseUrl}/api/ephemerides`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-request-id": requestId,
+        "x-internal-engine-token": internalEngineToken,
+      },
+      body: JSON.stringify({
+        year,
+        month,
+        birthDate: profile.birth_date,
+        birthTime: profile.birth_time,
+        birthTimezone: profile.birth_timezone,
+      }),
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
+  } catch (error) {
+    const code = error instanceof Error && error.name === "AbortError" ? "ENGINE_TIMEOUT" : "EPHEMERIDES_FAILED";
+    return NextResponse.json(
+      { error: "Falha ao calcular efemérides.", code, requestId },
+      { status: 500 },
+    );
+  }
 
   const payload = (await response.json().catch(() => ({}))) as EphemeridesResponse | EphemeridesError;
 
   if (!response.ok) {
-    const errorPayload = payload as EphemeridesError;
     return NextResponse.json(
-      { error: errorPayload.error || "Falha ao calcular efemérides.", code: errorPayload.code ?? "EPHEMERIDES_FAILED" },
+      { error: "Falha ao calcular efemérides.", code: "EPHEMERIDES_FAILED", requestId },
       { status: 500 },
     );
   }

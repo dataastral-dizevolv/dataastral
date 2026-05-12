@@ -7,12 +7,14 @@ import ZodiacWheelSection from "@/components/landing/ZodiacWheelSection";
 import Navbar from "@/components/landing/Navbar";
 import SocialProof from "@/components/landing/SocialProof";
 
+const SHOW_SKY_NOW = false;
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <HeroSection />
-      <ZodiacWheelSection />
+      {SHOW_SKY_NOW ? <ZodiacWheelSection /> : null}
       <HowItWorks />
       <SocialProof />
       <FAQ />

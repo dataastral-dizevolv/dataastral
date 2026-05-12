@@ -38,6 +38,7 @@ const MAX_QUESTION_LENGTH = 300;
 const MAX_LOCATION_LENGTH = 200;
 const MAX_TIMEZONE_LENGTH = 80;
 const MAX_PLACE_QUERY_LENGTH = 200;
+const ENGINE_TIMEOUT_MS = 20_000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 12;
 // TODO: Este rate-limit em memória é por processo/instância.
@@ -184,16 +185,29 @@ export async function POST(request: NextRequest) {
   };
 
   const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000"}/api/engine`;
+  const internalEngineToken = process.env.ENGINE_INTERNAL_TOKEN?.trim() || "";
+  const isProduction = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+
+  if (isProduction && !internalEngineToken) {
+    return NextResponse.json(
+      { error: "Serviço temporariamente indisponível.", code: "ENGINE_NOT_CONFIGURED", requestId },
+      { status: 500 },
+    );
+  }
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), ENGINE_TIMEOUT_MS);
     const edgeResponse = await fetch(engineUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-request-id": requestId,
+        "x-internal-engine-token": internalEngineToken,
       },
       body: JSON.stringify(edgeRequestPayload),
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
 
     const rawEdgeResponse = await edgeResponse.text();
     let edgePayload: EngineFunctionSuccessResponse | EngineFunctionErrorResponse = {};
@@ -206,8 +220,10 @@ export async function POST(request: NextRequest) {
 
     if (!edgeResponse.ok) {
       const code = (edgePayload as EngineFunctionErrorResponse).code ?? "PREDICTION_ENGINE_FAILED";
-      const error = (edgePayload as EngineFunctionErrorResponse).error ?? "Não foi possível gerar sua previsão agora. Tente novamente em instantes.";
-      return NextResponse.json({ error, code, requestId }, { status: 500 });
+      return NextResponse.json(
+        { error: "Não foi possível gerar sua previsão agora. Tente novamente em instantes.", code, requestId },
+        { status: 500 },
+      );
     }
 
     const edgeSuccessPayload = edgePayload as EngineFunctionSuccessResponse;
@@ -234,9 +250,10 @@ export async function POST(request: NextRequest) {
       engineCode: edgeSuccessPayload.code,
       requestId,
     });
-  } catch {
+  } catch (error) {
+    const code = error instanceof Error && error.name === "AbortError" ? "ENGINE_TIMEOUT" : "PREDICTION_ENGINE_FAILED";
     return NextResponse.json(
-      { error: "Falha de conexão ao gerar a previsão.", code: "PREDICTION_ENGINE_FAILED", requestId },
+      { error: "Falha de conexão ao gerar a previsão.", code, requestId },
       { status: 500 },
     );
   }

@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from dotenv import load_dotenv
 import swisseph as swe
 from datetime import datetime, timezone
@@ -9,6 +8,9 @@ import requests
 import math
 import importlib
 import re
+import hmac
+import time
+import uuid
 
 try:
     import kerykeion
@@ -60,7 +62,86 @@ load_dotenv(os.path.join(API_DIR, ".env"), override=False)
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-CORS(app)
+
+
+def _is_production():
+    return os.getenv("VERCEL_ENV") == "production" or os.getenv("NODE_ENV") == "production"
+
+
+def _build_allowed_origins():
+    origins = set()
+    app_url = (os.getenv("APP_URL") or "").strip()
+    public_app_url = (os.getenv("NEXT_PUBLIC_APP_URL") or "").strip()
+    vercel_url = (os.getenv("VERCEL_URL") or "").strip()
+
+    if app_url:
+        origins.add(app_url.rstrip("/"))
+    if public_app_url:
+        origins.add(public_app_url.rstrip("/"))
+    if vercel_url:
+        normalized = vercel_url.replace("https://", "").replace("http://", "").rstrip("/")
+        origins.add(f"https://{normalized}")
+
+    if not _is_production():
+        origins.update({
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:5000",
+            "http://127.0.0.1:5000",
+        })
+
+    return origins
+
+
+ALLOWED_ORIGINS = _build_allowed_origins()
+
+
+@app.after_request
+def apply_cors_headers(response):
+    origin = (request.headers.get("Origin") or "").rstrip("/")
+    if origin and origin in ALLOWED_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, x-request-id, x-internal-engine-token"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+
+@app.before_request
+def handle_options_request():
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+
+def _get_request_id():
+    return (request.headers.get("x-request-id") or "").strip() or str(uuid.uuid4())
+
+
+def _log_engine_event(route, code, status, started_at, request_id):
+    duration_ms = int((time.monotonic() - started_at) * 1000)
+    print({
+        "requestId": request_id,
+        "code": code,
+        "route": route,
+        "status": status,
+        "durationMs": duration_ms,
+    })
+
+
+def _require_internal_token(request_id):
+    configured_token = (os.getenv("ENGINE_INTERNAL_TOKEN") or "").strip()
+    provided_token = (request.headers.get("x-internal-engine-token") or "").strip()
+
+    if _is_production() and not configured_token:
+        return jsonify({"error": "Not found", "code": "NOT_FOUND", "requestId": request_id}), 404
+
+    if not configured_token or not provided_token:
+        return jsonify({"error": "Not found", "code": "NOT_FOUND", "requestId": request_id}), 404
+
+    if not hmac.compare_digest(configured_token, provided_token):
+        return jsonify({"error": "Not found", "code": "NOT_FOUND", "requestId": request_id}), 404
+
+    return None
 
 
 def get_supabase_admin_env():
@@ -1322,30 +1403,62 @@ def run_engine(body):
 
 @app.route('/api/engine', methods=['POST'])
 def handler():
+    started_at = time.monotonic()
+    request_id = _get_request_id()
+    token_failure = _require_internal_token(request_id)
+    if token_failure is not None:
+        _log_engine_event("/api/engine", "NOT_FOUND", 404, started_at, request_id)
+        return token_failure
+
     body = request.get_json() or {}
     try:
         result = run_engine(body)
+        _log_engine_event("/api/engine", "OK", 200, started_at, request_id)
         return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"error": str(e), "code": "ENGINE_ERROR"}), 500
+    except Exception:
+        _log_engine_event("/api/engine", "ENGINE_ERROR", 500, started_at, request_id)
+        return jsonify({"error": "Engine unavailable", "code": "ENGINE_ERROR", "requestId": request_id}), 500
+
+
+@app.route('/api/engine', methods=['GET'])
+def handler_health():
+    return jsonify({"ok": True, "service": "python-engine"}), 200
 
 
 @app.route('/api/ephemerides', methods=['POST'])
 def handler_ephemerides():
+    started_at = time.monotonic()
+    request_id = _get_request_id()
+    token_failure = _require_internal_token(request_id)
+    if token_failure is not None:
+        _log_engine_event("/api/ephemerides", "NOT_FOUND", 404, started_at, request_id)
+        return token_failure
+
     body = request.get_json() or {}
     try:
         result = scan_ephemerides_month(body)
+        _log_engine_event("/api/ephemerides", "OK", 200, started_at, request_id)
         return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"error": str(e), "code": "ENGINE_ERROR"}), 500
+    except Exception:
+        _log_engine_event("/api/ephemerides", "ENGINE_ERROR", 500, started_at, request_id)
+        return jsonify({"error": "Engine unavailable", "code": "ENGINE_ERROR", "requestId": request_id}), 500
 
 
 @app.route('/api/sky-now', methods=['GET'])
 def handler_sky_now():
+    started_at = time.monotonic()
+    request_id = _get_request_id()
+    token_failure = _require_internal_token(request_id)
+    if token_failure is not None:
+        _log_engine_event("/api/sky-now", "NOT_FOUND", 404, started_at, request_id)
+        return token_failure
+
     try:
         lat = _to_float(request.args.get("lat"), SKY_DEFAULT_LAT)
         lon = _to_float(request.args.get("lon"), SKY_DEFAULT_LON)
         result = get_sky_now_data(lat, lon)
+        _log_engine_event("/api/sky-now", "OK", 200, started_at, request_id)
         return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"error": str(e), "code": "SKY_NOW_ERROR"}), 500
+    except Exception:
+        _log_engine_event("/api/sky-now", "SKY_NOW_ERROR", 500, started_at, request_id)
+        return jsonify({"error": "Engine unavailable", "code": "SKY_NOW_ERROR", "requestId": request_id}), 500

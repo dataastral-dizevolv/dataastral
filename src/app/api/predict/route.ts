@@ -71,6 +71,7 @@ interface PredictApiResponse {
 const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
 const AUTH_REQUIRED_ERROR = "Entre na sua conta para continuar.";
 const INSUFFICIENT_CREDITS_ERROR = "Você não possui créditos suficientes para gerar esta previsão.";
+const ENGINE_TIMEOUT_MS = 20_000;
 
 function sanitizeErrorCode(value: string | undefined, fallback: string) {
   if (!value) {
@@ -438,6 +439,12 @@ export async function POST(request: NextRequest) {
   });
 
   const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000"}/api/engine`;
+  const internalEngineToken = process.env.ENGINE_INTERNAL_TOKEN?.trim() || "";
+  const isProduction = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+
+  if (isProduction && !internalEngineToken) {
+    return errorResponse(500, "ENGINE_NOT_CONFIGURED", "ENGINE_INTERNAL_TOKEN ausente em produção.");
+  }
 
   let enginePrediction: {
     predictionText: string;
@@ -452,14 +459,18 @@ export async function POST(request: NextRequest) {
   let engineHttpStatus: number | null = null;
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), ENGINE_TIMEOUT_MS);
     const edgeResponse = await fetch(engineUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-request-id": requestId,
+        "x-internal-engine-token": internalEngineToken,
       },
       body: JSON.stringify(edgeRequestPayload),
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
 
     const rawEdgeResponse = await edgeResponse.text();
     engineResponseReceived = rawEdgeResponse.length > 0;
@@ -509,8 +520,8 @@ export async function POST(request: NextRequest) {
       dateIso: edgeSuccessPayload.eventDateIso,
       code: edgeSuccessPayload.code,
     };
-  } catch {
-    const code = "PREDICTION_ENGINE_FAILED";
+  } catch (error) {
+    const code = error instanceof Error && error.name === "AbortError" ? "ENGINE_TIMEOUT" : "PREDICTION_ENGINE_FAILED";
 
     await writeAuditLog({
       success: false,
