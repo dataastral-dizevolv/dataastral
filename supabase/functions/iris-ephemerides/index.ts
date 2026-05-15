@@ -309,12 +309,11 @@ Deno.serve(async (request: Request) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch {
     return new Response(
       JSON.stringify({
         error: "Falha no cálculo de efemérides.",
         code: "EPHEMERIDES_ENGINE_FAILED",
-        detail: String(error),
       }),
       {
         status: 500,

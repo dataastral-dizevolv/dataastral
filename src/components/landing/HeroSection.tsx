@@ -38,7 +38,7 @@ export default function HeroSection() {
             transition={{ delay: 0.45 }}
             className="font-mono-iris text-xs text-iris-muted"
           >
-            Gratis agora - Sem cadastro - Resultado na hora
+            Grátis agora - Sem cadastro - Resultado na hora
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex flex-wrap gap-3 pt-1">

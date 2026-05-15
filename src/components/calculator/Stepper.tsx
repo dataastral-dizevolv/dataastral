@@ -5,9 +5,10 @@ import type { CalcState, CalcStep } from "@/types/calculator";
 interface StepperProps {
   currentStep: CalcStep;
   state: CalcState;
+  onStepClick?: (step: CalcStep) => void;
 }
 
-export function Stepper({ currentStep, state }: StepperProps) {
+export function Stepper({ currentStep, state, onStepClick }: StepperProps) {
   const steps = [
     { num: 1, label: "Tema" },
     { num: 2, label: "Pergunta" },
@@ -17,23 +18,32 @@ export function Stepper({ currentStep, state }: StepperProps) {
 
   const isComplete = (stepNum: number) => (state === "result" ? stepNum < 4 : state === "loading" ? stepNum <= 3 : stepNum < currentStep);
   const isActive = (stepNum: number) => (state === "flow" ? stepNum === currentStep : stepNum === 4);
+  const isClickable = (stepNum: number) => state === "flow" && stepNum < currentStep;
 
   return (
     <div className="mb-8 flex items-center justify-between">
       {steps.map((step, index) => (
         <div key={step.num} className="flex flex-1 items-center last:flex-none">
           <div className="flex flex-col items-center gap-1.5">
-            <div
+            <button
+              type="button"
+              onClick={() => {
+                if (!onStepClick || !isClickable(step.num)) return;
+                onStepClick(step.num as CalcStep);
+              }}
+              disabled={!isClickable(step.num)}
+              aria-label={`Ir para passo ${step.num}: ${step.label}`}
+              title={isClickable(step.num) ? `Voltar para ${step.label}` : undefined}
               className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-mono-iris transition-all ${
                 isComplete(step.num)
                   ? "bg-muted text-muted-foreground"
                   : isActive(step.num)
                     ? "bg-primary text-primary-foreground"
                     : "border border-iris text-iris-muted"
-              }`}
+              } ${isClickable(step.num) ? "cursor-pointer hover:border-foreground/50 hover:text-foreground" : "cursor-default disabled:opacity-100"}`}
             >
               {isComplete(step.num) ? <Check size={13} /> : step.num}
-            </div>
+            </button>
             <span className={`hidden text-[10px] uppercase tracking-wider sm:block ${isActive(step.num) ? "text-iris-accent" : "text-iris-muted"}`}>
               {step.label}
             </span>

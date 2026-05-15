@@ -12,6 +12,7 @@ import { StepResult } from "@/components/calculator/StepResult";
 import { Stepper } from "@/components/calculator/Stepper";
 import { StepTheme } from "@/components/calculator/StepTheme";
 import { StepUserData } from "@/components/calculator/StepUserData";
+import type { StepUserDataFormState } from "@/components/calculator/StepUserData";
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { themeToCategory } from "@/lib/calculator-categories";
@@ -30,6 +31,18 @@ interface CalculatorProps {
   context?: "landing" | "app";
   layout?: "section" | "embedded";
 }
+
+const INITIAL_USER_DATA_FORM_STATE: StepUserDataFormState = {
+  date: "",
+  time: "",
+  gender: "",
+  placeQuery: "",
+  birthLocation: "",
+  birthTimezone: null,
+  birthLat: null,
+  birthLng: null,
+  dynamicAnswers: {},
+};
 
 export default function Calculator({ context = "landing", layout = "section" }: CalculatorProps) {
   const router = useRouter();
@@ -53,6 +66,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
   const [dynamicQuestions, setDynamicQuestions] = useState<CalculatorQuestion[]>([]);
   const [dynamicQuestionsLoading, setDynamicQuestionsLoading] = useState(false);
   const [dynamicQuestionsError, setDynamicQuestionsError] = useState<string | null>(null);
+  const [userDataFormState, setUserDataFormState] = useState<StepUserDataFormState>(INITIAL_USER_DATA_FORM_STATE);
   const isInApp = context === "app";
 
   function buildAuthNextPath() {
@@ -138,6 +152,16 @@ export default function Calculator({ context = "landing", layout = "section" }: 
 
         if (!response.ok) {
           const errorPayload = payload as PredictErrorResponse;
+          if (errorPayload.code === "FREE_LIMIT_REACHED") {
+            setSubmitError(errorPayload.error || "Você já usou suas 3 leituras gratuitas. Entre ou crie uma conta para continuar.");
+            setSubmitErrorCode(errorPayload.code ?? null);
+            setAuthNextPath(buildAuthNextPath());
+            setAuthModalOpen(true);
+            setState("flow");
+            setStep(3);
+            return;
+          }
+
           setSubmitError(errorPayload.error || "Não foi possível gerar sua previsão agora. Tente novamente em instantes.");
           setSubmitErrorCode(errorPayload.code ?? null);
           setState("flow");
@@ -396,7 +420,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
     return () => {
       cancelled = true;
     };
-  }, [selectedTheme, step]);
+  }, [selectedTheme]);
 
   function reset() {
     setState("flow");
@@ -411,6 +435,13 @@ export default function Calculator({ context = "landing", layout = "section" }: 
     setResultPrediction(null);
     setResultEventDate(null);
     setRemainingCredits(null);
+    setUserDataFormState(INITIAL_USER_DATA_FORM_STATE);
+  }
+
+  function handleStepNavigation(targetStep: CalcStep) {
+    if (state !== "flow") return;
+    if (targetStep >= step) return;
+    setStep(targetStep);
   }
 
   return (
@@ -424,15 +455,30 @@ export default function Calculator({ context = "landing", layout = "section" }: 
           </div>
         ) : null}
         <div className={layout === "embedded" ? "w-full border-b border-border/70 pb-4" : "mx-auto w-full max-w-4xl border-b border-border/70 pb-10"}>
-            <div className={layout === "embedded" ? "p-0" : "p-6 sm:p-8 lg:p-10"}>
+            <div className={layout === "embedded" ? "min-h-[560px] md:min-h-[620px] p-0" : "min-h-[560px] md:min-h-[620px] p-6 sm:p-8 lg:p-10"}>
               {layout === "embedded" ? (
-                <p className="mb-4 font-body text-sm text-iris-secondary">Gratis nesta fase. Sem login. Resultado gerado na hora.</p>
+                <p className="mb-4 font-body text-sm text-iris-secondary">Grátis nesta fase. Sem login. Resultado gerado na hora.</p>
               ) : null}
-              <Stepper currentStep={step} state={state} />
+              <Stepper currentStep={step} state={state} onStepClick={handleStepNavigation} />
               <AnimatePresence mode="wait">
                 {state === "flow" ? (
                   <motion.div key={`step-${step}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-                    {step === 1 ? <StepTheme selectedTheme={selectedTheme} onSelectTheme={setSelectedTheme} onContinue={() => { setStep(2); setSelectedQuestion(null); }} /> : null}
+                    {step === 1 ? (
+                      <StepTheme
+                        selectedTheme={selectedTheme}
+                        onSelectTheme={(theme) => {
+                          setSelectedTheme((current) => {
+                            if (current && current !== theme) {
+                              setSelectedQuestion(null);
+                            }
+                            return theme;
+                          });
+                        }}
+                        onContinue={() => {
+                          setStep(2);
+                        }}
+                      />
+                    ) : null}
                     {step === 2 && selectedTheme ? (
                       <StepQuestion
                         questions={themeQuestions}
@@ -450,6 +496,8 @@ export default function Calculator({ context = "landing", layout = "section" }: 
                         dynamicQuestions={dynamicQuestions}
                         dynamicQuestionsLoading={dynamicQuestionsLoading}
                         dynamicQuestionsError={dynamicQuestionsError}
+                        formState={userDataFormState}
+                        onFormStateChange={setUserDataFormState}
                         onBack={() => setStep(2)}
                         onGenerate={handleGenerate}
                         submitError={submitError}

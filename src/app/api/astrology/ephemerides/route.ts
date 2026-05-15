@@ -12,6 +12,11 @@ interface EphemeridesError {
   code?: string;
 }
 
+function maskUserId(value: string) {
+  if (value.length <= 10) return "***";
+  return `${value.slice(0, 6)}***${value.slice(-4)}`;
+}
+
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID();
   const supabase = await createClient();
@@ -43,7 +48,7 @@ export async function GET(request: NextRequest) {
   const hasBirthData = Boolean(profile?.birth_date && profile.birth_timezone);
 
   console.info("[ephemerides] Buscando efemerides", {
-    userId: user.id,
+    userIdMasked: maskUserId(user.id),
     birthDataStatus: hasBirthData ? "OK" : "Faltando",
     year,
     month,

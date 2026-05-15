@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 interface StepQuestionProps {
   questions: string[];
@@ -22,8 +23,14 @@ export function StepQuestion({
   return (
     <div className="space-y-6">
       <div>
-        <Button type="button" variant="ghost" onClick={onBack} className="mb-3 h-auto p-0 text-xs text-iris-secondary hover:text-foreground">
-          Voltar aos temas
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onBack}
+          className="mb-3 inline-flex h-8 items-center gap-1.5 rounded-md border border-iris px-2.5 text-xs text-iris-secondary hover:border-foreground/40 hover:bg-muted/30 hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" />
+          Voltar
         </Button>
         <p className="mb-1 font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">Passo 2</p>
         <h3 className="font-display text-lg text-foreground">Escolha sua pergunta</h3>

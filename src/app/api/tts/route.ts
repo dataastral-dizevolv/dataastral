@@ -96,22 +96,9 @@ function getErrorStatusCode(error: unknown) {
   return null;
 }
 
-function getProviderErrorPayload(error: unknown) {
-  if (!error || typeof error !== "object") {
-    return null;
-  }
-
-  const typed = error as {
-    response?: { data?: unknown; body?: unknown; text?: unknown; status?: unknown };
-    data?: unknown;
-    body?: unknown;
-    text?: unknown;
-  };
-
-  return typed.response?.data ?? typed.response?.body ?? typed.response?.text ?? typed.data ?? typed.body ?? typed.text ?? null;
-}
-
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   const body = (await request.json().catch(() => ({}))) as TtsRequestBody;
   const predictionIdRaw = body.predictionId?.trim() ?? "";
   const eventIdRaw = body.eventId?.trim() ?? "";
@@ -277,14 +264,19 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const statusCode = getErrorStatusCode(error);
     const errorMessage = error instanceof Error ? error.message.toLowerCase() : "";
-    const providerPayload = getProviderErrorPayload(error);
+    const durationMs = Date.now() - startedAt;
 
     if (statusCode === 429 || statusCode === 402 || errorMessage.includes("quota")) {
       console.error("[tts] ElevenLabs 429/402", {
+        requestId,
+        operation: "tts_generate",
+        provider: "elevenlabs",
+        code: "TTS_QUOTA_EXCEEDED",
+        status: statusCode ?? 429,
         statusCode,
         predictionId: predictionId || null,
-        voiceId,
-        providerPayload,
+        textLength: narrationTextLimited.length,
+        durationMs,
       });
       return NextResponse.json(
         { error: "Limite de narração atingido no momento. Tente novamente em instantes.", code: "TTS_QUOTA_EXCEEDED" },
@@ -293,11 +285,15 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("[tts] ElevenLabs provider error", {
+      requestId,
+      operation: "tts_generate",
+      provider: "elevenlabs",
+      code: "TTS_PROVIDER_FAILED",
+      status: statusCode ?? 502,
       statusCode,
       predictionId: predictionId || null,
-      voiceId,
-      providerPayload,
-      errorMessage,
+      textLength: narrationTextLimited.length,
+      durationMs,
     });
 
     return NextResponse.json(

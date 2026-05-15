@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const NARRATIVE_MESSAGES = [
   "Mapeando as coordenadas do seu nascimento...",
-  "Calculando transitos planetarios de longo prazo...",
-  "O Motor Iris esta localizando os gatilhos exatos...",
-  "Sincronizando efemerides com o seu mapa natal...",
+  "Calculando trânsitos planetários de longo prazo...",
+  "O Motor Iris está localizando os gatilhos exatos...",
+  "Sincronizando efemérides com o seu mapa natal...",
 ];
 
 export function StepLoading() {
@@ -109,7 +109,7 @@ export function StepLoading() {
         </div>
 
         <div className="space-y-3">
-          <p className="font-mono-iris text-[0.65rem] uppercase tracking-[0.2em] text-iris-secondary">Sincronia Cosmologica</p>
+          <p className="font-mono-iris text-[0.65rem] uppercase tracking-[0.2em] text-iris-secondary">Sincronia Cosmológica</p>
           <AnimatePresence mode="wait">
             <motion.p
               key={NARRATIVE_MESSAGES[messageIndex]}

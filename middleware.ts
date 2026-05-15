@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isAdminRoute(pathname)) {
-    const { data: profile } = await supabase.from("user_profiles").select("role, active").eq("id", user.id).maybeSingle();
+    const { data: profile } = await supabase.from("user_profiles").select("active").eq("id", user.id).maybeSingle();
 
     if (profile?.active === false) {
       const loginUrl = request.nextUrl.clone();
@@ -62,11 +62,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const { data: rpcData, error: rpcError } = await supabase.rpc("is_admin", { user_id: user.id });
-    let isAdmin = rpcData === true;
-
-    if (rpcError || !isAdmin) {
-      isAdmin = profile?.role === "admin";
-    }
+    const isAdmin = !rpcError && rpcData === true;
 
     if (!isAdmin) {
       const dashboardUrl = request.nextUrl.clone();

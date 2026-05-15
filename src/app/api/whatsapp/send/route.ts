@@ -30,7 +30,14 @@ function normalizePhone(value: string) {
   return value.replace(/[^0-9]/g, "").slice(0, 20);
 }
 
+function maskPhone(value: string | null) {
+  if (!value) return null;
+  const suffix = value.slice(-4);
+  return suffix ? `***${suffix}` : "***";
+}
+
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
   const body = (await request.json().catch(() => ({}))) as WhatsAppSendBody;
   const predictionIdRaw = body.predictionId?.trim() ?? "";
   const textRaw = body.text?.trim() ?? "";
@@ -98,6 +105,7 @@ export async function POST(request: NextRequest) {
   }
 
   const normalizedPhone = phoneRaw ? normalizePhone(phoneRaw) : null;
+  const phoneMasked = maskPhone(normalizedPhone);
 
   const { error: logError } = await admin.from("engine_audit_logs").insert({
     user_id: user.id,
@@ -108,9 +116,10 @@ export async function POST(request: NextRequest) {
     technical_details: {
       provider: "zapi_mock",
       status: "Pronta para envio",
+      requestId,
       predictionId: sourcePrediction?.id ?? null,
-      phone: normalizedPhone,
-      messagePreview: messageText.slice(0, 280),
+      hasPhone: Boolean(normalizedPhone),
+      phoneMasked,
       messageLength: messageText.length,
     },
   });

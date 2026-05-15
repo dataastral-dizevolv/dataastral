@@ -13,6 +13,7 @@ interface BuyCreditsRequestBody {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
   if (!stripeSecretKey) {
     return NextResponse.json({ error: "Servidor sem configuração de pagamento (Stripe)." }, { status: 500 });
@@ -85,8 +86,13 @@ export async function POST(request: NextRequest) {
         success: false,
         engine_code: "STRIPE_CHECKOUT_CREATE_FAILED",
         technical_details: {
-          reason: "checkout_url_missing",
+          operation: "stripe_checkout_create",
+          provider: "stripe",
+          code: "STRIPE_CHECKOUT_CREATE_FAILED",
+          status: 500,
+          requestId,
           packageId: selectedPackage.id,
+          sessionCreated: false,
         },
       });
 
@@ -100,10 +106,13 @@ export async function POST(request: NextRequest) {
       success: true,
       engine_code: "STRIPE_CHECKOUT_CREATED",
       technical_details: {
+        operation: "stripe_checkout_create",
+        provider: "stripe",
+        code: "STRIPE_CHECKOUT_CREATED",
+        status: 200,
+        requestId,
         packageId: selectedPackage.id,
-        sessionId: session.id,
-        amountCents: selectedPackage.priceCents,
-        stripePriceId,
+        sessionCreated: true,
       },
     });
 
@@ -114,6 +123,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(payload);
   } catch (error) {
+    const stripeErrorCode =
+      error && typeof error === "object" && "code" in error && typeof (error as { code?: unknown }).code === "string"
+        ? (error as { code: string }).code
+        : "STRIPE_ERROR";
+
     await adminClient.from("engine_audit_logs").insert({
       user_id: user.id,
       theme: "financas",
@@ -121,8 +135,13 @@ export async function POST(request: NextRequest) {
       success: false,
       engine_code: "STRIPE_CHECKOUT_CREATE_FAILED",
       technical_details: {
+        operation: "stripe_checkout_create",
+        provider: "stripe",
+        code: stripeErrorCode,
+        status: 500,
+        requestId,
         packageId: selectedPackage.id,
-        details: error instanceof Error ? error.message : String(error),
+        sessionCreated: false,
       },
     });
 

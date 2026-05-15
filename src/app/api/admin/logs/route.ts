@@ -8,6 +8,42 @@ function isIsoDate(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+function sanitizeTechnicalDetails(input: Record<string, unknown> | null) {
+  if (!input || typeof input !== "object") {
+    return null;
+  }
+
+  const output: Record<string, unknown> = { ...input };
+
+  if ("messagePreview" in output) {
+    delete output.messagePreview;
+  }
+
+  if ("providerPayload" in output) {
+    delete output.providerPayload;
+  }
+
+  if (typeof output.phone === "string") {
+    const digits = output.phone.replace(/\D/g, "");
+    const suffix = digits.slice(-4);
+    output.phone = suffix ? `***${suffix}` : "***";
+  }
+
+  if (typeof output.phoneMasked === "string") {
+    const digits = output.phoneMasked.replace(/\D/g, "");
+    const suffix = digits.slice(-4);
+    output.phoneMasked = suffix ? `***${suffix}` : "***";
+  }
+
+  for (const [key, value] of Object.entries(output)) {
+    if (typeof value === "string" && value.length > 300) {
+      output[key] = `${value.slice(0, 300)}...`;
+    }
+  }
+
+  return output;
+}
+
 export async function GET(request: NextRequest) {
   const { isAdmin } = await requireAdminUser();
 
@@ -50,7 +86,7 @@ export async function GET(request: NextRequest) {
     success: row.success,
     engineCode: row.engine_code,
     executionTimeMs: row.execution_time_ms,
-    technicalDetails: (row.technical_details as Record<string, unknown> | null) ?? null,
+    technicalDetails: sanitizeTechnicalDetails((row.technical_details as Record<string, unknown> | null) ?? null),
     createdAt: row.created_at,
   }));
 

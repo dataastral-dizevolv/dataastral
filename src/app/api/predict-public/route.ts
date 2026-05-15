@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { FREE_QUESTIONS_LIMIT, GUEST_ID_COOKIE } from "@/lib/guest/constants";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { ThemeId } from "@/types/calculator";
 
 export const runtime = "nodejs";
@@ -33,6 +35,20 @@ interface EngineFunctionErrorResponse {
   code?: string;
 }
 
+interface PredictPublicSuccessResponse {
+  prediction: string;
+  prediction_text: string;
+  audio_text: string;
+  whatsapp_text: string;
+  eventDate: string;
+  eventDateIso: string;
+  remainingCredits: number;
+  remainingFreeQuestions: number;
+  cached: boolean;
+  engineCode?: string;
+  requestId: string;
+}
+
 const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
 const MAX_QUESTION_LENGTH = 300;
 const MAX_LOCATION_LENGTH = 200;
@@ -41,6 +57,7 @@ const MAX_PLACE_QUERY_LENGTH = 200;
 const ENGINE_TIMEOUT_MS = 20_000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 12;
+const GUEST_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
 // TODO: Este rate-limit em memória é por processo/instância.
 // Em produção com múltiplas instâncias, o controle pode ficar inconsistente.
 // Migrar para solução distribuída (ex.: Redis/KV) para enforcement global.
@@ -89,6 +106,28 @@ function checkRateLimit(ip: string) {
   recent.push(now);
   ipRequestMap.set(ip, recent);
   return true;
+}
+
+function isValidUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function withGuestCookie(response: NextResponse, guestId: string, shouldSetGuestCookie: boolean) {
+  if (!shouldSetGuestCookie) {
+    return response;
+  }
+
+  const isSecure = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+  response.cookies.set({
+    name: GUEST_ID_COOKIE,
+    value: guestId,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isSecure,
+    path: "/",
+    maxAge: GUEST_COOKIE_MAX_AGE_SECONDS,
+  });
+  return response;
 }
 
 function normalizeDynamicAnswers(input: unknown) {
@@ -174,6 +213,56 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Consulta de local muito longa.", code: "INVALID_PLACE_QUERY", requestId }, { status: 400 });
   }
 
+  const rawGuestId = request.cookies.get(GUEST_ID_COOKIE)?.value?.trim() ?? "";
+  const hasValidGuestId = isValidUuid(rawGuestId);
+  const guestId = hasValidGuestId ? rawGuestId : crypto.randomUUID();
+  const shouldSetGuestCookie = !hasValidGuestId;
+
+  let remainingFreeQuestions = 0;
+
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin.rpc("consume_guest_question", { p_guest_id: guestId });
+
+    if (error) {
+      return withGuestCookie(
+        NextResponse.json(
+          { error: "Não foi possível validar seu acesso gratuito agora. Tente novamente em instantes.", code: "FREE_LIMIT_CHECK_FAILED", requestId },
+          { status: 500 },
+        ),
+        guestId,
+        shouldSetGuestCookie,
+      );
+    }
+
+    if (data === null) {
+      return withGuestCookie(
+        NextResponse.json(
+          {
+            error: `Você já usou suas ${FREE_QUESTIONS_LIMIT} leituras gratuitas. Entre ou crie uma conta para continuar.`,
+            code: "FREE_LIMIT_REACHED",
+            remainingFreeQuestions: 0,
+            requestId,
+          },
+          { status: 403 },
+        ),
+        guestId,
+        shouldSetGuestCookie,
+      );
+    }
+
+    remainingFreeQuestions = typeof data === "number" ? data : 0;
+  } catch {
+    return withGuestCookie(
+      NextResponse.json(
+        { error: "Não foi possível validar seu acesso gratuito agora. Tente novamente em instantes.", code: "FREE_LIMIT_CHECK_FAILED", requestId },
+        { status: 500 },
+      ),
+      guestId,
+      shouldSetGuestCookie,
+    );
+  }
+
   const edgeRequestPayload = {
     theme,
     question,
@@ -238,7 +327,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    return withGuestCookie(NextResponse.json({
       prediction: predictionText,
       prediction_text: predictionText,
       audio_text: audioText || predictionText,
@@ -246,10 +335,11 @@ export async function POST(request: NextRequest) {
       eventDate: edgeSuccessPayload.eventDate ?? "",
       eventDateIso: edgeSuccessPayload.eventDateIso ?? "",
       remainingCredits: 0,
+      remainingFreeQuestions,
       cached: false,
       engineCode: edgeSuccessPayload.code,
       requestId,
-    });
+    } satisfies PredictPublicSuccessResponse), guestId, shouldSetGuestCookie);
   } catch (error) {
     const code = error instanceof Error && error.name === "AbortError" ? "ENGINE_TIMEOUT" : "PREDICTION_ENGINE_FAILED";
     return NextResponse.json(
