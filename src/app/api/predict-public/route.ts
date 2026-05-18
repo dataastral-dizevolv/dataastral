@@ -50,6 +50,7 @@ interface PredictPublicSuccessResponse {
 }
 
 const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
+const CALIBRATION_THEMES = new Set<ThemeId>(["carreira", "saude", "familia", "viagens"]);
 const MAX_QUESTION_LENGTH = 300;
 const MAX_LOCATION_LENGTH = 200;
 const MAX_TIMEZONE_LENGTH = 80;
@@ -187,6 +188,13 @@ export async function POST(request: NextRequest) {
 
   if (!isValidTheme(theme)) {
     return NextResponse.json({ error: "Tema inválido.", code: "INVALID_THEME", requestId }, { status: 400 });
+  }
+
+  if (CALIBRATION_THEMES.has(theme)) {
+    return NextResponse.json(
+      { error: "Este tema está em calibração e será liberado em breve. Nenhum crédito foi cobrado.", code: "THEME_IN_CALIBRATION", requestId },
+      { status: 422 },
+    );
   }
 
   if (!question || question.length > MAX_QUESTION_LENGTH) {

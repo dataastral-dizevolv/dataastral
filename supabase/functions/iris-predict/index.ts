@@ -615,6 +615,15 @@ async function runEngine(
 Deno.serve(async (request: Request) => {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
 
+  const incomingToken = request.headers.get("x-internal-engine-token") ?? "";
+  const expectedToken = Deno.env.get("ENGINE_INTERNAL_TOKEN")?.trim() ?? "";
+  if (!expectedToken || incomingToken !== expectedToken) {
+    return new Response(
+      JSON.stringify({ error: "Não autorizado.", code: "UNAUTHORIZED", requestId }),
+      { status: 401, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ error: "Método não permitido", code: "METHOD_NOT_ALLOWED", requestId }), {
       status: 405,

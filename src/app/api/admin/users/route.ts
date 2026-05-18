@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   const payload: AdminUserRow[] = (profilesRes.data ?? []).map((row) => ({
     id: row.id,
     fullName: row.full_name,
-    email: row.id,
+    email: null,
     role: rolesMap.get(row.id)?.role ?? "user",
     active: rolesMap.get(row.id)?.active ?? true,
     credits: row.credits ?? 0,

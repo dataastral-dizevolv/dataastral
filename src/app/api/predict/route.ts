@@ -69,6 +69,7 @@ interface PredictApiResponse {
 }
 
 const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
+const CALIBRATION_THEMES = new Set<ThemeId>(["carreira", "saude", "familia", "viagens"]);
 const AUTH_REQUIRED_ERROR = "Entre na sua conta para continuar.";
 const INSUFFICIENT_CREDITS_ERROR = "Você não possui créditos suficientes para gerar esta previsão.";
 const ENGINE_TIMEOUT_MS = 20_000;
@@ -222,6 +223,10 @@ export async function POST(request: NextRequest) {
 
   if (!theme || !isValidTheme(theme)) {
     return errorResponse(400, "INVALID_THEME", `theme recebido: ${String(theme ?? "")}`);
+  }
+
+  if (CALIBRATION_THEMES.has(theme)) {
+    return errorResponse(422, "THEME_IN_CALIBRATION", `Tema ${theme} em calibração.`, "Este tema está em calibração e será liberado em breve. Nenhum crédito foi cobrado.");
   }
 
   if (!question) {

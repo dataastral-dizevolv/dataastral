@@ -13,7 +13,7 @@ export interface EngineAuditLogItem {
 export interface AdminUserRow {
   id: string;
   fullName: string | null;
-  email: string;
+  email: string | null;
   role: "admin" | "user";
   active: boolean;
   credits: number;

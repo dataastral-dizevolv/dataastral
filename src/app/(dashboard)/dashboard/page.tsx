@@ -162,7 +162,12 @@ export default function DashboardHomePage() {
         <div className="space-y-3">
           {carregandoHistorico ? <div className="h-16 animate-pulse bg-muted/30" /> : null}
           {!carregandoHistorico && (historico?.length ?? 0) === 0 ? (
-            <p className="text-sm text-muted-foreground">Você ainda não possui previsões salvas.</p>
+            <div className="space-y-3 py-2">
+              <p className="text-sm text-muted-foreground">Você ainda não fez nenhuma pergunta. Escolha um tema e descubra o que os astros dizem para você.</p>
+              <Button asChild>
+                <Link href="/calculadora">Fazer minha primeira pergunta</Link>
+              </Button>
+            </div>
           ) : null}
           {historico.map((item) => (
             <div

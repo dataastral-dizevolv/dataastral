@@ -10,7 +10,11 @@ const NARRATIVE_MESSAGES = [
   "Sincronizando efemérides com o seu mapa natal...",
 ];
 
-export function StepLoading() {
+interface StepLoadingProps {
+  onCancel?: () => void;
+}
+
+export function StepLoading({ onCancel }: StepLoadingProps) {
   const [messageIndex, setMessageIndex] = useState(0);
 
   const particles = useMemo(
@@ -123,6 +127,16 @@ export function StepLoading() {
             </motion.p>
           </AnimatePresence>
         </div>
+
+        {onCancel ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="font-body text-xs text-iris-muted transition-colors hover:text-iris-secondary"
+          >
+            Cancelar
+          </button>
+        ) : null}
       </div>
     </motion.div>
   );

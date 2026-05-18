@@ -4,6 +4,8 @@ import { THEMES } from "@/lib/calculator-data";
 import { Button } from "@/components/ui/button";
 import type { ThemeId } from "@/types/calculator";
 
+const CALIBRATION_THEME_IDS = new Set<ThemeId>(["carreira", "saude", "familia", "viagens"]);
+
 const THEME_ICONS: Record<ThemeId, ReactNode> = {
   amor: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="h-6 w-6">
@@ -69,17 +71,27 @@ export function StepTheme({ selectedTheme, onSelectTheme, onContinue }: StepThem
         {THEMES.map((theme) => {
           const icon = THEME_ICONS[theme.id];
           const selected = selectedTheme === theme.id;
+          const isCalibration = CALIBRATION_THEME_IDS.has(theme.id);
 
           return (
             <Button
               key={theme.id}
               type="button"
               variant="outline"
-              onClick={() => onSelectTheme(theme.id)}
-              className={`h-auto flex-col gap-2.5 rounded-md p-4 text-center ${selected ? "border-foreground bg-muted text-foreground" : "border-iris hover:border-foreground/40 hover:bg-muted/30"}`}
+              disabled={isCalibration}
+              title={isCalibration ? "Em breve" : undefined}
+              onClick={isCalibration ? undefined : () => onSelectTheme(theme.id)}
+              className={`h-auto flex-col gap-2.5 rounded-md p-4 text-center ${
+                isCalibration
+                  ? "cursor-not-allowed border-iris opacity-40"
+                  : selected
+                    ? "border-foreground bg-muted text-foreground"
+                    : "border-iris hover:border-foreground/40 hover:bg-muted/30"
+              }`}
             >
-              <span className={selected ? "text-foreground" : "text-iris-secondary"}>{icon}</span>
-              <span className={`text-xs leading-tight ${selected ? "text-foreground" : "text-iris-secondary"}`}>{theme.name}</span>
+              <span className={selected && !isCalibration ? "text-foreground" : "text-iris-secondary"}>{icon}</span>
+              <span className={`text-xs leading-tight ${selected && !isCalibration ? "text-foreground" : "text-iris-secondary"}`}>{theme.name}</span>
+              {isCalibration ? <span className="font-mono-iris text-[9px] uppercase tracking-wider text-iris-muted">Em breve</span> : null}
             </Button>
           );
         })}

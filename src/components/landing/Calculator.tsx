@@ -58,6 +58,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
   const [themeQuestionsError, setThemeQuestionsError] = useState<string | null>(null);
   const [resultPrediction, setResultPrediction] = useState<string | null>(null);
   const [resultEventDate, setResultEventDate] = useState<string | null>(null);
+  const [resultEngineCode, setResultEngineCode] = useState<string | null>(null);
   const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitErrorCode, setSubmitErrorCode] = useState<string | null>(null);
@@ -172,6 +173,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
         const successPayload = payload as PredictSuccessResponse;
         setResultPrediction(successPayload.prediction);
         setResultEventDate(successPayload.eventDate ?? null);
+        setResultEngineCode(successPayload.engineCode ?? null);
         setRemainingCredits(null);
         setState("result");
         return;
@@ -273,6 +275,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
       const successPayload = payload as PredictSuccessResponse;
       setResultPrediction(successPayload.prediction);
       setResultEventDate(successPayload.eventDate ?? null);
+      setResultEngineCode(successPayload.engineCode ?? null);
       setRemainingCredits(successPayload.remainingCredits);
       setState("result");
 
@@ -434,6 +437,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
     setSubmitErrorCode(null);
     setResultPrediction(null);
     setResultEventDate(null);
+    setResultEngineCode(null);
     setRemainingCredits(null);
     setUserDataFormState(INITIAL_USER_DATA_FORM_STATE);
   }
@@ -508,7 +512,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
                 ) : null}
 
                 {state === "loading" ? (
-                  <StepLoading />
+                  <StepLoading onCancel={() => { setState("flow"); setStep(3); }} />
                 ) : null}
 
                 {state === "result" && selectedQuestion ? (
@@ -517,6 +521,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
                       selectedQuestion={selectedQuestion}
                       prediction={resultPrediction ?? ""}
                       eventDate={resultEventDate ?? undefined}
+                      engineCode={resultEngineCode ?? undefined}
                       remainingCredits={remainingCredits}
                       onReset={reset}
                     />

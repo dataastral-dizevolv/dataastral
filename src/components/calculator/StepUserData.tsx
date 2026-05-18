@@ -441,7 +441,7 @@ export function StepUserData({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="birth-date" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
-              Data de nascimento
+              Data de nascimento <span className="text-red-400">*</span>
             </Label>
             <Input
               id="birth-date"
@@ -493,7 +493,7 @@ export function StepUserData({
 
         <div className="relative space-y-2">
           <Label htmlFor="birth-place" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
-            Cidade, estado e país de nascimento
+            Cidade, estado e país de nascimento <span className="text-red-400">*</span>
           </Label>
 
           <div className="relative">

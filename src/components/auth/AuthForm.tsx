@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -91,6 +91,8 @@ function GoogleIcon() {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isBlocked = searchParams.get("blocked") === "1";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -190,6 +192,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   return (
     <section className="w-full max-w-md space-y-6 border-b border-border/70 pb-6">
+      {isBlocked ? (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3">
+          <p className="text-xs text-red-400">Sua conta foi desativada. Entre em contato com o suporte.</p>
+        </div>
+      ) : null}
       <header className="space-y-2 border-b border-border/70 pb-4">
         <div className="space-y-2">
           <h1 className="font-display text-3xl tracking-tight text-foreground">{content.title}</h1>

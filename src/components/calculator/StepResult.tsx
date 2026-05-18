@@ -5,17 +5,21 @@ interface StepResultProps {
   selectedQuestion: string;
   prediction: string;
   eventDate?: string;
+  engineCode?: string;
   remainingCredits: number | null;
   onReset: () => void;
 }
 
-export function StepResult({ selectedQuestion, prediction, eventDate, remainingCredits, onReset }: StepResultProps) {
+const NO_ASPECT_CODES = new Set(["NO_RELEVANT_ASPECT_FOUND", "THEME_IN_CALIBRATION"]);
+
+export function StepResult({ selectedQuestion, prediction, eventDate, engineCode, remainingCredits, onReset }: StepResultProps) {
   const paragraphs = prediction
     .split(/\n\s*\n/g)
     .map((paragraph) => paragraph.trim())
     .filter((paragraph) => paragraph.length > 0);
 
   const noAspectFound =
+    (engineCode ? NO_ASPECT_CODES.has(engineCode) : false) ||
     prediction.toLowerCase().includes("nenhum aspecto encontrado") ||
     prediction.toLowerCase().includes("nenhum transito") ||
     (eventDate ?? "").toLowerCase().includes("nenhum transito") ||
@@ -42,7 +46,9 @@ export function StepResult({ selectedQuestion, prediction, eventDate, remainingC
 
         {noAspectFound ? (
           <p className="rounded-lg border border-iris-accent/20 bg-muted/20 px-3 py-2 font-body text-sm text-iris-secondary">
-            Não encontramos gatilhos fortes nesta janela. Tente outra pergunta ou mude o tema para explorar novas possibilidades.
+            {engineCode === "THEME_IN_CALIBRATION"
+              ? "Este tema ainda está em calibração no Motor Iris. Nenhum crédito foi cobrado."
+              : "Não encontramos aspectos relevantes no período de busca para esta pergunta. Tente reformular ou escolha outro tema."}
           </p>
         ) : null}
       </div>
