@@ -49,3 +49,4 @@ public_openapi_schema.json
 venv/
 .env
 __pycache__
+.mcp.json
