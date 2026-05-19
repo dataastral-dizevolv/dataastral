@@ -59,7 +59,7 @@ const ASPECT_LABELS: Record<number, string> = {
 const SWISS_FLAGS = 2 | 256;
 const SE_GREG_CAL = 1;
 const JD_UNIX_EPOCH = 2440587.5;
-const SWISS_WASM_URL = "https://oyftaljsgnybquwvcwrq.supabase.co/storage/v1/object/public/engine-assets/swiss/swiss_eph.wasm";
+const SWISS_WASM_URL = `${Deno.env.get("SUPABASE_URL") ?? ""}/storage/v1/object/public/engine-assets/swiss/swiss_eph.wasm`;
 
 let ephPromise: Promise<SwissEph> | null = null;
 

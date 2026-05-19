@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/admin/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AdminCreditPackage } from "@/types/admin";
@@ -222,6 +222,7 @@ export default function AdminPrecosPage() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Atualizar Valor</DialogTitle>
+            <DialogDescription className="sr-only">Edite o nome e valor do pacote de créditos</DialogDescription>
           </DialogHeader>
 
           <form className="space-y-4" onSubmit={(event) => void handleSave(event)}>

@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
     ...(dynamicAnswers ? { dynamicAnswers } : {}),
   };
 
-  const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000"}/api/engine`;
+  const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/iris-predict`;
   const internalEngineToken = process.env.ENGINE_INTERNAL_TOKEN?.trim() || "";
   const isProduction = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
 

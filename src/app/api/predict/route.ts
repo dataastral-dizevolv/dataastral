@@ -443,7 +443,7 @@ export async function POST(request: NextRequest) {
     userId: maskedUserId,
   });
 
-  const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.VERCEL_URL ? `http://${process.env.VERCEL_URL}` : "http://localhost:5000"}/api/engine`;
+  const engineUrl = process.env.PYTHON_ENGINE_URL ?? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/iris-predict`;
   const internalEngineToken = process.env.ENGINE_INTERNAL_TOKEN?.trim() || "";
   const isProduction = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
 
@@ -622,11 +622,24 @@ export async function POST(request: NextRequest) {
   });
 
   if (debitError || remainingAfterDebit === null) {
-    const rollbackResults = await Promise.all([
+    const [predRollback, histRollback] = await Promise.all([
       serviceClient.from("user_predictions").delete().eq("id", insertedPrediction.id).eq("user_id", authUser.id),
       serviceClient.from("user_prediction_history").delete().eq("id", insertedHistory.id).eq("user_id", authUser.id),
     ]);
-    void rollbackResults;
+    if (predRollback.error) {
+      console.error("[predict] Rollback user_predictions failed", {
+        requestId,
+        code: predRollback.error.code,
+        message: predRollback.error.message,
+      });
+    }
+    if (histRollback.error) {
+      console.error("[predict] Rollback user_prediction_history failed", {
+        requestId,
+        code: histRollback.error.code,
+        message: histRollback.error.message,
+      });
+    }
     const remainingCredits = await getRemainingCredits();
 
     await writeAuditLog({

@@ -6,7 +6,7 @@ import { Menu } from "lucide-react";
 
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface AdminLayoutClientProps {
   userName: string;
@@ -38,6 +38,10 @@ export function AdminLayoutClient({ userName, userEmail, children }: AdminLayout
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-[250px] max-w-[250px] border-r border-border p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu administrativo</SheetTitle>
+            <SheetDescription>Menu de navegação do painel administrativo</SheetDescription>
+          </SheetHeader>
           <AdminSidebar userName={userName} userEmail={userEmail} onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>

@@ -5,7 +5,7 @@ type SwissEph = Awaited<ReturnType<(typeof import("npm:@fusionstrings/swiss-eph"
 
 const SWISS_FLAGS = 2 | 256;
 const SE_GREG_CAL = 1;
-const SWISS_WASM_URL = "https://oyftaljsgnybquwvcwrq.supabase.co/storage/v1/object/public/engine-assets/swiss/swiss_eph.wasm";
+const SWISS_WASM_URL = `${Deno.env.get("SUPABASE_URL") ?? ""}/storage/v1/object/public/engine-assets/swiss/swiss_eph.wasm`;
 
 const PLANET_LABELS: Record<number, string> = {
   0: "Sol",
@@ -30,6 +30,24 @@ interface EphemerisEvent {
   planeta?: string;
   aspecto?: string;
 }
+
+const ASPECT_LABELS: Record<number, string> = {
+  0: "conjunção",
+  60: "sextil",
+  90: "quadratura",
+  120: "trígono",
+  150: "quincúncio",
+  180: "oposição",
+};
+
+const ASPECT_TIPO: Record<number, EphemerisEvent["tipo"]> = {
+  0: "portal",
+  60: "harmonia",
+  90: "tensao",
+  120: "harmonia",
+  150: "neutro",
+  180: "tensao",
+};
 
 interface AstrologyRule {
   id: number;
@@ -262,8 +280,8 @@ async function computeMonthEphemerides(body: RequestBody) {
         }
 
         const natalPlanet = PLANET_LABELS[natalPlanetId] ?? `Planeta ${natalPlanetId}`;
-        const aspect = rule.aspect_angle === 0 ? "conjunção" : "trígono";
-        const aspectLabel = rule.aspect_angle === 0 ? "conjunção" : "trígono";
+        const aspect = ASPECT_LABELS[rule.aspect_angle] ?? `${rule.aspect_angle}°`;
+        const aspectLabel = ASPECT_LABELS[rule.aspect_angle] ?? `${rule.aspect_angle}°`;
         const key = `${date}-${rule.id}-${natalPlanetId}-${rule.aspect_angle}`;
 
         if (dedupe.has(key)) {
@@ -282,7 +300,7 @@ async function computeMonthEphemerides(body: RequestBody) {
             aspect,
             aspectAngle: rule.aspect_angle,
           }),
-          tipo: rule.aspect_angle === 0 ? "portal" : "harmonia",
+          tipo: ASPECT_TIPO[rule.aspect_angle] ?? "neutro",
           planeta: transitPlanet,
           aspecto: aspectLabel,
         });

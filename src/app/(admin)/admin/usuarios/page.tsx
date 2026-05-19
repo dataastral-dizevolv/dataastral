@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { toast } from "sonner";
 
+import { AlertTriangle } from "lucide-react";
+
 import { DataTable } from "@/components/admin/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -199,16 +201,17 @@ export default function AdminUsersPage() {
                 header: "Ações",
                 render: (row) => (
                   <div className="flex flex-wrap items-center gap-2">
-                    <Button type="button" size="sm" variant="outline" onClick={() => void handleAddCredits(row.id, 1)} disabled={!row.active}>
+                    <Button type="button" size="sm" variant="outline" onClick={() => void handleAddCredits(row.id, 1)} disabled={!row.active} aria-label={`Adicionar 1 crédito para ${row.fullName ?? "usuário"}`}>
                       +1
                     </Button>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void handleAddCredits(row.id, 3)} disabled={!row.active}>
+                    <Button type="button" size="sm" variant="outline" onClick={() => void handleAddCredits(row.id, 3)} disabled={!row.active} aria-label={`Adicionar 3 créditos para ${row.fullName ?? "usuário"}`}>
                       +3
                     </Button>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void handleAddCredits(row.id, 5)} disabled={!row.active}>
+                    <Button type="button" size="sm" variant="outline" onClick={() => void handleAddCredits(row.id, 5)} disabled={!row.active} aria-label={`Adicionar 5 créditos para ${row.fullName ?? "usuário"}`}>
                       +5
                     </Button>
-                    <Button type="button" size="sm" variant="destructive" onClick={() => setDeactivatingUser(row)} disabled={!row.active}>
+                    <Button type="button" size="sm" variant="destructive" onClick={() => setDeactivatingUser(row)} disabled={!row.active} className="border border-destructive/60">
+                      <AlertTriangle size={14} className="mr-1" />
                       Desativar
                     </Button>
                   </div>

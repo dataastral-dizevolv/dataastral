@@ -7,7 +7,7 @@ import { Menu } from "lucide-react";
 import { DashboardUserProvider } from "@/components/dashboard/DashboardUserContext";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { DashboardUser } from "@/lib/auth/user";
 
 interface DashboardLayoutClientProps {
@@ -46,6 +46,10 @@ export function DashboardLayoutClient({ user, children }: DashboardLayoutClientP
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetContent side="left" className="w-[240px] max-w-[240px] border-r border-border p-0">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Menu de navegação</SheetTitle>
+              <SheetDescription>Menu de navegação do dashboard</SheetDescription>
+            </SheetHeader>
             <Sidebar onNavigate={() => setMobileOpen(false)} />
           </SheetContent>
         </Sheet>

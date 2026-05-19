@@ -5,6 +5,7 @@ import Link from "next/link";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import ptBrLocale from "@fullcalendar/core/locales/pt-br";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -44,7 +45,7 @@ function formatarDataLocalIso(data: Date) {
 }
 
 function formatarTitulo(
-  view: "dayGridMonth" | "timeGridWeek",
+  view: "dayGridMonth" | "timeGridWeek" | "listWeek",
   referencia: Date,
 ): string {
   if (view === "dayGridMonth") {
@@ -66,7 +67,7 @@ export function CalendarioEfemerides() {
 
   const [diaSelecionado, setDiaSelecionado] = useState<string | null>(null);
   const [drawerAberto, setDrawerAberto] = useState(false);
-  const [view, setView] = useState<"dayGridMonth" | "timeGridWeek">("dayGridMonth");
+  const [view, setView] = useState<"dayGridMonth" | "timeGridWeek" | "listWeek">("dayGridMonth");
   const [filtroAtivo, setFiltroAtivo] = useState<EphemerisEventType | "todos">("todos");
   const [referenciaTitulo, setReferenciaTitulo] = useState(hoje);
   const [mesSelecionado, setMesSelecionado] = useState({
@@ -203,7 +204,7 @@ export function CalendarioEfemerides() {
     api.next();
   }
 
-  function alterarView(novaView: "dayGridMonth" | "timeGridWeek") {
+  function alterarView(novaView: "dayGridMonth" | "timeGridWeek" | "listWeek") {
     setView(novaView);
     const api = calendarRef.current?.getApi();
     api?.changeView(novaView);
@@ -232,6 +233,14 @@ export function CalendarioEfemerides() {
               className="text-xs uppercase tracking-widest"
             >
               Semanal
+            </Button>
+            <Button
+              type="button"
+              variant={view === "listWeek" ? "default" : "outline"}
+              onClick={() => alterarView("listWeek")}
+              className="text-xs uppercase tracking-widest sm:hidden"
+            >
+              Lista
             </Button>
             <Button type="button" variant="outline" size="icon-sm" onClick={() => navegarCalendario("prev")} aria-label="Periodo anterior">
               <ChevronLeft className="size-4" />
@@ -262,7 +271,7 @@ export function CalendarioEfemerides() {
         ) : null}
         <FullCalendar
           ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView="dayGridMonth"
           locale={ptBrLocale}
           headerToolbar={false}

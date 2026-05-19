@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, Coins } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Coins, Loader2 } from "lucide-react";
 import useSWR from "swr";
 import { toast } from "sonner";
 
@@ -123,7 +123,12 @@ export default function FinanceiroPage() {
                     onClick={() => void handleBuy(item.id)}
                     disabled={disabled}
                   >
-                    {buyingPackageId === item.id ? "Processando..." : "Comprar"}
+                    {buyingPackageId === item.id ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" />
+                        Processando...
+                      </>
+                    ) : "Comprar"}
                   </Button>
                 </div>
               </section>

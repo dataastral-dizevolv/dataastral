@@ -7,7 +7,7 @@ import { ArrowLeft, Loader2, MapPin, Search } from "lucide-react";
 import { useOptionalDashboardUser } from "@/components/dashboard/DashboardUserContext";
 import { useLocationSearch } from "@/hooks/useLocationSearch";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { CalculatorQuestion, DynamicAnswerValue, GeneratePredictionInput, LocationData } from "@/types/calculator";
@@ -692,6 +692,7 @@ export function StepUserData({
         <DialogContent className="max-w-[calc(100%-1rem)] rounded-md border border-iris bg-background p-4 sm:max-w-xl sm:p-5" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle className="font-display text-base text-foreground">Escolha sua data de nascimento</DialogTitle>
+            <DialogDescription className="sr-only">Selecione o dia, mês e ano do nascimento</DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-3 gap-2">
@@ -740,6 +741,7 @@ export function StepUserData({
         <DialogContent className="max-w-[calc(100%-1rem)] rounded-md border border-iris bg-background p-4 sm:max-w-md sm:p-5" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle className="font-display text-base text-foreground">Escolha sua hora de nascimento</DialogTitle>
+            <DialogDescription className="sr-only">Selecione a hora e minuto do nascimento</DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-2">
