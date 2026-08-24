@@ -458,10 +458,10 @@ export default function Calculator({ context = "landing", layout = "section" }: 
             <p className="font-body text-iris-secondary">Escolha um tema, faça uma pergunta e receba sua previsão baseada em efemérides reais.</p>
           </div>
         ) : null}
-        <div className={layout === "embedded" ? "w-full border-b border-border/70 pb-4" : "mx-auto w-full max-w-4xl border-b border-border/70 pb-10"}>
-            <div className={layout === "embedded" ? "min-h-[560px] md:min-h-[620px] p-0" : "min-h-[560px] md:min-h-[620px] p-6 sm:p-8 lg:p-10"}>
+        <div className={layout === "embedded" ? "w-full" : "mx-auto w-full max-w-4xl"}>
+            <div className={layout === "embedded" ? "min-h-[560px] rounded-2xl border border-border bg-card/50 p-4 shadow-sm backdrop-blur-sm md:min-h-[620px] md:p-6" : "min-h-[560px] rounded-2xl border border-border bg-card/50 p-6 shadow-sm backdrop-blur-sm md:min-h-[620px] sm:p-8 lg:p-10"}>
               {layout === "embedded" ? (
-                <p className="mb-4 font-body text-sm text-iris-secondary">Grátis nesta fase. Sem login. Resultado gerado na hora.</p>
+                <p className="mb-4 font-body text-sm text-muted-foreground">Grátis nesta fase. Sem login. Resultado gerado na hora.</p>
               ) : null}
               <Stepper currentStep={step} state={state} onStepClick={handleStepNavigation} />
               <AnimatePresence mode="wait">
@@ -533,10 +533,10 @@ export default function Calculator({ context = "landing", layout = "section" }: 
       </div>
 
       <Dialog open={authModalOpen} onOpenChange={setAuthModalOpen}>
-        <DialogContent className="max-w-md border border-iris p-6">
+        <DialogContent className="max-w-md rounded-2xl border border-border bg-card p-6 shadow-lg">
           <DialogHeader>
             <DialogTitle className="font-display text-xl text-foreground">Entre para gerar sua previsão</DialogTitle>
-            <DialogDescription className="text-sm text-iris-secondary">
+            <DialogDescription className="text-sm text-muted-foreground">
               Seus dados foram mantidos. Entre ou crie sua conta para continuar a geração com 3 créditos grátis.
             </DialogDescription>
           </DialogHeader>
@@ -544,7 +544,7 @@ export default function Calculator({ context = "landing", layout = "section" }: 
           <div className="grid gap-3 sm:grid-cols-2">
             <Link
               href={`/login?next=${encodeURIComponent(authNextPath)}`}
-              className="inline-flex h-10 items-center justify-center border border-iris px-4 font-body text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-muted"
+              className="inline-flex h-10 items-center justify-center rounded-full border border-border bg-background px-4 font-body text-xs uppercase tracking-wider text-foreground transition-colors hover:bg-muted"
             >
               Fazer login
             </Link>

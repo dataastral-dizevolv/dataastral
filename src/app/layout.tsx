@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
-import { DM_Mono, DM_Sans, Libre_Baskerville } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans, Ubuntu } from "next/font/google";
 
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const fontBody = DM_Sans({
-  variable: "--font-body",
+const fontJakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta-fallback",
   subsets: ["latin"],
 });
 
-const fontDisplay = Libre_Baskerville({
-  variable: "--font-display",
+const fontUbuntu = Ubuntu({
+  variable: "--font-ubuntu-fallback",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
 });
 
-const fontMono = DM_Mono({
-  variable: "--font-mono",
+const fontMono = JetBrains_Mono({
+  variable: "--font-mono-face",
   subsets: ["latin"],
   weight: ["400", "500"],
 });
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${fontBody.variable} ${fontDisplay.variable} ${fontMono.variable} bg-background text-foreground antialiased`}
+        className={`${fontJakarta.variable} ${fontUbuntu.variable} ${fontMono.variable} bg-background text-foreground antialiased`}
       >
         {children}
         <Toaster />

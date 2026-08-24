@@ -14,6 +14,10 @@ export interface DashboardUser {
   birthTimezone: string | null;
   birthLat: number | null;
   birthLng: number | null;
+  phone: string | null;
+  phoneCountry: string | null;
+  whatsapp: string | null;
+  pendingDeletionScheduledFor: string | null;
 }
 
 interface DashboardUserProfileRow {
@@ -30,13 +34,22 @@ interface DashboardProfileRow {
   birth_timezone?: string | null;
   birth_lat?: number | null;
   birth_lng?: number | null;
+  phone?: string | null;
+  phone_country?: string | null;
+  whatsapp?: string | null;
+}
+
+interface DashboardPendingDeletionRow {
+  scheduled_for?: string | null;
 }
 
 interface DashboardSupabaseClient {
-  from: (table: "user_profiles" | "profiles") => {
+  from: (table: "user_profiles" | "profiles" | "pending_deletions") => {
     select: (columns: string) => {
-      eq: (column: "id", value: string) => {
-        maybeSingle: () => Promise<{ data: DashboardUserProfileRow | DashboardProfileRow | null }>;
+      eq: (column: "id" | "user_id", value: string) => {
+        maybeSingle: () => Promise<{
+          data: DashboardUserProfileRow | DashboardProfileRow | DashboardPendingDeletionRow | null;
+        }>;
       };
     };
   };
@@ -77,6 +90,7 @@ export function buildDashboardUser(
   user: User,
   profile: DashboardUserProfileRow | null,
   profileData: DashboardProfileRow | null,
+  pendingDeletion: DashboardPendingDeletionRow | null = null,
 ): DashboardUser {
   return {
     id: user.id,
@@ -94,20 +108,32 @@ export function buildDashboardUser(
     birthTimezone: profileData?.birth_timezone ?? null,
     birthLat: profileData?.birth_lat ?? null,
     birthLng: profileData?.birth_lng ?? null,
+    phone: profileData?.phone ?? null,
+    phoneCountry: profileData?.phone_country ?? "+55",
+    whatsapp: profileData?.whatsapp ?? null,
+    pendingDeletionScheduledFor: pendingDeletion?.scheduled_for ?? null,
   };
 }
 
 export async function fetchDashboardUser(supabase: unknown, user: User): Promise<DashboardUser> {
   const client = supabase as DashboardSupabaseClient;
 
-  const [{ data: profile }, { data: profileData }] = await Promise.all([
+  const [{ data: profile }, { data: profileData }, { data: pendingDeletion }] = await Promise.all([
     client.from("user_profiles").select("full_name, role").eq("id", user.id).maybeSingle(),
     client
       .from("profiles")
-      .select("credits, full_name, birth_date, birth_time, birth_location, birth_timezone, birth_lat, birth_lng")
+      .select(
+        "credits, full_name, birth_date, birth_time, birth_location, birth_timezone, birth_lat, birth_lng, phone, phone_country, whatsapp",
+      )
       .eq("id", user.id)
       .maybeSingle(),
+    client.from("pending_deletions").select("scheduled_for").eq("user_id", user.id).maybeSingle(),
   ]);
 
-  return buildDashboardUser(user, profile as DashboardUserProfileRow | null, profileData as DashboardProfileRow | null);
+  return buildDashboardUser(
+    user,
+    profile as DashboardUserProfileRow | null,
+    profileData as DashboardProfileRow | null,
+    pendingDeletion as DashboardPendingDeletionRow | null,
+  );
 }

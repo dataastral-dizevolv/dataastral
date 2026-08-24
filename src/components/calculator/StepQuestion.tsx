@@ -27,7 +27,7 @@ export function StepQuestion({
           type="button"
           variant="ghost"
           onClick={onBack}
-          className="mb-3 inline-flex h-8 items-center gap-1.5 rounded-md border border-iris px-2.5 text-xs text-iris-secondary hover:border-foreground/40 hover:bg-muted/30 hover:text-foreground"
+          className="mb-3 inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 text-xs text-muted-foreground hover:border-iris-accent/40 hover:bg-card hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" />
           Voltar
@@ -39,13 +39,13 @@ export function StepQuestion({
       <div className="space-y-3">
         {loading ? (
           <div className="space-y-2">
-            <div className="h-11 animate-pulse rounded-md border border-iris/50 bg-muted/30" />
-            <div className="h-11 animate-pulse rounded-md border border-iris/50 bg-muted/30" />
-            <div className="h-11 animate-pulse rounded-md border border-iris/50 bg-muted/30" />
+            <div className="h-11 animate-pulse rounded-2xl border border-border bg-muted/40" />
+            <div className="h-11 animate-pulse rounded-2xl border border-border bg-muted/40" />
+            <div className="h-11 animate-pulse rounded-2xl border border-border bg-muted/40" />
           </div>
         ) : null}
 
-        {!loading && loadError ? <p className="text-xs text-amber-300">{loadError}</p> : null}
+        {!loading && loadError ? <p className="text-xs text-destructive">{loadError}</p> : null}
 
         {!loading && !loadError && questions.length === 0 ? (
           <p className="text-xs text-iris-muted">Nenhuma pergunta disponível para este tema no momento.</p>
@@ -60,9 +60,9 @@ export function StepQuestion({
               type="button"
               variant="outline"
               onClick={() => onSelectQuestion(question)}
-              className={`h-auto w-full justify-start rounded-md p-4 text-left ${selected ? "border-foreground bg-muted text-foreground" : "border-iris hover:border-foreground/40 hover:bg-muted/30"}`}
+              className={`h-auto w-full justify-start rounded-2xl border bg-card/60 p-4 text-left shadow-sm ${selected ? "border-powder-blue bg-powder-blue/15 text-foreground ring-1 ring-powder-blue/40" : "border-border hover:border-iris-accent/40 hover:bg-card"}`}
             >
-              <span className={`text-sm leading-relaxed ${selected ? "text-foreground" : "text-iris-secondary"}`}>{question}</span>
+              <span className={`text-sm leading-relaxed ${selected ? "text-foreground" : "text-muted-foreground"}`}>{question}</span>
             </Button>
           );
         })}

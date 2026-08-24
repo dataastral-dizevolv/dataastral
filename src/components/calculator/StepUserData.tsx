@@ -152,8 +152,8 @@ function WheelColumn({
   return (
     <div className="relative flex-1">
       <p className="mb-2 text-center font-mono-iris text-[11px] uppercase tracking-wider text-iris-secondary">{title}</p>
-      <div className="pointer-events-none absolute inset-x-1 top-1/2 z-10 h-10 -translate-y-1/2 rounded-md border border-foreground/20 bg-background/70" />
-      <div className="h-44 snap-y snap-mandatory overflow-y-auto rounded-md border border-iris/50 bg-muted/30 p-1 sm:h-48">
+      <div className="pointer-events-none absolute inset-x-1 top-1/2 z-10 h-10 -translate-y-1/2 rounded-xl border border-powder-blue/40 bg-background/80" />
+      <div className="h-44 snap-y snap-mandatory overflow-y-auto rounded-2xl border border-border bg-card/70 p-1 sm:h-48">
         <div className="h-20" />
         {options.map((option) => {
           const isSelected = option.value === selectedValue;
@@ -400,7 +400,7 @@ export function StepUserData({
             type="button"
             variant="ghost"
             onClick={onBack}
-            className="mb-3 inline-flex h-8 items-center gap-1.5 rounded-md border border-iris px-2.5 text-xs text-iris-secondary hover:border-foreground/40 hover:bg-muted/30 hover:text-foreground"
+            className="mb-3 inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 text-xs text-muted-foreground hover:border-iris-accent/40 hover:bg-card hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" />
             Voltar
@@ -425,10 +425,10 @@ export function StepUserData({
                       gender: option.value,
                     }))
                   }
-                  className={`min-h-10 rounded-md border px-3 py-2 text-xs font-body tracking-wide transition-colors ${
+                  className={`min-h-10 rounded-2xl border px-3 py-2 text-xs font-body tracking-wide transition-colors ${
                     selected
-                      ? "border-foreground bg-muted text-foreground"
-                      : "border-iris bg-muted/70 text-iris-secondary hover:text-foreground"
+                      ? "border-powder-blue bg-powder-blue/15 text-foreground ring-1 ring-powder-blue/40"
+                      : "border-border bg-card/70 text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <span className="block whitespace-normal break-words leading-tight">{option.label}</span>
@@ -441,7 +441,7 @@ export function StepUserData({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="birth-date" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
-              Data de nascimento <span className="text-red-400">*</span>
+              Data de nascimento <span className="text-destructive">*</span>
             </Label>
             <Input
               id="birth-date"
@@ -459,7 +459,7 @@ export function StepUserData({
             <button
               type="button"
               onClick={openDateWheel}
-              className="block h-10 w-full rounded-md border border-iris bg-muted/70 px-3 text-left text-sm text-foreground sm:hidden"
+              className="block h-10 w-full rounded-xl border border-border bg-card px-3 text-left text-sm text-foreground sm:hidden"
             >
               {formatDateForDisplay(date)}
             </button>
@@ -484,7 +484,7 @@ export function StepUserData({
             <button
               type="button"
               onClick={openTimeWheel}
-              className="block h-10 w-full rounded-md border border-iris bg-muted/70 px-3 text-left text-sm text-foreground sm:hidden"
+              className="block h-10 w-full rounded-xl border border-border bg-card px-3 text-left text-sm text-foreground sm:hidden"
             >
               {formatTimeForDisplay(time)}
             </button>
@@ -493,7 +493,7 @@ export function StepUserData({
 
         <div className="relative space-y-2">
           <Label htmlFor="birth-place" className="font-mono-iris text-xs uppercase tracking-wider text-iris-secondary">
-            Cidade, estado e país de nascimento <span className="text-red-400">*</span>
+            Cidade, estado e país de nascimento <span className="text-destructive">*</span>
           </Label>
 
           <div className="relative">
@@ -517,7 +517,7 @@ export function StepUserData({
               }}
               onFocus={() => setLocationOpen(locationResults.length > 0)}
               placeholder="Digite cidade, estado e país"
-              className="border-iris bg-muted pl-9"
+              className="border-border bg-card pl-9"
             />
             {locationLoading ? <Loader2 className="absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin text-iris-muted" /> : null}
           </div>
@@ -528,7 +528,7 @@ export function StepUserData({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
-                className="z-30 mt-1 max-h-80 overflow-y-auto rounded-md border border-iris bg-muted p-1"
+                className="z-30 mt-1 max-h-80 overflow-y-auto rounded-2xl border border-border bg-card p-1 shadow-md"
               >
                 {locationResults.map((locationOption) => (
                   <button
@@ -557,7 +557,7 @@ export function StepUserData({
             ) : null}
           </AnimatePresence>
 
-          {locationError ? <p className="text-[11px] text-red-300">{locationError}</p> : null}
+          {locationError ? <p className="text-[11px] text-destructive">{locationError}</p> : null}
         </div>
 
         {SHOW_DYNAMIC_QUESTIONS && dynamicQuestionsLoading ? (
@@ -666,17 +666,17 @@ export function StepUserData({
           </div>
         ) : null}
 
-        {SHOW_DYNAMIC_QUESTIONS && !dynamicQuestionsLoading && dynamicQuestionsError ? <p className="text-[11px] text-amber-300">{dynamicQuestionsError}</p> : null}
+        {SHOW_DYNAMIC_QUESTIONS && !dynamicQuestionsLoading && dynamicQuestionsError ? <p className="text-[11px] text-destructive">{dynamicQuestionsError}</p> : null}
 
         <Button type="submit" className="w-full font-body text-xs uppercase tracking-wider">
           Gerar minha previsão
         </Button>
 
-        {formError ? <p className="text-[11px] text-red-300">{formError}</p> : null}
+        {formError ? <p className="text-[11px] text-destructive">{formError}</p> : null}
 
         {submitError ? (
-          <div className="space-y-3 rounded-md border border-red-500/50 bg-red-500/10 p-4">
-            <p className="text-sm text-red-200">{submitError}</p>
+          <div className="space-y-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4">
+            <p className="text-sm text-destructive">{submitError}</p>
             {submitErrorCode === "INSUFFICIENT_CREDITS" ? (
               <Button className="w-full font-body text-xs uppercase tracking-wider">Comprar créditos</Button>
             ) : null}
@@ -689,7 +689,7 @@ export function StepUserData({
       </form>
 
       <Dialog open={dateWheelOpen} onOpenChange={setDateWheelOpen}>
-        <DialogContent className="max-w-[calc(100%-1rem)] rounded-md border border-iris bg-background p-4 sm:max-w-xl sm:p-5" showCloseButton={false}>
+        <DialogContent className="max-w-[calc(100%-1rem)] rounded-2xl border border-border bg-card p-4 sm:max-w-xl sm:p-5" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle className="font-display text-base text-foreground">Escolha sua data de nascimento</DialogTitle>
             <DialogDescription className="sr-only">Selecione o dia, mês e ano do nascimento</DialogDescription>
@@ -738,7 +738,7 @@ export function StepUserData({
       </Dialog>
 
       <Dialog open={timeWheelOpen} onOpenChange={setTimeWheelOpen}>
-        <DialogContent className="max-w-[calc(100%-1rem)] rounded-md border border-iris bg-background p-4 sm:max-w-md sm:p-5" showCloseButton={false}>
+        <DialogContent className="max-w-[calc(100%-1rem)] rounded-2xl border border-border bg-card p-4 sm:max-w-md sm:p-5" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle className="font-display text-base text-foreground">Escolha sua hora de nascimento</DialogTitle>
             <DialogDescription className="sr-only">Selecione a hora e minuto do nascimento</DialogDescription>

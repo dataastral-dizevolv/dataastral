@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { isLikelyPhone, isLikelyWhatsapp, normalizePhoneCountry, toStoredPhone, toStoredWhatsapp } from "@/lib/profile/phone";
 
 interface UpdateProfileBody {
   fullName?: string;
@@ -11,6 +12,9 @@ interface UpdateProfileBody {
   birthTimezone?: string;
   birthLat?: number;
   birthLng?: number;
+  phone?: string;
+  phoneCountry?: string;
+  whatsapp?: string;
 }
 
 function isValidDate(value: string) {
@@ -44,6 +48,11 @@ export async function PATCH(request: NextRequest) {
   const birthTimezone = body.birthTimezone?.trim() ?? "";
   const birthLat = body.birthLat;
   const birthLng = body.birthLng;
+  const hasPhoneFields = Object.hasOwn(body, "phone") || Object.hasOwn(body, "phoneCountry");
+  const hasWhatsappField = Object.hasOwn(body, "whatsapp");
+  const phoneCountry = hasPhoneFields ? normalizePhoneCountry(body.phoneCountry ?? "+55") : undefined;
+  const phone = hasPhoneFields ? toStoredPhone(phoneCountry ?? "+55", body.phone ?? "") : undefined;
+  const whatsapp = hasWhatsappField ? toStoredWhatsapp(body.whatsapp ?? "", phoneCountry ?? "+55") : undefined;
 
   if (birthDate.length > 0 && !isValidDate(birthDate)) {
     return NextResponse.json({ error: "Data de nascimento inválida." }, { status: 400 });
@@ -59,6 +68,14 @@ export async function PATCH(request: NextRequest) {
 
   if (birthLocation.length > 0 && (birthLat == null || birthLng == null || birthTimezone.length === 0)) {
     return NextResponse.json({ error: "Selecione uma localização válida da lista." }, { status: 400 });
+  }
+
+  if (phone !== undefined && !isLikelyPhone(phone)) {
+    return NextResponse.json({ error: "Informe um celular válido." }, { status: 400 });
+  }
+
+  if (whatsapp !== undefined && !isLikelyWhatsapp(whatsapp)) {
+    return NextResponse.json({ error: "Informe um WhatsApp válido, com DDI." }, { status: 400 });
   }
 
   let adminClient: ReturnType<typeof createAdminClient>;
@@ -79,11 +96,17 @@ export async function PATCH(request: NextRequest) {
     birth_lat: birthLat ?? null,
     birth_lng: birthLng ?? null,
     updated_at: new Date().toISOString(),
+    ...(hasPhoneFields ? { phone, phone_country: phoneCountry } : {}),
+    ...(hasWhatsappField ? { whatsapp } : {}),
   };
 
   const { error: profileError } = await adminClient.from("profiles").upsert(profilePayload, { onConflict: "id" });
 
   if (profileError) {
+    if (profileError.code === "23505") {
+      return NextResponse.json({ error: "Este celular já está em uso em outra conta." }, { status: 409 });
+    }
+
     return NextResponse.json({ error: "Falha ao salvar perfil." }, { status: 500 });
   }
 

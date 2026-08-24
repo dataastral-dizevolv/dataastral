@@ -41,12 +41,14 @@ function SheetContent({
   side = "right",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  side?: "left" | "right";
+  side?: "left" | "right" | "bottom";
 }) {
   const sideClassName =
     side === "left"
       ? "left-0 right-auto border-r border-l-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left"
-      : "right-0 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right";
+      : side === "bottom"
+        ? "inset-x-0 bottom-0 top-auto h-[min(90dvh,720px)] max-w-none rounded-t-[28px] border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+        : "right-0 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right";
 
   return (
     <SheetPortal>

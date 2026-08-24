@@ -81,12 +81,12 @@ export function StepTheme({ selectedTheme, onSelectTheme, onContinue }: StepThem
               disabled={isCalibration}
               title={isCalibration ? "Em breve" : undefined}
               onClick={isCalibration ? undefined : () => onSelectTheme(theme.id)}
-              className={`h-auto flex-col gap-2.5 rounded-md p-4 text-center ${
+              className={`h-auto flex-col gap-2.5 rounded-2xl border bg-card/60 p-4 text-center shadow-sm backdrop-blur-sm ${
                 isCalibration
-                  ? "cursor-not-allowed border-iris opacity-40"
+                  ? "cursor-not-allowed border-border opacity-40"
                   : selected
-                    ? "border-foreground bg-muted text-foreground"
-                    : "border-iris hover:border-foreground/40 hover:bg-muted/30"
+                    ? "border-powder-blue bg-powder-blue/15 text-foreground ring-1 ring-powder-blue/40"
+                    : "border-border hover:border-iris-accent/40 hover:bg-card"
               }`}
             >
               <span className={selected && !isCalibration ? "text-foreground" : "text-iris-secondary"}>{icon}</span>

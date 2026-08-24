@@ -1,25 +1,30 @@
-import FAQ from "@/components/landing/FAQ";
-import FinalCTA from "@/components/landing/FinalCTA";
+import { Suspense } from "react";
+import Header from "@/components/landing/Header";
+import Hero from "@/components/landing/Hero";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import WorldReachMap from "@/components/landing/WorldReachMap";
 import Footer from "@/components/landing/Footer";
-import HeroSection from "@/components/landing/HeroSection";
-import HowItWorks from "@/components/landing/HowItWorks";
-import ZodiacWheelSection from "@/components/landing/ZodiacWheelSection";
-import Navbar from "@/components/landing/Navbar";
-import SocialProof from "@/components/landing/SocialProof";
-
-const SHOW_SKY_NOW = false;
+import AnimatedGradientBackground from "@/components/landing/AnimatedGradientBackground";
+import Calculator from "@/components/landing/Calculator";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      <HeroSection />
-      {SHOW_SKY_NOW ? <ZodiacWheelSection /> : null}
-      <HowItWorks />
-      <SocialProof />
-      <FAQ />
-      <FinalCTA />
-      <Footer />
+    <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <AnimatedGradientBackground />
+      <div className="relative z-10">
+        <Header />
+        <main>
+          <Hero />
+          <section id="calculadora" className="relative scroll-mt-20">
+            <Suspense fallback={null}>
+              <Calculator context="landing" layout="section" />
+            </Suspense>
+          </section>
+          <TestimonialsSection />
+          <WorldReachMap />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseConfig } from "@/lib/supabase/config";
+import { enrichText } from "@/lib/enrichText";
 import type { ThemeId } from "@/types/calculator";
 
 export const runtime = "nodejs";
@@ -378,11 +379,16 @@ export async function POST(request: NextRequest) {
       responseSize: cachedPrediction.prediction_text.length,
     });
 
+    const cachedEnriched = await enrichText({
+      predictionText: cachedPrediction.prediction_text,
+      eventDate: cachedPrediction.event_date || "",
+    });
+
     const response = NextResponse.json({
-      prediction: cachedPrediction.prediction_text,
-      prediction_text: cachedPrediction.prediction_text,
-      audio_text: cachedPrediction.prediction_text,
-      whatsapp_text: cachedPrediction.prediction_text,
+      prediction: cachedEnriched,
+      prediction_text: cachedEnriched,
+      audio_text: cachedEnriched,
+      whatsapp_text: cachedEnriched,
       eventDate: cachedPrediction.event_date || "",
       eventDateIso: "",
       remainingCredits,
@@ -672,9 +678,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  console.info("[predict] Engine code para enrichText", { engineCode: enginePrediction.code });
+  const enrichedPrediction = await enrichText({
+    predictionText: interpretedPrediction,
+    eventDate: enginePrediction.date ?? "",
+  });
+
   const response = NextResponse.json({
-    prediction: interpretedPrediction,
-    prediction_text: interpretedPrediction,
+    prediction: enrichedPrediction,
+    prediction_text: enrichedPrediction,
     audio_text: enginePrediction.audioText,
     whatsapp_text: enginePrediction.whatsappText,
     eventDate: enginePrediction.date,

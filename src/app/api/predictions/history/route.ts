@@ -70,3 +70,39 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(payload);
 }
+
+export async function DELETE(request: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  }
+
+  const deleteAll = request.nextUrl.searchParams.get("all") === "1";
+  const id = request.nextUrl.searchParams.get("id")?.trim() ?? "";
+
+  if (!deleteAll && !id) {
+    return NextResponse.json({ error: "Informe o item ou all=1." }, { status: 400 });
+  }
+
+  let query = supabase.from("user_prediction_history").delete().eq("user_id", user.id);
+
+  if (!deleteAll) {
+    if (!/^[0-9a-f-]{36}$/i.test(id)) {
+      return NextResponse.json({ error: "Identificador inválido." }, { status: 400 });
+    }
+    query = query.eq("id", id);
+  }
+
+  const { error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: "Falha ao excluir histórico." }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
+

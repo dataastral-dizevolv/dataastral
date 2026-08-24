@@ -2,6 +2,236 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* ── Local brand fonts (public/fonts) — no __l5e CDN ── */
+
+@font-face {
+  font-family: "Kalissa";
+  src: url("/fonts/Kalissa-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Andalusia Script";
+  src:
+    url("/fonts/AndalusiaScript.otf") format("opentype"),
+    url("/fonts/AndalusiaScript.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Garden Royale";
+  src:
+    url("/fonts/GardenRoyale-Regular.woff2") format("woff2"),
+    url("/fonts/GardenRoyale-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Behind The Nineties";
+  src: url("/fonts/BehindTheNineties-Rg.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Behind The Nineties";
+  src: url("/fonts/BehindTheNineties-Md.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rupture Script";
+  src: url("/fonts/RuptureScript.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Rupture Sans";
+  src: url("/fonts/RuptureSans.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Modista Pro";
+  src: url("/fonts/ModistaPro-Thin.woff2") format("woff2");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Modista Pro";
+  src: url("/fonts/ModistaPro-ExtraLight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Modista Pro";
+  src: url("/fonts/ModistaPro-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Modista Pro";
+  src: url("/fonts/ModistaPro-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Modista Pro";
+  src: url("/fonts/ModistaPro-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Modista Pro";
+  src: url("/fonts/ModistaPro-Heavy.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wasted Punk";
+  src:
+    url("/fonts/WastedPunk.otf") format("opentype"),
+    url("/fonts/WastedPunk.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "itagi Sans";
+  src: url("/fonts/itagi/itagiSans-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "itagi Sans";
+  src: url("/fonts/itagi/itagiSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "itagi Sans";
+  src: url("/fonts/itagi/itagiSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "itagi Sans";
+  src: url("/fonts/itagi/itagiSans-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "itagi Sans";
+  src: url("/fonts/itagi/itagiSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "itagi Sans";
+  src: url("/fonts/itagi/itagiSans-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "The Grimm";
+  src:
+    url("/fonts/grimm/TheGrimm-Light.woff") format("woff"),
+    url("/fonts/grimm/TheGrimm-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "The Grimm";
+  src:
+    url("/fonts/grimm/TheGrimm-Light.woff") format("woff"),
+    url("/fonts/grimm/TheGrimm-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0044, U+0064;
+  size-adjust: 110%;
+}
+
+@font-face {
+  font-family: "Gandaria";
+  src: url("/fonts/gandaria/GandariaFont-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gandaria";
+  src: url("/fonts/gandaria/GandariaFont-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gandaria";
+  src: url("/fonts/gandaria/GandariaFont-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gandaria";
+  src: url("/fonts/gandaria/GandariaFont-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gandaria";
+  src: url("/fonts/gandaria/GandariaFont-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -24,6 +254,101 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+
+  --color-black: hsl(var(--black));
+  --color-white: hsl(var(--white));
+
+  --color-surface-1: hsl(var(--surface-1));
+  --color-surface-2: hsl(var(--surface-2));
+  --color-surface-3: hsl(var(--surface-3));
+  --color-sky: hsl(var(--sky));
+
+  --color-iris: hsl(var(--iris));
+  --color-iris-foreground: hsl(var(--iris-foreground));
+  --color-iris-pastel: hsl(var(--iris-pastel));
+  --color-iris-pastel-ink: hsl(var(--iris-pastel-ink));
+
+  --color-iris-blue-mist: hsl(var(--blue-mist));
+  --color-iris-blue-chambray: hsl(var(--blue-chambray));
+  --color-iris-blue-steel: hsl(var(--blue-steel));
+  --color-iris-blue-deep: hsl(var(--blue-deep));
+  --color-iris-blue-ink: hsl(var(--blue-ink));
+  --color-iris-blue-graphite: hsl(var(--blue-graphite));
+  --color-iris-blue-crystal: hsl(var(--crystal-blue));
+
+  --color-mandala-deep: hsl(var(--mandala-deep));
+  --color-mandala-dark: hsl(var(--mandala-dark));
+  --color-mandala-mid: hsl(var(--mandala-mid));
+  --color-mandala-light: hsl(var(--mandala-light));
+
+  --color-azure: hsl(var(--azure));
+  --color-azure-soft: hsl(var(--azure-soft));
+  --color-azure-pale: hsl(var(--azure-pale));
+  --color-azure-glow: hsl(var(--azure-glow));
+  --color-azure-sky: hsl(var(--azure-sky));
+  --color-azure-foreground: hsl(var(--azure-foreground));
+
+  --color-powder-blue: hsl(var(--powder-blue));
+  --color-powder-blue-foreground: hsl(var(--powder-blue-foreground));
+  --color-planetary: hsl(var(--planetary));
+  --color-planetary-foreground: hsl(var(--planetary-foreground));
+  --color-milky-way: hsl(var(--milky-way));
+  --color-milky-way-foreground: hsl(var(--milky-way-foreground));
+
+  --color-neon-blue: hsl(var(--neon-blue));
+  --color-lightblue: hsl(var(--lightblue));
+  --color-highlight: hsl(var(--highlight));
+  --color-highlight-foreground: hsl(var(--highlight-foreground));
+  --color-mint: hsl(var(--mint-bg));
+  --color-mint-green: hsl(var(--mint-green));
+  --color-bubble: hsl(var(--warm-bubble));
+  --color-chat-vibrant: hsl(var(--chat-vibrant));
+  --color-chat-vibrant-fg: hsl(var(--chat-vibrant-fg));
+
+  --color-electric-blue: hsl(var(--electric-blue));
+  --color-electric-blue-foreground: hsl(var(--electric-blue-foreground));
+  --color-ultramarine: hsl(var(--ultramarine));
+  --color-ultramarine-foreground: hsl(var(--ultramarine-foreground));
+  --color-cornflower: hsl(var(--cornflower));
+  --color-cornflower-foreground: hsl(var(--cornflower-foreground));
+  --color-neon-green: hsl(var(--neon-green));
+  --color-neon-green-foreground: hsl(var(--neon-green-foreground));
+  --color-sea-serpent: hsl(var(--sea-serpent));
+  --color-sea-serpent-foreground: hsl(var(--sea-serpent-foreground));
+  --color-chambray: hsl(var(--chambray));
+  --color-chambray-foreground: hsl(var(--chambray-foreground));
+  --color-bold-blue: hsl(var(--bold-blue));
+  --color-bold-blue-foreground: hsl(var(--bold-blue-foreground));
+  --color-non-photo-blue: hsl(var(--non-photo-blue));
+  --color-non-photo-blue-foreground: hsl(var(--non-photo-blue-foreground));
+
+  --color-juniper: hsl(var(--juniper));
+  --color-mystic: hsl(var(--mystic));
+  --color-casper: hsl(var(--casper));
+  --color-jungle-mist: hsl(var(--jungle-mist));
+  --color-midnight: hsl(var(--midnight));
+  --color-porcelain: hsl(var(--porcelain));
+  --color-misty: hsl(var(--misty));
+  --color-cherry: hsl(var(--cherry));
+  --color-blush: hsl(var(--blush));
+  --color-branco-gelo: hsl(var(--branco-gelo));
+
+  --color-rich-black: hsl(var(--rich-black));
+  --color-oxford-blue: hsl(var(--oxford-blue));
+  --color-ylnmn-blue: hsl(var(--ylnmn-blue));
+  --color-silver-lake: hsl(var(--silver-lake));
+  --color-pigeon-blue: hsl(var(--pigeon-blue));
+  --color-platinum: hsl(var(--platinum));
+  --color-deep-navy: hsl(var(--deep-navy));
+  --color-buttercream: hsl(var(--buttercream));
+  --color-st-patrick-blue: hsl(var(--st-patrick-blue));
+  --color-true-blue: hsl(var(--true-blue));
+  --color-universe: hsl(var(--universe));
+  --color-calm-blue: hsl(var(--calm-blue));
+  --color-ice-blue: hsl(var(--ice-blue));
+  --color-silver: hsl(var(--silver));
+  --color-sky-map-blue: hsl(var(--sky-map-blue));
+
   --color-sidebar: hsl(var(--sidebar-background));
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));
   --color-sidebar-primary: hsl(var(--sidebar-primary));
@@ -32,62 +357,246 @@
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
-  --font-sans: var(--font-body);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+
+  --font-sans: "itagi Sans", Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-body: "itagi Sans", Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: var(--font-ubuntu-fallback, "Ubuntu"), var(--font-jakarta-fallback, "Plus Jakarta Sans"),
+    Inter, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face, "JetBrains Mono"), "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --font-itagi: "itagi Sans", var(--font-jakarta-fallback, "Plus Jakarta Sans"), Inter, system-ui, sans-serif;
+  --font-jakarta: var(--font-jakarta-fallback, "Plus Jakarta Sans"), Inter, system-ui, sans-serif;
+  --font-gandaria: "Gandaria", Inter, system-ui, sans-serif;
+  --font-script: "Behind The Nineties", "Andalusia Script", "Garden Royale", cursive;
+  --font-nineties: "itagi Sans", "Behind The Nineties", system-ui, sans-serif;
+  --font-ubuntu: var(--font-ubuntu-fallback, "Ubuntu"), Inter, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
+
+  --shadow-card-soft: 0 1px 2px hsl(220 6% 13% / 0.04), 0 4px 12px -4px hsl(220 6% 13% / 0.06);
+  --shadow-card-soft-hover: 0 2px 4px hsl(220 6% 13% / 0.06), 0 12px 24px -8px hsl(220 6% 13% / 0.1);
+
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-marquee-x: marquee-x var(--duration, 60s) linear infinite;
+  --animate-marquee-x-reverse: marquee-x-reverse var(--duration, 60s) linear infinite;
+  --animate-marquee-y: marquee-y 20s linear infinite;
+  --animate-shine: shine 1.4s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 2.4s ease-in-out infinite;
+  --animate-spin-ccw: spin-ccw 8s linear infinite;
+  --animate-neon-pulse-once: neon-pulse-once 2.4s ease-out 1;
+  --animate-hint-flash: hint-flash 1.1s ease-in-out 1 both;
+  --animate-rotate-slow: rotate-slow 120s linear infinite;
+  --animate-progress: progress 2.5s ease-out forwards;
 }
 
 :root {
-  --background: 225 15% 6%;
-  --foreground: 0 0% 93%;
-  --card: 225 12% 10%;
-  --card-foreground: 0 0% 93%;
-  --popover: 225 12% 10%;
-  --popover-foreground: 0 0% 93%;
-  --primary: 0 0% 86%;
-  --primary-foreground: 225 15% 6%;
-  --secondary: 220 9% 33%;
-  --secondary-foreground: 0 0% 93%;
-  --muted: 225 10% 15%;
-  --muted-foreground: 0 0% 66%;
-  --accent: 225 10% 15%;
-  --accent-foreground: 0 0% 93%;
-  --destructive: 4 65% 46%;
-  --destructive-foreground: 0 0% 93%;
-  --border: 0 0% 93% / 0.08;
-  --input: 0 0% 93% / 0.08;
-  --ring: 0 0% 80%;
-  --radius: 0.375rem;
+  /* Pastel-blue base — Lovable light theme */
+  --background: 213 70% 96%;
+  --foreground: 217 25% 18%;
 
-  --iris-bg-primary: 225 15% 6%;
-  --iris-bg-secondary: 225 12% 10%;
-  --iris-bg-tertiary: 225 10% 13%;
-  --iris-bg-glass: 0 0% 100% / 0.03;
-  --iris-text-primary: 0 0% 93%;
-  --iris-text-secondary: 0 0% 66%;
-  --iris-text-muted: 0 0% 50%;
-  --iris-accent: 0 0% 86%;
-  --iris-accent-light: 0 0% 93%;
-  --iris-accent-glow: 0 0% 86% / 0.15;
-  --iris-secondary: 220 9% 33%;
-  --iris-secondary-light: 220 9% 45%;
-  --iris-tensao: 4 65% 46%;
-  --iris-harmonia: 145 54% 42%;
-  --iris-portal: 220 6% 44%;
-  --iris-neutro: 0 0% 53%;
-  --iris-border-accent: 0 0% 86% / 0.3;
+  --black: 0 0% 0%;
+  --white: 0 0% 100%;
 
-  --sidebar-background: 225 12% 10%;
-  --sidebar-foreground: 0 0% 93%;
-  --sidebar-primary: 0 0% 86%;
-  --sidebar-primary-foreground: 225 15% 6%;
-  --sidebar-accent: 225 10% 13%;
-  --sidebar-accent-foreground: 0 0% 93%;
-  --sidebar-border: 0 0% 93% / 0.08;
-  --sidebar-ring: 0 0% 80%;
+  --sky: 213 60% 93%;
+
+  --surface-1: 213 65% 95%;
+  --surface-2: 212 50% 91%;
+  --surface-3: 212 42% 86%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 217 25% 18%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 217 25% 18%;
+
+  --primary: 217 46% 22%;
+  --primary-foreground: 213 70% 96%;
+
+  --secondary: 213 50% 92%;
+  --secondary-foreground: 217 25% 18%;
+
+  --accent: 213 40% 55%;
+  --accent-foreground: 0 0% 100%;
+
+  --muted: 213 45% 92%;
+  --muted-foreground: 216 15% 38%;
+
+  --destructive: 0 72% 48%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 213 32% 84%;
+  --input: 213 28% 82%;
+  --ring: 213 40% 55%;
+  --radius: 1.25rem;
+
+  --text-primary: 220 6% 12%;
+  --text-secondary: 220 4% 32%;
+  --text-tertiary: 220 3% 50%;
+  --text-pastel: 215 15% 68%;
+  --divider: 213 30% 86%;
+
+  --neon: 152 68% 42%;
+  --neon-blue: 217 91% 56%;
+  --lightblue: 199 100% 52%;
+
+  --rich-black: 211 53% 11%;
+  --oxford-blue: 246 25% 85%;
+  --ylnmn-blue: 220 34% 71%;
+  --silver-lake: 214 23% 56%;
+  --pigeon-blue: 218 22% 55%;
+  --platinum: 150 4% 90%;
+  --deep-navy: 216 48% 11%;
+  --buttercream: 45 9% 80%;
+  --st-patrick-blue: 235 54% 31%;
+  --true-blue: 205 100% 41%;
+  --universe: 217 53% 63%;
+  --calm-blue: 208 100% 67%;
+  --ice-blue: 195 39% 80%;
+  --silver: 0 0% 75%;
+  --sky-map-blue: 207 46% 70%;
+
+  --azure: 210 100% 50%;
+  --azure-soft: 209 56% 74%;
+  --azure-pale: 196 92% 90%;
+  --azure-glow: 211 69% 87%;
+  --azure-sky: 210 91% 56%;
+  --azure-foreground: 0 0% 100%;
+  --electric-blue: 234 100% 49%;
+  --electric-blue-foreground: 0 0% 100%;
+  --ultramarine: 228 90% 61%;
+  --ultramarine-foreground: 0 0% 100%;
+  --cornflower: 221 88% 68%;
+  --cornflower-foreground: 228 60% 16%;
+  --neon-green: 150 79% 58%;
+  --neon-green-foreground: 158 60% 12%;
+  --mint-green: 158 60% 88%;
+  --sea-serpent: 189 76% 59%;
+  --sea-serpent-foreground: 195 70% 14%;
+  --chambray: 205 50% 76%;
+  --chambray-foreground: 213 46% 22%;
+  --bold-blue: 219 89% 86%;
+  --bold-blue-foreground: 228 60% 16%;
+  --powder-blue: 205 68% 75%;
+  --powder-blue-foreground: 220 6% 12%;
+  --planetary: 227 54% 44%;
+  --planetary-foreground: 0 0% 100%;
+  --milky-way: 40 24% 98%;
+  --milky-way-foreground: 220 6% 12%;
+  --branco-gelo: 220 14% 93%;
+  --branco-gelo-foreground: 220 6% 12%;
+  --non-photo-blue: 186 71% 76%;
+  --non-photo-blue-foreground: 195 70% 14%;
+
+  --juniper: 191 19% 46%;
+  --juniper-foreground: 195 70% 14%;
+  --mystic: 190 20% 90%;
+  --mystic-foreground: 195 70% 14%;
+  --casper: 195 23% 73%;
+  --casper-foreground: 195 70% 14%;
+  --jungle-mist: 184 26% 73%;
+  --jungle-mist-foreground: 195 70% 14%;
+  --midnight: 189 84% 21%;
+  --midnight-foreground: 0 0% 100%;
+  --porcelain: 214 32% 95%;
+  --porcelain-foreground: 220 6% 12%;
+  --misty: 220 57% 82%;
+  --misty-foreground: 220 40% 20%;
+
+  --cherry: 348 98% 55%;
+  --cherry-foreground: 0 0% 100%;
+  --blush: 350 100% 99%;
+  --blush-foreground: 348 98% 55%;
+
+  --mint-bg: 40 10% 94%;
+  --warm-bubble: 43 40% 97%;
+  --chat-vibrant: 174 80% 40%;
+  --chat-vibrant-fg: 0 0% 100%;
+
+  --highlight: 220 6% 20%;
+  --highlight-foreground: 0 0% 100%;
+
+  --iris: 217 91% 56%;
+  --iris-foreground: 0 0% 100%;
+  --iris-pastel: 210 45% 82%;
+  --iris-pastel-ink: 213 46% 38%;
+
+  --blue-mist: 210 40% 96%;
+  --blue-chambray: 207 44% 70%;
+  --blue-steel: 210 42% 56%;
+  --blue-deep: 213 46% 38%;
+  --blue-ink: 217 46% 22%;
+  --blue-graphite: 217 39% 22%;
+  --crystal-blue: 191 51% 85%;
+
+  --hero-icon-blue-1: 218 10% 42%;
+  --hero-icon-blue-2: 218 9% 46%;
+  --hero-icon-blue-3: 217 9% 50%;
+  --hero-icon-blue-4: 217 9% 54%;
+  --hero-icon-blue-5: 216 8% 58%;
+  --hero-icon-blue-6: 216 8% 62%;
+  --hero-icon-blue-7: 215 8% 66%;
+  --blue-medium: 207 56% 52%;
+
+  --mandala-deep: 215 51% 22%;
+  --mandala-dark: 214 45% 32%;
+  --mandala-mid: 216 38% 41%;
+  --mandala-light: 219 31% 53%;
+
+  --palatinate-blue: 232 90% 56%;
+  --white-blue: 40 12% 98%;
+  --black-blue: 220 6% 13%;
+  --blackout: 220 6% 13%;
+
+  --shadow-card-soft: 0 1px 2px hsl(220 6% 13% / 0.04), 0 4px 12px -4px hsl(220 6% 13% / 0.06);
+  --shadow-card-soft-hover: 0 2px 4px hsl(220 6% 13% / 0.06), 0 12px 24px -8px hsl(220 6% 13% / 0.1);
+
+  --event-1: 211 70% 55%;
+  --event-2: 152 55% 42%;
+  --event-3: 32 88% 52%;
+  --event-4: 340 70% 58%;
+  --event-5: 258 50% 58%;
+  --event-6: 188 60% 42%;
+
+  /* Legacy iris-* remapped to light equivalents (dashboard compat) */
+  --iris-bg-primary: 213 70% 96%;
+  --iris-bg-secondary: 0 0% 100%;
+  --iris-bg-tertiary: 213 65% 95%;
+  --iris-bg-glass: 0 0% 100% / 0.72;
+  --iris-text-primary: 217 25% 18%;
+  --iris-text-secondary: 216 15% 38%;
+  --iris-text-muted: 220 3% 50%;
+  --iris-accent: 217 91% 56%;
+  --iris-accent-light: 213 40% 55%;
+  --iris-accent-glow: 217 91% 56% / 0.18;
+  --iris-secondary: 213 50% 92%;
+  --iris-secondary-light: 212 42% 86%;
+  --iris-tensao: 0 72% 48%;
+  --iris-harmonia: 152 68% 42%;
+  --iris-portal: 213 40% 55%;
+  --iris-neutro: 220 3% 50%;
+  --iris-border-accent: 217 91% 56% / 0.28;
+
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 217 25% 18%;
+  --sidebar-primary: 217 46% 22%;
+  --sidebar-primary-foreground: 213 70% 96%;
+  --sidebar-accent: 213 50% 92%;
+  --sidebar-accent-foreground: 217 25% 18%;
+  --sidebar-border: 213 32% 84%;
+  --sidebar-ring: 213 40% 55%;
+
+  /* Font stacks — local first, next/font Google vars as fallbacks */
+  --font-itagi: "itagi Sans", var(--font-jakarta-fallback, "Plus Jakarta Sans"), Inter, -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  --font-jakarta: var(--font-jakarta-fallback, "Plus Jakarta Sans"), Inter, system-ui, sans-serif;
+  --font-gandaria: "Gandaria", Inter, system-ui, sans-serif;
+  --font-script: "Behind The Nineties", "Andalusia Script", "Garden Royale", cursive;
+  --font-nineties: "itagi Sans", "Behind The Nineties", system-ui, sans-serif;
+  --font-ubuntu: var(--font-ubuntu-fallback, "Ubuntu"), Inter, system-ui, sans-serif;
+  --font-body: "itagi Sans", Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: var(--font-ubuntu-fallback, "Ubuntu"), var(--font-jakarta-fallback, "Plus Jakarta Sans"),
+    Inter, system-ui, sans-serif;
 }
 
 @layer base {
@@ -95,11 +604,24 @@
     @apply border-border;
   }
 
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+
+  html,
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
   }
 
   h1,
@@ -109,6 +631,9 @@
   h5,
   h6 {
     font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: hsl(var(--foreground));
   }
 }
 
@@ -123,6 +648,30 @@
 
   .font-mono-iris {
     font-family: var(--font-mono);
+  }
+
+  .font-itagi {
+    font-family: var(--font-itagi);
+  }
+
+  .font-jakarta {
+    font-family: var(--font-jakarta);
+  }
+
+  .font-gandaria {
+    font-family: var(--font-gandaria);
+  }
+
+  .font-script {
+    font-family: var(--font-script);
+  }
+
+  .font-nineties {
+    font-family: var(--font-nineties);
+  }
+
+  .font-ubuntu {
+    font-family: var(--font-ubuntu);
   }
 
   .text-iris-primary {
@@ -162,11 +711,47 @@
   }
 
   .shadow-iris-card {
-    box-shadow: none;
+    box-shadow: var(--shadow-card-soft);
   }
 
   .shadow-iris-glow {
-    box-shadow: none;
+    box-shadow: 0 0 24px hsl(var(--iris-accent-glow));
+  }
+
+  .shadow-card-soft {
+    box-shadow: var(--shadow-card-soft);
+  }
+
+  .section-title,
+  .section-title-energias {
+    font-family: var(--font-ubuntu);
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    font-size: 32px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (min-width: 640px) {
+    .section-title,
+    .section-title-energias {
+      font-size: 42px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .section-title,
+    .section-title-energias {
+      font-size: 52px;
+    }
+  }
+
+  .text-azure-glow {
+    color: hsl(var(--azure-glow));
+  }
+
+  .shadow-card-soft-hover {
+    box-shadow: var(--shadow-card-soft-hover);
   }
 
   .eyebrow {
@@ -186,9 +771,9 @@
   }
 
   .badge-harmonia {
-    background: hsl(145 54% 42% / 0.15);
-    color: hsl(145 54% 52%);
-    border: 1px solid hsl(145 54% 42% / 0.3);
+    background: hsl(152 68% 42% / 0.12);
+    color: hsl(152 68% 32%);
+    border: 1px solid hsl(152 68% 42% / 0.28);
   }
 
   .iris-badge {
@@ -201,6 +786,9 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    background: hsl(var(--iris) / 0.1);
+    color: hsl(var(--iris));
+    border: 1px solid hsl(var(--iris) / 0.22);
   }
 
   .blur-mask {
@@ -215,13 +803,68 @@
   .animate-progress {
     animation: progress 2.5s ease-out forwards;
   }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-marquee-x {
+    animation: marquee-x var(--duration, 60s) linear infinite;
+  }
+
+  .animate-marquee-x-reverse {
+    animation: marquee-x-reverse var(--duration, 60s) linear infinite;
+  }
+
+  .animate-marquee-y {
+    animation: marquee-y 20s linear infinite;
+  }
+
+  .animate-shine {
+    animation: shine 1.4s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2.4s ease-in-out infinite;
+  }
+
+  .animate-spin-ccw {
+    animation: spin-ccw 8s linear infinite;
+  }
+
+  .animate-neon-pulse-once {
+    animation: neon-pulse-once 2.4s ease-out 1;
+  }
+
+  .animate-hint-flash {
+    animation: hint-flash 1.1s ease-in-out 1 both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-x,
+  .animate-marquee-x-reverse,
+  .animate-marquee-y,
+  .animate-shine,
+  .animate-glow-pulse,
+  .animate-spin-ccw,
+  .animate-rotate-slow,
+  .animate-progress,
+  .animate-fade-in,
+  .animate-neon-pulse-once,
+  .animate-hint-flash {
+    animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 @keyframes rotate-slow {
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -231,7 +874,6 @@
   from {
     width: 0%;
   }
-
   to {
     width: 100%;
   }
@@ -243,15 +885,119 @@
     opacity: 0.3;
     transform: scale(1);
   }
-
   50% {
     opacity: 1;
     transform: scale(1.4);
   }
 }
 
-html {
-  scroll-behavior: smooth;
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap, 1rem)));
+  }
+}
+
+@keyframes marquee-x-reverse {
+  from {
+    transform: translateX(calc(-100% - var(--gap, 1rem)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes marquee-y {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  60% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 hsl(213 40% 55% / 0),
+      0 0 20px 0 hsl(213 40% 55% / 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px hsl(213 40% 55% / 0.08),
+      0 0 40px 8px hsl(213 40% 55% / 0.22);
+  }
+}
+
+@keyframes spin-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes neon-pulse-once {
+  0% {
+    box-shadow:
+      0 0 0 0 hsl(var(--neon-blue) / 0),
+      0 0 0 0 hsl(var(--neon-blue) / 0);
+  }
+  20% {
+    box-shadow:
+      0 0 0 3px hsl(var(--neon-blue) / 0.35),
+      0 0 24px 6px hsl(var(--neon-blue) / 0.65);
+  }
+  60% {
+    box-shadow:
+      0 0 0 6px hsl(var(--neon-blue) / 0.15),
+      0 0 40px 10px hsl(var(--neon-blue) / 0.45);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 hsl(var(--neon-blue) / 0),
+      0 0 0 0 hsl(var(--neon-blue) / 0);
+  }
+}
+
+@keyframes hint-flash {
+  0%,
+  100% {
+    background-color: transparent;
+    color: hsl(var(--foreground) / 0.7);
+  }
+  30%,
+  60% {
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
 }
 
 ::-webkit-scrollbar {
@@ -259,12 +1005,16 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(234 33% 5%);
+  background: hsl(var(--surface-2));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(0 0% 88% / 0.3);
+  background: hsl(var(--border));
   border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.45);
 }
 
 .fc {
@@ -273,7 +1023,7 @@ html {
 
 .fc-theme-standard td,
 .fc-theme-standard th {
-  border-color: rgb(240 239 232 / 0.08);
+  border-color: hsl(var(--border));
 }
 
 .fc-col-header-cell-cushion {
@@ -290,7 +1040,7 @@ html {
 }
 
 .fc-day-today {
-  background: hsl(0 0% 88% / 0.06) !important;
+  background: hsl(var(--sky) / 0.85) !important;
 }
 
 .fc-day-today .fc-daygrid-day-number {
@@ -316,4 +1066,13 @@ html {
 
 .fc-scrollgrid-section > td {
   border: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

@@ -8,9 +8,15 @@ export interface CreditTransactionItem {
   createdAt: string;
 }
 
+export type CheckoutUiMode = "hosted" | "embedded";
+
 export interface BuyCreditsResponse {
   packageId: string;
-  checkoutUrl: string;
+  uiMode?: CheckoutUiMode;
+  /** Present when uiMode is hosted (default). */
+  checkoutUrl?: string;
+  /** Present when uiMode is embedded. */
+  clientSecret?: string;
 }
 
 export interface CreditPackageItem {

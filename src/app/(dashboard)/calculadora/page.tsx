@@ -1,13 +1,11 @@
 import { Suspense } from "react";
 
-import Calculator from "@/components/landing/Calculator";
+import { IrisChatShell } from "@/components/iris-chat/IrisChatShell";
 
 export default function CalculadoraPage() {
   return (
-    <main className="bg-background">
-      <Suspense fallback={null}>
-        <Calculator context="app" />
-      </Suspense>
-    </main>
+    <Suspense fallback={<div className="h-full bg-background" />}>
+      <IrisChatShell context="app" />
+    </Suspense>
   );
 }

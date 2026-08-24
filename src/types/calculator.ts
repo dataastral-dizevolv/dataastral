@@ -32,6 +32,7 @@ export interface PredictSuccessResponse {
   eventDateIso?: string;
   predictionId?: string;
   remainingCredits: number;
+  remainingFreeQuestions?: number;
   cached?: boolean;
   engineCode?: string;
   requestId?: string;

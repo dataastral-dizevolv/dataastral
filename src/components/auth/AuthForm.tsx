@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,20 +19,22 @@ interface AuthFormProps {
 
 const copyByMode = {
   login: {
-    title: "Entrar na plataforma",
-    description: "Acesse sua conta para continuar suas previsões.",
+    title: "Boas vindas de volta!",
+    description: "Entre para continuar sua jornada.",
     submit: "Entrar",
     switchLabel: "Ainda não tem conta?",
     switchAction: "Criar conta",
     switchHref: "/cadastro",
+    googleLabel: "Entrar com Google",
   },
   cadastro: {
     title: "Criar conta",
-    description: "Comece com seu acesso para salvar perguntas e previsões.",
+    description: "Cadastre-se para acessar mapa astral, planner e meus dados.",
     submit: "Criar conta",
     switchLabel: "Já tem conta?",
-    switchAction: "Fazer login",
+    switchAction: "Clique aqui — Entrar",
     switchHref: "/login",
+    googleLabel: "Cadastrar com Google",
   },
 } as const;
 
@@ -41,6 +43,8 @@ const AUTH_MESSAGES = {
   signupFailed: "Não foi possível criar sua conta agora. Tente novamente em instantes.",
   googleFailed: "Não foi possível entrar com Google. Tente novamente.",
 };
+
+const tapFx = "transition-all active:scale-[0.98] active:opacity-80 duration-150";
 
 function getSafeRedirectPath(rawNext: string | null) {
   if (!rawNext) {
@@ -68,22 +72,22 @@ function getSafeRedirectPath(rawNext: string | null) {
 
 function GoogleIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" xmlns="http://www.w3.org/2000/svg">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M21.35 11.1H12v2.98h5.33c-.23 1.5-1.07 2.77-2.28 3.62v2.4h3.69c2.16-1.99 3.41-4.93 3.41-8.1 0-.69-.06-1.36-.18-2.01Z"
         fill="#4285F4"
+        d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.44c-.28 1.48-1.12 2.73-2.39 3.58v2.98h3.86c2.26-2.09 3.58-5.17 3.58-8.8z"
       />
       <path
-        d="M12 22c2.7 0 4.97-.9 6.63-2.44l-3.69-2.4c-1.03.69-2.35 1.1-3.94 1.1-3.03 0-5.6-2.05-6.52-4.8H.67v2.48A9.996 9.996 0 0 0 12 22Z"
         fill="#34A853"
+        d="M12 24c3.24 0 5.95-1.08 7.93-2.93l-3.86-2.98c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"
       />
       <path
-        d="M4.48 13.46A5.997 5.997 0 0 1 4.14 12c0-.51.09-1 .24-1.46V8.06H.67A9.996 9.996 0 0 0 0 12c0 1.61.39 3.14 1.08 4.46l3.4-2.99Z"
         fill="#FBBC05"
+        d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"
       />
       <path
-        d="M12 5.75c1.47 0 2.8.51 3.84 1.5l2.88-2.88C16.97 2.75 14.7 2 12 2 8.07 2 4.67 4.24 2.98 7.54l3.71 2.98c.92-2.76 3.49-4.77 5.31-4.77Z"
         fill="#EA4335"
+        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"
       />
     </svg>
   );
@@ -191,68 +195,60 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <section className="w-full max-w-md space-y-6 border-b border-border/70 pb-6">
+    <section className="w-full">
       {isBlocked ? (
-        <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3">
-          <p className="text-xs text-red-400">Sua conta foi desativada. Entre em contato com o suporte.</p>
+        <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3">
+          <p className="text-xs text-destructive">Sua conta foi desativada. Entre em contato com o suporte.</p>
         </div>
       ) : null}
-      <header className="space-y-2 border-b border-border/70 pb-4">
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl tracking-tight text-foreground">{content.title}</h1>
-          <p className="text-sm text-muted-foreground">{content.description}</p>
-        </div>
-      </header>
 
-      <div className="space-y-5">
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 w-full border-iris-accent bg-transparent font-body text-sm"
-          onClick={handleGoogleAuth}
-          disabled={loading}
-        >
-          {loading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-          {mode === "login" ? "Entrar com Google" : "Continuar com Google"}
-        </Button>
-
-        <div className="relative flex items-center justify-center">
-          <span className="absolute inset-x-0 h-px bg-border" />
-          <span className="relative bg-background px-3 font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
-            ou continue com email
-          </span>
+      <div className="rounded-2xl border border-border bg-card/40 p-7 shadow-card-soft backdrop-blur-sm">
+        <div className="mb-6">
+          <h1 className="font-jakarta text-2xl font-black text-foreground">{content.title}</h1>
+          <p className="mt-1 text-sm text-foreground/60">{content.description}</p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           {mode === "cadastro" ? (
-            <div className="space-y-2">
-              <Label htmlFor="nome" className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
+            <div>
+              <Label htmlFor="nome" className="text-sm text-foreground">
                 Nome completo
               </Label>
-              <Input id="nome" name="nome" required placeholder="Seu nome" className="h-10" />
+              <Input id="nome" name="nome" required placeholder="Seu nome" className="mt-1.5 h-10 bg-background" />
             </div>
           ) : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="email" className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
-              Email
+          <div>
+            <Label htmlFor="email" className="text-sm text-foreground">
+              E-mail
             </Label>
-            <Input id="email" name="email" type="email" required placeholder="voce@email.com" className="h-10" />
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="voce@exemplo.com"
+              className="mt-1.5 h-10 bg-background"
+            />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="senha" className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted">
+          <div>
+            <Label htmlFor="senha" className="text-sm text-foreground">
               Senha
             </Label>
-            <Input id="senha" name="senha" type="password" required placeholder="••••••••" className="h-10" />
+            <Input
+              id="senha"
+              name="senha"
+              type="password"
+              required
+              placeholder="••••••••"
+              className="mt-1.5 h-10 bg-background"
+            />
           </div>
 
           {mode === "cadastro" ? (
-            <div className="space-y-2">
-              <Label
-                htmlFor="confirmarSenha"
-                className="font-mono-iris text-[0.65rem] uppercase tracking-widest text-iris-muted"
-              >
+            <div>
+              <Label htmlFor="confirmarSenha" className="text-sm text-foreground">
                 Confirmar senha
               </Label>
               <Input
@@ -261,27 +257,56 @@ export function AuthForm({ mode }: AuthFormProps) {
                 type="password"
                 required
                 placeholder="Repita a senha"
-                className="h-10"
+                className="mt-1.5 h-10 bg-background"
               />
             </div>
           ) : null}
 
-          {error ? <p className="text-xs text-red-400">{error}</p> : null}
+          {error ? <p className="text-xs text-destructive">{error}</p> : null}
 
-          <Button type="submit" className="h-10 w-full font-body text-xs uppercase tracking-wider" disabled={loading}>
+          <Button
+            type="submit"
+            disabled={loading}
+            className={`h-11 w-full bg-foreground font-jakarta text-sm font-bold text-background hover:bg-foreground/90 ${tapFx}`}
+          >
             {loading ? <Loader2 className="size-4 animate-spin" /> : null}
             {content.submit}
-            <ArrowRight className="size-4" />
+          </Button>
+
+          <div className="relative my-2 flex items-center">
+            <div className="flex-1 border-t border-border" />
+            <span className="px-3 text-xs uppercase tracking-wider text-foreground/50">ou</span>
+            <div className="flex-1 border-t border-border" />
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className={`h-11 w-full gap-3 border-border bg-background text-sm font-medium text-foreground hover:bg-muted ${tapFx}`}
+            onClick={handleGoogleAuth}
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+            {content.googleLabel}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-iris-secondary">
+        <div className="mt-6 border-t border-border pt-5 text-center text-sm text-foreground/70">
           {content.switchLabel}{" "}
-          <Link href={content.switchHref} className="font-medium text-iris-accent transition-colors hover:text-foreground">
+          <Link
+            href={content.switchHref}
+            className="font-medium text-sky-600 underline underline-offset-4 transition-colors hover:text-sky-500"
+          >
             {content.switchAction}
           </Link>
-        </p>
+        </div>
       </div>
+
+      <p className="mt-6 text-center text-xs leading-relaxed text-foreground/40">
+        Você pode explorar o site sem entrar.
+        <br />
+        Login só é necessário para mapa astral, meus dados e planner.
+      </p>
     </section>
   );
 }

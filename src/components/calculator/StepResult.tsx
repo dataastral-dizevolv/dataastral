@@ -45,7 +45,7 @@ export function StepResult({ selectedQuestion, prediction, eventDate, engineCode
         ))}
 
         {noAspectFound ? (
-          <p className="rounded-lg border border-iris-accent/20 bg-muted/20 px-3 py-2 font-body text-sm text-iris-secondary">
+          <p className="rounded-2xl border border-border bg-card/70 px-3 py-2 font-body text-sm text-muted-foreground shadow-sm">
             {engineCode === "THEME_IN_CALIBRATION"
               ? "Este tema ainda está em calibração no Motor Iris. Nenhum crédito foi cobrado."
               : "Não encontramos aspectos relevantes no período de busca para esta pergunta. Tente reformular ou escolha outro tema."}

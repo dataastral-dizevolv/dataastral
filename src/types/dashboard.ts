@@ -12,6 +12,10 @@ export interface DashboardMeResponse {
   birthTimezone: string | null;
   birthLat: number | null;
   birthLng: number | null;
+  phone: string | null;
+  phoneCountry: string | null;
+  whatsapp: string | null;
+  pendingDeletionScheduledFor: string | null;
 }
 
 export interface PredictionHistoryItem {

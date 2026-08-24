@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { FREE_QUESTIONS_LIMIT, GUEST_ID_COOKIE } from "@/lib/guest/constants";
+import { enrichText } from "@/lib/enrichText";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { ThemeId } from "@/types/calculator";
 
@@ -335,9 +336,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.info("[predict-public] Engine code para enrichText", { engineCode: edgeSuccessPayload.code });
+    const finalPrediction = await enrichText({
+      predictionText,
+      eventDate: edgeSuccessPayload.eventDate ?? "",
+    });
+
     return withGuestCookie(NextResponse.json({
-      prediction: predictionText,
-      prediction_text: predictionText,
+      prediction: finalPrediction,
+      prediction_text: finalPrediction,
       audio_text: audioText || predictionText,
       whatsapp_text: whatsappText || predictionText,
       eventDate: edgeSuccessPayload.eventDate ?? "",

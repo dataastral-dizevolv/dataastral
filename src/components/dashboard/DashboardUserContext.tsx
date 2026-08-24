@@ -49,6 +49,10 @@ export function DashboardUserProvider({ user, children }: DashboardUserProviderP
     birthTimezone: data?.birthTimezone ?? user.birthTimezone,
     birthLat: data?.birthLat ?? user.birthLat,
     birthLng: data?.birthLng ?? user.birthLng,
+    phone: data?.phone ?? user.phone,
+    phoneCountry: data?.phoneCountry ?? user.phoneCountry,
+    whatsapp: data?.whatsapp ?? user.whatsapp,
+    pendingDeletionScheduledFor: data?.pendingDeletionScheduledFor ?? user.pendingDeletionScheduledFor,
   };
 
   return (

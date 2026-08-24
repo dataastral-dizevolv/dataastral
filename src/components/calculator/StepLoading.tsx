@@ -47,13 +47,13 @@ export function StepLoading({ onCancel }: StepLoadingProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative flex min-h-[360px] items-center justify-center overflow-hidden rounded-md border border-iris bg-background"
+      className="relative flex min-h-[360px] items-center justify-center overflow-hidden rounded-2xl border border-border bg-card/50 shadow-sm backdrop-blur-sm"
     >
       <div className="pointer-events-none absolute inset-0 opacity-50">
         {particles.map((particle, index) => (
           <motion.span
             key={`particle-${index}`}
-            className="absolute rounded-full bg-foreground/60"
+            className="absolute rounded-full bg-iris-accent/40"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
@@ -78,35 +78,35 @@ export function StepLoading({ onCancel }: StepLoadingProps) {
       <div className="relative flex w-full max-w-md flex-col items-center gap-9 px-6 py-10 text-center">
         <div className="relative flex h-52 w-52 items-center justify-center">
           <motion.div
-            className="absolute h-[190px] w-[190px] rounded-full border border-foreground/20"
+            className="absolute h-[190px] w-[190px] rounded-full border border-powder-blue/40"
             animate={{ rotate: 360 }}
             transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
           />
           <motion.div
-            className="absolute h-[142px] w-[142px] rounded-full border border-foreground/30"
+            className="absolute h-[142px] w-[142px] rounded-full border border-iris-accent/30"
             animate={{ rotate: -360 }}
             transition={{ duration: 14, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
           />
           <motion.div
-            className="absolute h-[96px] w-[96px] rounded-full border border-foreground/40"
+            className="absolute h-[96px] w-[96px] rounded-full border border-iris-accent/45"
             animate={{ rotate: 360 }}
             transition={{ duration: 9, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
           />
 
           <motion.span
-            className="absolute h-3 w-3 rounded-full bg-foreground/80"
+            className="absolute h-3 w-3 rounded-full bg-iris-accent/80"
             style={{ top: "16%", left: "74%" }}
             animate={{ scale: [0.7, 1.15, 0.7], opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
           />
           <motion.span
-            className="absolute h-2.5 w-2.5 rounded-full bg-foreground/70"
+            className="absolute h-2.5 w-2.5 rounded-full bg-powder-blue"
             style={{ top: "66%", left: "17%" }}
             animate={{ scale: [1.1, 0.75, 1.1], opacity: [0.8, 0.35, 0.8] }}
             transition={{ duration: 2.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
           />
           <motion.span
-            className="h-5 w-5 rounded-full bg-foreground"
+            className="h-5 w-5 rounded-full bg-iris-accent"
             animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.75, 1, 0.75] }}
             transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
           />

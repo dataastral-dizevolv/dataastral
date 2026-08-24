@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -84,13 +85,21 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   }
 
   return (
-    <aside className="flex h-full w-full flex-col bg-background">
+    <aside className="flex h-full w-full flex-col bg-card text-card-foreground">
       <div className="px-5 py-6">
-        <Link href="/dashboard" onClick={onNavigate} className="inline-flex items-center gap-2 font-display text-2xl italic tracking-tight text-iris-accent">
-          <span className="text-lg text-iris-accent" style={{ display: "inline-block", animation: "twinkle 3s ease-in-out infinite" }}>
-            ✦
-          </span>
-          Data Astral
+        <Link
+          href="/dashboard"
+          onClick={onNavigate}
+          className="inline-flex items-center gap-2.5 transition-opacity hover:opacity-80"
+        >
+          <Image
+            src="/brand/brand-star-pastel.png"
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 object-contain"
+          />
+          <span className="font-ubuntu text-lg font-bold tracking-tight text-foreground">Data Astral</span>
         </Link>
       </div>
 
@@ -104,14 +113,14 @@ export function Sidebar({ onNavigate }: SidebarProps) {
               key={item.href}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-md border-l-2 px-3 py-2.5 text-sm transition-colors ${
+              className={`flex items-center gap-3 rounded-xl border-l-[3px] px-3 py-2.5 text-sm transition-colors ${
                 ativo
-                  ? "border-l-primary font-medium text-foreground"
-                  : "border-l-transparent text-iris-secondary hover:text-foreground"
+                  ? "border-l-powder-blue bg-powder-blue/15 font-medium text-foreground"
+                  : "border-l-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground"
               }`}
             >
-              <span>
-                <Icone size={20} weight="thin" />
+              <span className={ativo ? "text-iris-accent" : undefined}>
+                <Icone size={20} weight={ativo ? "regular" : "thin"} />
               </span>
               <span>{item.label}</span>
             </Link>
@@ -121,7 +130,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           <Link
             href="/admin"
             onClick={onNavigate}
-            className="flex items-center gap-3 rounded-md border-l-2 border-l-iris-accent/60 px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:text-foreground"
+            className="flex items-center gap-3 rounded-xl border-l-[3px] border-l-iris-accent/50 px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/60"
           >
             <ShieldStar size={20} weight="thin" />
             <span>Admin</span>
@@ -130,13 +139,18 @@ export function Sidebar({ onNavigate }: SidebarProps) {
       </nav>
 
       <div className="mt-auto px-3 pb-4">
-        <div className="mb-4 h-px w-full bg-border/80" />
+        <div className="mb-4 h-px w-full bg-border" />
         <div className="mb-3">
           <CreditosWidget
             credits={user.credits}
             loading={loading}
             actions={
-              <Button asChild variant="outline" size="icon-sm" className="h-6 w-6 border-iris-accent/40 text-iris-accent hover:bg-iris-accent/10">
+              <Button
+                asChild
+                variant="outline"
+                size="icon-sm"
+                className="h-6 w-6 border-powder-blue/50 text-iris-accent hover:bg-powder-blue/15"
+              >
                 <Link href="/financeiro" aria-label="Comprar créditos" onClick={onNavigate}>
                   <Plus size={14} weight="bold" />
                 </Link>
@@ -144,8 +158,8 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             }
           />
         </div>
-        <div className="mb-3 rounded-md border border-border p-3">
-          <p className="font-mono-iris text-[0.6rem] uppercase tracking-widest text-iris-accent">Hoje no céu</p>
+        <div className="mb-3 rounded-xl border border-border bg-background/70 p-3">
+          <p className="font-ubuntu text-[0.6rem] uppercase tracking-widest text-iris-accent">Hoje no céu</p>
           <p className="mt-1 line-clamp-2 text-sm text-foreground">{eventoHoje?.titulo ?? "Sem destaque para hoje"}</p>
           {eventoHoje ? (
             <Badge
@@ -160,26 +174,20 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             </Badge>
           ) : null}
         </div>
-        <div className="flex items-center gap-3 rounded-md border border-border p-3">
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-background/70 p-3">
           <Avatar>
-            <AvatarFallback className="bg-muted text-foreground">{getIniciais(user.nome)}</AvatarFallback>
+            <AvatarFallback className="bg-powder-blue/25 text-foreground">{getIniciais(user.nome)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm text-foreground">{user.nome}</p>
-            <p className="truncate font-mono-iris text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+            <p className="truncate font-ubuntu text-[0.65rem] uppercase tracking-widest text-muted-foreground">
               {user.email}
             </p>
             {user.role === "admin" ? (
-              <p className="font-mono-iris text-[0.6rem] uppercase tracking-widest text-iris-accent">Administrador</p>
+              <p className="font-ubuntu text-[0.6rem] uppercase tracking-widest text-iris-accent">Administrador</p>
             ) : null}
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleSignOut}
-            aria-label="Sair"
-          >
+          <Button type="button" variant="ghost" size="icon-sm" onClick={handleSignOut} aria-label="Sair">
             <SignOut size={20} weight="thin" />
           </Button>
         </div>

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { digitsOnly, normalizePredictionId, recordWhatsAppReady } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
 
@@ -16,24 +17,6 @@ interface UserPredictionRow {
   theme: string;
   question: string;
   prediction_text: string;
-}
-
-function normalizePredictionId(value: string) {
-  const safe = value.trim().toLowerCase();
-  if (/^[a-f0-9-]{8,64}$/.test(safe)) {
-    return safe;
-  }
-  return "";
-}
-
-function normalizePhone(value: string) {
-  return value.replace(/[^0-9]/g, "").slice(0, 20);
-}
-
-function maskPhone(value: string | null) {
-  if (!value) return null;
-  const suffix = value.slice(-4);
-  return suffix ? `***${suffix}` : "***";
 }
 
 export async function POST(request: NextRequest) {
@@ -104,24 +87,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const normalizedPhone = phoneRaw ? normalizePhone(phoneRaw) : null;
-  const phoneMasked = maskPhone(normalizedPhone);
-
-  const { error: logError } = await admin.from("engine_audit_logs").insert({
-    user_id: user.id,
+  const normalizedPhone = phoneRaw ? digitsOnly(phoneRaw) : null;
+  const logError = await recordWhatsAppReady({
+    userId: user.id,
+    requestId,
+    phone: normalizedPhone,
+    messageText,
+    predictionId: sourcePrediction?.id ?? null,
     theme: sourcePrediction?.theme ?? null,
     question: sourcePrediction?.question ?? null,
-    success: true,
-    engine_code: "WHATSAPP_READY",
-    technical_details: {
-      provider: "zapi_mock",
-      status: "Pronta para envio",
-      requestId,
-      predictionId: sourcePrediction?.id ?? null,
-      hasPhone: Boolean(normalizedPhone),
-      phoneMasked,
-      messageLength: messageText.length,
-    },
   });
 
   if (logError) {

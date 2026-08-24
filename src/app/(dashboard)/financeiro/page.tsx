@@ -56,9 +56,13 @@ export default function FinanceiroPage() {
         body: JSON.stringify({ packageId }),
       });
 
-      const payload = (await response.json()) as BuyCreditsResponse | { error?: string };
+      const payload = (await response.json()) as BuyCreditsResponse | { error?: string; code?: string };
 
       if (!response.ok) {
+        if ((payload as { code?: string }).code === "STRIPE_PRICE_MISSING") {
+          toast.error("Pacote sem Price ID — configure no admin.");
+          return;
+        }
         toast.error((payload as { error?: string }).error ?? "Falha ao iniciar compra.");
         return;
       }
