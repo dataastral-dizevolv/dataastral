@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { getSupabaseConfig } from "./src/lib/supabase/config";
+import { tryGetSupabaseConfig } from "./src/lib/supabase/config";
 
 const AUTH_ROUTES = ["/login", "/cadastro"];
 const PROTECTED_ROUTES = ["/dashboard", "/calculadora", "/calendario", "/financeiro", "/perfil"];
@@ -21,7 +21,20 @@ function isAdminRoute(pathname: string) {
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
-  const { supabaseUrl, supabasePublishableKey } = getSupabaseConfig();
+  const pathname = request.nextUrl.pathname;
+  const config = tryGetSupabaseConfig();
+
+  if (!config) {
+    if (isProtectedRoute(pathname) || isAdminRoute(pathname)) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return response;
+  }
+
+  const { supabaseUrl, supabasePublishableKey } = config;
 
   const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
     cookies: {
@@ -41,8 +54,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const pathname = request.nextUrl.pathname;
 
   if (!user && (isProtectedRoute(pathname) || isAdminRoute(pathname))) {
     const loginUrl = request.nextUrl.clone();

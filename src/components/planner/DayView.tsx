@@ -17,7 +17,7 @@ export function DayView({ cursor, events, onEventClick }: DayViewProps) {
     .sort((a, b) => a.start.getTime() - b.start.getTime());
 
   return (
-    <div className="overflow-hidden border border-border bg-background">
+    <div className="overflow-hidden rounded-3xl border border-border bg-background">
       <div className="border-b border-border px-4 py-3 sm:px-6">
         <div className="text-[10px] tracking-[0.18em] text-muted-foreground uppercase">{formatWeekday(cursor)}</div>
         <div className="mt-1 text-2xl font-medium">{formatLongDay(cursor)}</div>

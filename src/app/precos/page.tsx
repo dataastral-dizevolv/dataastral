@@ -28,6 +28,7 @@ function PrecosPageContent() {
   const userId = useAuthUserId();
   const { data: packages, error, isLoading } = useSWR("/api/credits/packages", fetcher, {
     revalidateOnFocus: false,
+    shouldRetryOnError: false,
   });
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [checkoutPackageId, setCheckoutPackageId] = useState<string | null>(null);

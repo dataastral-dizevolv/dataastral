@@ -1,15 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from "@fullcalendar/list";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import ptBrLocale from "@fullcalendar/core/locales/pt-br";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import useSWR from "swr";
 
 import { ICalFeedManager } from "@/components/calendar/ICalFeedManager";
@@ -17,13 +10,15 @@ import { FiltroEventos } from "@/components/dashboard/FiltroEventos";
 import { PrevisaoDrawer } from "@/components/dashboard/PrevisaoDrawer";
 import { DayView } from "@/components/planner/DayView";
 import { EventDrawer } from "@/components/planner/EventDrawer";
+import { MonthView } from "@/components/planner/MonthView";
+import { PlannerToolbar, type PlannerView } from "@/components/planner/PlannerToolbar";
 import { ToneLegend } from "@/components/planner/ToneLegend";
+import { WeekView } from "@/components/planner/WeekView";
 import { Button } from "@/components/ui/button";
-import { addDays, addMonths, addWeeks, formatLongDay, formatMonthYear, toIsoDate } from "@/lib/planner/dates";
+import { capitalizeMonth } from "@/lib/planner/dates";
 import { parseICal } from "@/lib/planner/icalParser";
 import { ephemerisToPlannerEvent, icalToPlannerEvent, TONE_TO_TYPE } from "@/lib/planner/mapEvents";
 import { generateSkyEvents, type PlannerEvent } from "@/lib/planner/plannerEvents";
-import { EVENT_TYPE_COLORS } from "@/lib/theme/event-colors";
 import type { ICalFeed } from "@/types/calendar";
 import type { EphemerisEvent, EphemerisEventType, PredictionHistoryItem } from "@/types/dashboard";
 
@@ -36,8 +31,6 @@ class CalendarApiError extends Error {
   }
 }
 
-type CalendarMode = "month" | "week" | "list" | "day";
-
 const fetcher = async <T,>(url: string): Promise<T> => {
   const response = await fetch(url, { credentials: "include" });
 
@@ -49,32 +42,12 @@ const fetcher = async <T,>(url: string): Promise<T> => {
   return (await response.json()) as T;
 };
 
-function formatarDataLocalIso(data: Date) {
-  return toIsoDate(data);
-}
-
-function formatarTitulo(mode: CalendarMode, referencia: Date): string {
-  if (mode === "month") {
-    return formatMonthYear(referencia);
-  }
-
-  if (mode === "day") {
-    return formatLongDay(referencia);
-  }
-
-  return `Semana de ${new Intl.DateTimeFormat("pt-BR", {
-    day: "numeric",
-    month: "long",
-  }).format(referencia)}`;
-}
-
 export function CalendarioEfemerides() {
   const hoje = new Date();
-  const calendarRef = useRef<FullCalendar | null>(null);
 
   const [diaSelecionado, setDiaSelecionado] = useState<string | null>(null);
   const [drawerAberto, setDrawerAberto] = useState(false);
-  const [mode, setMode] = useState<CalendarMode>("month");
+  const [view, setView] = useState<PlannerView>("month");
   const [filtroAtivo, setFiltroAtivo] = useState<EphemerisEventType | "todos">("todos");
   const [cursor, setCursor] = useState(hoje);
   const [mesSelecionado, setMesSelecionado] = useState({
@@ -191,14 +164,6 @@ export function CalendarioEfemerides() {
     return plannerEvents.filter((event) => TONE_TO_TYPE[event.tone] === filtroAtivo);
   }, [filtroAtivo, plannerEvents]);
 
-  const plannerById = useMemo(() => {
-    const map = new Map<string, PlannerEvent>();
-    for (const event of eventosFiltrados) {
-      map.set(event.id, event);
-    }
-    return map;
-  }, [eventosFiltrados]);
-
   const diasComPrevisao = useMemo(() => {
     const dias = new Set<string>();
 
@@ -211,28 +176,6 @@ export function CalendarioEfemerides() {
 
     return dias;
   }, [historico]);
-
-  const eventosCalendar = useMemo(
-    () =>
-      eventosFiltrados.map((event) => {
-        const tipo = TONE_TO_TYPE[event.tone];
-        const cores = EVENT_TYPE_COLORS[tipo];
-        const startIso = toIsoDate(event.start);
-        const sameDay = toIsoDate(event.start) === toIsoDate(event.end);
-
-        return {
-          id: event.id,
-          title: event.title,
-          start: startIso,
-          end: sameDay ? undefined : toIsoDate(addDays(event.end, 1)),
-          allDay: true,
-          backgroundColor: event.channel === "personal" ? cores.surface : event.color,
-          borderColor: event.channel === "personal" ? cores.primary : event.color,
-          textColor: event.channel === "personal" ? cores.text : "hsl(var(--background))",
-        };
-      }),
-    [eventosFiltrados],
-  );
 
   const eventosDiaSelecionado = useMemo(() => {
     if (!diaSelecionado) {
@@ -286,119 +229,60 @@ export function CalendarioEfemerides() {
     });
   }
 
-  function navegarCalendario(direcao: "prev" | "next") {
-    const delta = direcao === "next" ? 1 : -1;
-
-    if (mode === "day") {
-      const next = addDays(cursor, delta);
-      setCursor(next);
-      syncMonthFromDate(next);
-      return;
-    }
-
-    const api = calendarRef.current?.getApi();
-    if (!api) {
-      const next = mode === "week" ? addWeeks(cursor, delta) : addMonths(cursor, delta);
-      setCursor(next);
-      syncMonthFromDate(next);
-      return;
-    }
-
-    if (direcao === "prev") {
-      api.prev();
-      return;
-    }
-
-    api.next();
-  }
-
-  function alterarView(novaView: CalendarMode) {
-    setMode(novaView);
+  function handleCursorChange(next: Date) {
+    setCursor(next);
+    syncMonthFromDate(next);
   }
 
   return (
-    <section className="space-y-6 font-ubuntu">
-      <header className="space-y-4">
-        <div>
+    <section className="space-y-8 font-ubuntu md:space-y-10">
+      <header className="space-y-6 md:space-y-8">
+        <div className="max-w-xl">
           <button
             type="button"
             onClick={() => setLearnMore((open) => !open)}
-            className="text-xs tracking-[0.18em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+            className="text-xs tracking-[0.18em] text-muted-foreground uppercase transition-colors hover:text-iris-blue-chambray"
           >
             {learnMore ? "fechar" : "saiba mais"}
           </button>
-          <AnimatePresence>
-            {learnMore ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="mt-3 max-w-xl space-y-3 text-sm leading-relaxed text-muted-foreground"
-              >
-                <p>
-                  Os trânsitos astrológicos em cada dia no seu mapa personalizado, diretamente na sua agenda. Ative para
-                  receber os avisos no seu WhatsApp.
-                </p>
-                <p>
-                  Ao saber a energia do dia, você saberá o melhor momento para avançar, decidir, aguardar ou encerrar.
-                </p>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-ubuntu text-3xl font-black tracking-tight text-foreground capitalize">
-            {formatarTitulo(mode, cursor)}
-          </h2>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant={mode === "month" ? "default" : "outline"}
-              onClick={() => alterarView("month")}
-              className="text-xs tracking-widest uppercase"
-            >
-              Mensal
-            </Button>
-            <Button
-              type="button"
-              variant={mode === "week" ? "default" : "outline"}
-              onClick={() => alterarView("week")}
-              className="text-xs tracking-widest uppercase"
-            >
-              Semanal
-            </Button>
-            <Button
-              type="button"
-              variant={mode === "day" ? "default" : "outline"}
-              onClick={() => alterarView("day")}
-              className="text-xs tracking-widest uppercase"
-            >
-              Dia
-            </Button>
-            <Button
-              type="button"
-              variant={mode === "list" ? "default" : "outline"}
-              onClick={() => alterarView("list")}
-              className="text-xs tracking-widest uppercase sm:hidden"
-            >
-              Lista
-            </Button>
-            <Button type="button" variant="outline" size="icon-sm" onClick={() => navegarCalendario("prev")} aria-label="Periodo anterior">
-              <ChevronLeft className="size-4" />
-            </Button>
-            <Button type="button" variant="outline" size="icon-sm" onClick={() => navegarCalendario("next")} aria-label="Proximo periodo">
-              <ChevronRight className="size-4" />
-            </Button>
+          <div
+            className={`overflow-hidden transition-all duration-500 ease-out ${
+              learnMore ? "mt-3 max-h-96 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Os trânsitos astrológicos em cada dia no seu mapa personalizado, diretamente na sua agenda! Ative para
+              receber os avisos no seu WhatsApp.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Ao saber a energia do dia, você saberá o melhor momento para avançar, decidir, aguardar ou encerrar. Poderá
+              entender a razão de um mal-estar passageiro, e quando vai passar! E ainda, as datas de esperar os melhores
+              resultados!
+            </p>
           </div>
         </div>
 
-        <FiltroEventos filtroAtivo={filtroAtivo} onChange={setFiltroAtivo} />
+        <div
+          className="pointer-events-none flex select-none items-baseline gap-3"
+          aria-hidden="true"
+        >
+          <span className="font-ubuntu text-5xl leading-[0.95] font-black tracking-[-0.04em] text-iris-blue-chambray/40 sm:text-6xl md:text-7xl lg:text-8xl">
+            {capitalizeMonth(cursor)}
+          </span>
+          <span className="font-ubuntu text-base font-bold tracking-[-0.02em] text-iris-blue-chambray/60 sm:text-lg">
+            {cursor.getFullYear()}
+          </span>
+        </div>
+
+        <div className="space-y-4">
+          <PlannerToolbar view={view} onViewChange={setView} cursor={cursor} onCursorChange={handleCursorChange} />
+          <FiltroEventos filtroAtivo={filtroAtivo} onChange={setFiltroAtivo} />
+        </div>
       </header>
 
-      <div className="space-y-4 border border-border bg-background p-3 sm:p-4">
+      <div className="space-y-4">
         {erroEventos ? (
-          <div className="mb-3 border border-border bg-background p-4">
+          <div className="rounded-3xl border border-border bg-background p-4 sm:p-5">
             <p className="text-sm text-destructive">
               {faltamDadosNatais
                 ? "Para ver seu calendário personalizado, complete seus dados de nascimento no Perfil."
@@ -414,76 +298,31 @@ export function CalendarioEfemerides() {
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={mode}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            key={view}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            {mode === "day" ? (
+            {view === "day" ? (
               <DayView cursor={cursor} events={eventosFiltrados} onEventClick={setSelectedEvent} />
-            ) : (
-              <FullCalendar
-                ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-                initialView={mode === "week" ? "timeGridWeek" : mode === "list" ? "listWeek" : "dayGridMonth"}
-                initialDate={cursor}
-                locale={ptBrLocale}
-                headerToolbar={false}
-                height="auto"
-                events={eventosCalendar}
-                dayMaxEvents={2}
-                eventClick={(info) => {
-                  const planner = plannerById.get(info.event.id);
-                  if (planner) {
-                    setSelectedEvent(planner);
-                    return;
-                  }
-                  const data = info.event.startStr.slice(0, 10);
-                  abrirDrawerData(data);
-                }}
-                dateClick={(info) => {
-                  abrirDrawerData(info.dateStr);
-                }}
-                datesSet={(info) => {
-                  const dataReferencia = info.view.currentStart;
-                  setCursor(dataReferencia);
-                  syncMonthFromDate(dataReferencia);
-                }}
-                dayCellDidMount={(info) => {
-                  const dayIso = formatarDataLocalIso(info.date);
-
-                  if (!diasComPrevisao.has(dayIso)) {
-                    return;
-                  }
-
-                  if (info.el.querySelector(".prediction-history-marker")) {
-                    return;
-                  }
-
-                  const marker = document.createElement("span");
-                  marker.className = "prediction-history-marker";
-                  marker.setAttribute("aria-label", "Dia com previsão pessoal");
-                  marker.title = "Você já tem previsão pessoal neste dia";
-                  marker.style.position = "absolute";
-                  marker.style.right = "6px";
-                  marker.style.bottom = "6px";
-                  marker.style.width = "6px";
-                  marker.style.height = "6px";
-                  marker.style.borderRadius = "9999px";
-                  marker.style.backgroundColor = EVENT_TYPE_COLORS.portal.primary;
-                  marker.style.border = "2px solid hsl(var(--background))";
-
-                  const frame = info.el as HTMLElement;
-                  frame.style.position = "relative";
-                  frame.appendChild(marker);
-                }}
+            ) : null}
+            {view === "week" ? (
+              <WeekView cursor={cursor} events={eventosFiltrados} onEventClick={setSelectedEvent} />
+            ) : null}
+            {view === "month" ? (
+              <MonthView
+                cursor={cursor}
+                events={eventosFiltrados}
+                onEventClick={setSelectedEvent}
+                onDayClick={abrirDrawerData}
+                predictionDays={diasComPrevisao}
               />
-            )}
+            ) : null}
           </motion.div>
         </AnimatePresence>
 
-        {carregandoEventos ? <div className="mt-4 h-9 w-56 animate-pulse bg-muted" /> : null}
+        {carregandoEventos ? <div className="mt-2 h-9 w-56 animate-pulse rounded-full bg-muted" /> : null}
         {loadingFeeds ? <p className="text-[11px] text-muted-foreground">Sincronizando agendas externas…</p> : null}
       </div>
 

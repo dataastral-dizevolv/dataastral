@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { isValidReferralCodeFormat, REFERRAL_COOKIE } from "@/lib/referrals";
+import { tryCreateClient } from "@/lib/supabase/client";
 
 type AuthMode = "login" | "cadastro";
 
@@ -70,6 +71,37 @@ function getSafeRedirectPath(rawNext: string | null) {
   }
 }
 
+function readReferralCode(searchParams: URLSearchParams) {
+  const raw = searchParams.get("ref")?.trim().toUpperCase() ?? "";
+  return isValidReferralCodeFormat(raw) ? raw : "";
+}
+
+function persistReferralCookie(code: string) {
+  if (!code) {
+    return;
+  }
+
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${REFERRAL_COOKIE}=${encodeURIComponent(code)}; Path=/; Max-Age=${60 * 60 * 24 * 14}; SameSite=Lax${secure}`;
+}
+
+async function attributeReferralIfNeeded(code: string) {
+  if (!code) {
+    return;
+  }
+
+  try {
+    await fetch("/api/referrals/attribute", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+  } catch {
+    // Atribuição é best-effort; o trigger/metadata e o callback cobrem o fluxo principal.
+  }
+}
+
 function GoogleIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg">
@@ -97,10 +129,30 @@ export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isBlocked = searchParams.get("blocked") === "1";
+  const referralCode = useMemo(() => readReferralCode(searchParams), [searchParams]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const content = useMemo(() => copyByMode[mode], [mode]);
+
+  const switchHref = useMemo(() => {
+    const params = new URLSearchParams();
+    const next = searchParams.get("next");
+    if (next) {
+      params.set("next", next);
+    }
+    if (referralCode) {
+      params.set("ref", referralCode);
+    }
+    const query = params.toString();
+    return query ? `${content.switchHref}?${query}` : content.switchHref;
+  }, [content.switchHref, referralCode, searchParams]);
+
+  useEffect(() => {
+    if (referralCode) {
+      persistReferralCookie(referralCode);
+    }
+  }, [referralCode]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -112,7 +164,12 @@ export function AuthForm({ mode }: AuthFormProps) {
     const email = String(formData.get("email") ?? "").trim();
     const senha = String(formData.get("senha") ?? "");
     const confirmarSenha = String(formData.get("confirmarSenha") ?? "");
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setError(mode === "login" ? AUTH_MESSAGES.loginFailed : AUTH_MESSAGES.signupFailed);
+      setLoading(false);
+      return;
+    }
 
     if (mode === "cadastro" && senha !== confirmarSenha) {
       setError("As senhas precisam ser iguais para continuar.");
@@ -141,6 +198,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         return;
       }
 
+      await attributeReferralIfNeeded(referralCode);
       router.push(redirectTo);
       setLoading(false);
       return;
@@ -152,6 +210,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       options: {
         data: {
           full_name: nome,
+          ...(referralCode ? { referral_code: referralCode } : {}),
         },
       },
     });
@@ -164,11 +223,17 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     if (!data.session) {
       toast.success("Conta criada. Verifique seu e-mail para confirmar o acesso.");
-      router.push(`/login?next=${encodeURIComponent(redirectTo)}`);
+      const loginParams = new URLSearchParams();
+      loginParams.set("next", redirectTo);
+      if (referralCode) {
+        loginParams.set("ref", referralCode);
+      }
+      router.push(`/login?${loginParams.toString()}`);
       setLoading(false);
       return;
     }
 
+    await attributeReferralIfNeeded(referralCode);
     toast.success("Conta criada com sucesso.");
     router.push(redirectTo);
     setLoading(false);
@@ -177,9 +242,18 @@ export function AuthForm({ mode }: AuthFormProps) {
   async function handleGoogleAuth() {
     setError(null);
     setLoading(true);
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setError(AUTH_MESSAGES.googleFailed);
+      setLoading(false);
+      return;
+    }
     const nextPath = new URLSearchParams(window.location.search).get("next");
     const redirectTo = getSafeRedirectPath(nextPath);
+
+    if (referralCode) {
+      persistReferralCookie(referralCode);
+    }
 
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -206,6 +280,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         <div className="mb-6">
           <h1 className="font-jakarta text-2xl font-black text-foreground">{content.title}</h1>
           <p className="mt-1 text-sm text-foreground/60">{content.description}</p>
+          {mode === "cadastro" && referralCode ? (
+            <p className="mt-2 text-xs text-foreground/50">Você chegou por indicação — quem te convidou ganha pontos quando você concluir o cadastro.</p>
+          ) : null}
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -294,8 +371,8 @@ export function AuthForm({ mode }: AuthFormProps) {
         <div className="mt-6 border-t border-border pt-5 text-center text-sm text-foreground/70">
           {content.switchLabel}{" "}
           <Link
-            href={content.switchHref}
-            className="font-medium text-sky-600 underline underline-offset-4 transition-colors hover:text-sky-500"
+            href={switchHref}
+            className="font-medium text-iris-accent underline underline-offset-4 transition-colors hover:opacity-80"
           >
             {content.switchAction}
           </Link>

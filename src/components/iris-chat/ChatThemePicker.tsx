@@ -52,9 +52,9 @@ export function ChatThemePicker() {
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-6 w-9 overflow-hidden rounded-md border border-border" aria-hidden>
-                        <span className="flex-1" style={{ backgroundColor: `hsl(${item.bg})` }} />
-                        <span className="flex-1" style={{ backgroundColor: `hsl(${item.bubble})` }} />
-                        <span className="flex-1" style={{ backgroundColor: `hsl(${item.vibrant})` }} />
+                        <span className="flex-1" style={{ backgroundColor: item.bgHex }} />
+                        <span className="flex-1" style={{ backgroundColor: item.bubbleHex }} />
+                        <span className="flex-1" style={{ backgroundColor: item.vibrantHex }} />
                       </div>
                       <span className="text-sm text-foreground">{item.label}</span>
                     </div>

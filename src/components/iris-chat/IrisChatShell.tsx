@@ -18,14 +18,15 @@ function ThemedChat({ context, header }: IrisChatShellProps) {
     ["--warm-bubble" as string]: theme.bubble,
     ["--chat-vibrant" as string]: theme.vibrant,
     ["--chat-vibrant-fg" as string]: theme.vibrantFg,
+    backgroundColor: `hsl(${theme.bg})`,
   } as CSSProperties;
 
   return (
     <div
       className={
         context === "app"
-          ? "flex h-full min-h-0 flex-col overflow-hidden bg-background"
-          : "flex h-[100dvh] flex-col overflow-hidden bg-background"
+          ? "flex h-full min-h-0 flex-col overflow-hidden bg-mint transition-colors duration-500"
+          : "flex h-[100dvh] flex-col overflow-hidden bg-mint transition-colors duration-500"
       }
       style={style}
     >

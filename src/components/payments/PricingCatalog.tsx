@@ -27,7 +27,7 @@ export function PricingCatalog({
   return (
     <>
       <div className="text-center">
-        <p className="mb-3 font-ubuntu text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Data Astral</p>
+        <p className="mb-3 font-ubuntu text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Data Iris</p>
         <h1 className="font-ubuntu text-3xl font-black tracking-tight text-foreground sm:text-5xl">
           Planos e Créditos
         </h1>

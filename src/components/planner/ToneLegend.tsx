@@ -4,7 +4,7 @@ import { TONE_COLORS, TONE_LABELS, type EventTone } from "@/lib/planner/plannerE
 
 export function ToneLegend() {
   return (
-    <div className="border border-border bg-background px-4 py-5 sm:px-6">
+    <div className="rounded-3xl border border-border bg-background px-4 py-5 sm:px-6">
       <p className="mb-4 text-[10px] tracking-[0.18em] text-muted-foreground uppercase">Legenda</p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {(Object.keys(TONE_LABELS) as EventTone[]).map((tone) => (

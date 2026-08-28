@@ -1,13 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { getSupabaseConfig } from "@/lib/supabase/config";
+import { tryGetSupabaseConfig } from "@/lib/supabase/config";
 
-export async function createClient() {
+export async function tryCreateClient(): Promise<SupabaseClient | null> {
+  const config = tryGetSupabaseConfig();
+  if (!config) {
+    return null;
+  }
+
   const cookieStore = await cookies();
-  const { supabaseUrl, supabasePublishableKey } = getSupabaseConfig();
 
-  return createServerClient(supabaseUrl, supabasePublishableKey, {
+  return createServerClient(config.supabaseUrl, config.supabasePublishableKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -23,4 +28,12 @@ export async function createClient() {
       },
     },
   });
+}
+
+export async function createClient() {
+  const client = await tryCreateClient();
+  if (!client) {
+    throw new Error("Configuração de ambiente indisponível.");
+  }
+  return client;
 }

@@ -51,12 +51,21 @@ const NATAL_BODIES: Array<{ id: string; key: string }> = [
 export function signFromLongitude(longitude: number) {
   const norm = ((longitude % 360) + 360) % 360;
   const idx = Math.floor(norm / 30);
+  const within = norm % 30;
+  const degree = Math.floor(within);
+  const minute = Math.floor((within - degree) * 60);
   return {
     index: idx,
     name: SIGN_NAMES[idx],
-    degree: Math.floor(norm % 30),
+    degree,
+    minute,
     norm,
   };
+}
+
+export function formatSignDegree(longitude: number) {
+  const sign = signFromLongitude(longitude);
+  return `${sign.name} ${sign.degree}°${String(sign.minute).padStart(2, "0")}′`;
 }
 
 function parseBirthInstant(birthDate: string, birthTime: string | null, birthTimezone: string | null) {
@@ -105,6 +114,20 @@ function computeAxes(date: Date, lat: number, lng: number) {
     ascendant: ((asc * 180) / Math.PI + 360) % 360,
     midheaven: ((mc * 180) / Math.PI + 360) % 360,
   };
+}
+
+export function hasNatalBirthData(input: {
+  birthDate: string | null;
+  birthTime?: string | null;
+  birthTimezone?: string | null;
+  birthLat?: number | null;
+  birthLng?: number | null;
+}): boolean {
+  if (!input.birthDate) {
+    return false;
+  }
+
+  return /^\d{4}-\d{2}-\d{2}$/.test(input.birthDate);
 }
 
 export function buildNatalChart(input: {

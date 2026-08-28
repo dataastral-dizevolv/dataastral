@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type ExplicitVariant = "blue" | "white" | "black" | "pastel";
@@ -14,15 +13,18 @@ interface BrandIconProps {
   variant?: ExplicitVariant | "auto";
   /** Background it sits on. "auto" reads the document dark class. */
   surface?: Surface;
-  /** "brand" → blue on light. "mono" → black on light. Dark surfaces use white. */
+  /** "brand" → Iris mark on light. "mono" → same mark (no separate mono asset). Dark surfaces use the same mark. */
   tone?: Tone;
 }
 
+/** Iris metallic sunburst mark — works on light and dark surfaces. */
+const IRIS_MARK = "/brand/iris-mark.png";
+
 const SRC: Record<ExplicitVariant, string> = {
-  pastel: "/brand/brand-star-pastel.png",
-  blue: "/brand/brand-icon.png",
-  white: "/brand/brand-star-pastel.png",
-  black: "/brand/app-logo.png",
+  pastel: IRIS_MARK,
+  blue: IRIS_MARK,
+  white: IRIS_MARK,
+  black: IRIS_MARK,
 };
 
 function resolveVariant(
@@ -44,7 +46,7 @@ function resolveVariant(
 
 export function BrandIcon({
   className = "h-8 w-8",
-  alt = "Data Astral",
+  alt = "Data Iris",
   variant = "auto",
   surface = "auto",
   tone = "brand",
@@ -52,13 +54,15 @@ export function BrandIcon({
   const resolved = resolveVariant(variant, surface, tone);
 
   return (
-    <Image
+    // Native img matches Lovable BrandIcon. Next/Image wraps a 128×128 box that
+    // reads as a white plate on dark heroes/menus even with unoptimized + transparent CSS.
+    <img
       src={SRC[resolved]}
       alt={alt}
       width={128}
       height={128}
-      className={cn("select-none object-contain", className)}
-      priority
+      className={cn("select-none bg-transparent object-contain", className)}
+      decoding="async"
       draggable={false}
     />
   );

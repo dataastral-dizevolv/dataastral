@@ -21,9 +21,11 @@ import type { DashboardUser } from "@/lib/auth/user";
 
 interface DeleteAccountDialogProps {
   user: DashboardUser;
+  variant?: "section" | "bubble";
+  backLink?: React.ReactNode;
 }
 
-export function DeleteAccountDialog({ user }: DeleteAccountDialogProps) {
+export function DeleteAccountDialog({ user, variant = "section", backLink }: DeleteAccountDialogProps) {
   const { mutate } = useSWRConfig();
   const [busy, setBusy] = useState(false);
 
@@ -72,20 +74,28 @@ export function DeleteAccountDialog({ user }: DeleteAccountDialogProps) {
       )
     : null;
 
-  return (
-    <section className="border-t border-border py-6">
-      <p className="text-[12px] font-black tracking-[0.22em] text-foreground uppercase">Conta</p>
+  const content = (
+    <>
+      <p
+        className={
+          variant === "bubble"
+            ? "font-jakarta text-[12px] font-black uppercase tracking-[0.22em] text-current sm:text-[13px]"
+            : "text-[12px] font-black tracking-[0.22em] text-foreground uppercase"
+        }
+      >
+        Conta
+      </p>
 
-      <div className="mt-4 border border-cherry bg-blush px-4 py-3">
+      <div className={`${variant === "bubble" ? "mt-3" : "mt-4"} rounded-2xl border border-cherry bg-blush px-4 py-3`}>
         <p className="text-xs font-black tracking-[0.14em] text-cherry uppercase">Aviso de segurança</p>
-        <p className="mt-1 text-xs leading-relaxed text-cherry">
-          Nunca compartilhe sua senha ou o link de acesso enviado por e-mail. Data Astral nunca pede sua senha por
+        <p className="mt-1 text-xs font-normal leading-relaxed text-cherry">
+          Nunca compartilhe sua senha ou o link de acesso enviado por e-mail. Data Iris nunca pede sua senha por
           mensagem. A exclusão de dados é confirmada por e-mail e é definitiva.
         </p>
       </div>
 
       {scheduledLabel ? (
-        <div className="mt-4 border border-border px-4 py-3 text-sm">
+        <div className={`${variant === "bubble" ? "mt-3" : "mt-4"} border border-border px-4 py-3 text-sm`}>
           <p>
             Exclusão agendada para <strong>{scheduledLabel}</strong>. Você pode cancelar até lá.
           </p>
@@ -95,7 +105,7 @@ export function DeleteAccountDialog({ user }: DeleteAccountDialogProps) {
         </div>
       ) : null}
 
-      <div className="mt-4 space-y-2">
+      <div className={`${variant === "bubble" ? "mt-3" : "mt-4"} space-y-2`}>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="outline" className="w-full bg-transparent font-black">
@@ -163,6 +173,13 @@ export function DeleteAccountDialog({ user }: DeleteAccountDialogProps) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </section>
+      {backLink}
+    </>
   );
+
+  if (variant === "bubble") {
+    return content;
+  }
+
+  return <section className="border-t border-border py-6">{content}</section>;
 }

@@ -700,7 +700,7 @@ const Hero = () => {
             <br /><br />
             Para quem diz que astrologia é pseudociência, vale a leitura da obra de um dos maiores cientistas de nossa era: o estudo feito por Kepler... [De fundamentis astrologiae certioribus. As bases mais confiáveis da astrologia, em 1601].
             <br /><br />
-            Com base na crítica científica, Data Astral aplica as posições astronômicas da Nasa, a parte que funciona: os aspectos!
+            Com base na crítica científica, Data Iris aplica as posições astronômicas da Nasa, a parte que funciona: os aspectos!
             <br /><br />
             Feito com inteligência humana, o método baseia-se apenas no que não fere a ciência e nem a ética da psicologia.
           </motion.p>
@@ -723,7 +723,7 @@ const Hero = () => {
             </div>
             <div className="px-8 sm:px-14 md:px-24 mt-32 sm:mt-40 md:mt-52 max-w-[1100px] mx-auto">
               <p className="text-left font-jakarta text-[14px] sm:text-[16px] md:text-[18px] leading-[1.95] text-white whitespace-pre-line">
-                {`Previsão no Data Astral não é sortear com a vida alheia. Também não é sobre apostas, nem invenções de videntes. Prever é ver antes, no sentido de saber as datas dos altos e baixos de energias da natureza.
+                {`Previsão no Data Iris não é sortear com a vida alheia. Também não é sobre apostas, nem invenções de videntes. Prever é ver antes, no sentido de saber as datas dos altos e baixos de energias da natureza.
 
 Há datas em que acaba a disposição. E por isso, acontecem perdas, tendências a acidentes, e azares. E há datas em nosso mapa de vida, em que acontecem os maiores ganhos e resultados. É sobre isso, um método de tomada de decisões, a partir do que é possível, em seu mapa astral.`}
               </p>
@@ -890,9 +890,9 @@ Há datas em que acaba a disposição. E por isso, acontecem perdas, tendências
                 className="overflow-hidden"
               >
                 <div className="mt-8 max-w-xl mx-auto px-8 sm:px-12 space-y-5 text-[14px] sm:text-[15px] md:text-[17px] leading-[1.6] text-foreground text-left">
-                  <p>Data Astral é construído com o exclusivo Método Data Astral, baseado em +53k depoimentos de vidas reais.</p>
+                  <p>Data Iris é construído com o exclusivo Método Data Iris, baseado em +53k depoimentos de vidas reais.</p>
                   <p>Ninguém fez um estudo como esse!</p>
-                  <p>Data Astral entrega a previsão das datas reais dos astros em seu mapa. Baseada nos 20% de astrologia que funciona. Sem ferir a ciência, nem a ética. Sem julgar, nem inventar.</p>
+                  <p>Data Iris entrega a previsão das datas reais dos astros em seu mapa. Baseada nos 20% de astrologia que funciona. Sem ferir a ciência, nem a ética. Sem julgar, nem inventar.</p>
                   <p>O significado real de previsão é planejar algo possível de acontecer, na realidade!</p>
                   <motion.p
                     initial={{ opacity: 0, y: 8 }}

@@ -1,15 +1,30 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { getSupabaseConfig } from "@/lib/supabase/config";
+import { tryGetSupabaseConfig } from "@/lib/supabase/config";
 
 let browserClient: SupabaseClient | undefined;
 
-export function createClient(): SupabaseClient {
-  if (!browserClient) {
-    const { supabaseUrl, supabasePublishableKey } = getSupabaseConfig();
-    browserClient = createBrowserClient(supabaseUrl, supabasePublishableKey);
+export function tryCreateClient(): SupabaseClient | null {
+  if (browserClient) {
+    return browserClient;
   }
 
-  return browserClient!;
+  const config = tryGetSupabaseConfig();
+  if (!config) {
+    return null;
+  }
+
+  browserClient = createBrowserClient(config.supabaseUrl, config.supabasePublishableKey);
+  return browserClient;
+}
+
+export function createClient(): SupabaseClient {
+  const client = tryCreateClient();
+
+  if (!client) {
+    throw new Error("Configuração de ambiente indisponível.");
+  }
+
+  return client;
 }

@@ -18,13 +18,13 @@ A psicologia por exemplo é uma escola recente. E sua ética e responsabilidade 
 
 Talvez, por isso, astrologia pode ter se tornado uma palavra vazia de seriedade.
 
-A pesquisa para criar o Data Astral foi justamente separar o que realmente acontece em previsões, do que seja superstição.
+A pesquisa para criar o Data Iris foi justamente separar o que realmente acontece em previsões, do que seja superstição.
 
 O propósito em apoiar pessoas, por meio da empatia, surgiu na prática e em retorno recorrente dos mesmos consulentes, por vinte anos.
 
 Seus relatos anônimos foram analisados de acordo com datas astrológicas.
 
-Com este conjunto robusto de depoimentos, Data Astral é o método para tomada de decisões, em face de incertezas e angústias.
+Com este conjunto robusto de depoimentos, Data Iris é o método para tomada de decisões, em face de incertezas e angústias.
 
 Astrólogos não inventam futuros. E sim, ajudam pessoas no acompanhamento da rotina em momentos de perdas graves, sofrimentos e também, sucessos.
 
@@ -32,9 +32,9 @@ A ciência despreza a astrologia de hoje. Contudo, no trabalho com ética, pode-
 
 Tempo é vida. E soberania é a liberdade de fazer melhores escolhas.
 
-Esses são os ganhos que Data Astral valoriza! Iluminar a confiança de milhares de consulentes que retornam todos os dias, confirmando a parte da astrologia que deu certo.
+Esses são os ganhos que Data Iris valoriza! Iluminar a confiança de milhares de consulentes que retornam todos os dias, confirmando a parte da astrologia que deu certo.
 
-Data Astral entrega a data de maior ou menor chance para decidir. Isso é importante, porque nos ajuda a:
+Data Iris entrega a data de maior ou menor chance para decidir. Isso é importante, porque nos ajuda a:
 
 ☆ não perder oportunidades
 ☆ a não gastar energia no dia errado

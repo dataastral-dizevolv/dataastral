@@ -9,7 +9,10 @@ interface TypewriterTextProps {
   speed?: number;
   onComplete?: () => void;
   className?: string;
+  /** "type" reveals char-by-char. "fade" reveals the whole text in one soft fade. */
   mode?: "type" | "fade";
+  /** Show a blinking cursor while typing. Default false. */
+  showCursor?: boolean;
 }
 
 export function TypewriterText({
@@ -19,6 +22,7 @@ export function TypewriterText({
   onComplete,
   className,
   mode = "type",
+  showCursor = false,
 }: TypewriterTextProps) {
   const [visibleChars, setVisibleChars] = useState(0);
   const [started, setStarted] = useState(false);
@@ -72,6 +76,13 @@ export function TypewriterText({
           {char}
         </motion.span>
       ))}
+      {showCursor && visibleChars < text.length ? (
+        <motion.span
+          animate={{ opacity: [1, 0, 1] }}
+          transition={{ repeat: Infinity, duration: 0.8 }}
+          className="ml-0.5 inline-block h-[1em] w-[2px] bg-current align-middle"
+        />
+      ) : null}
     </span>
   );
 }

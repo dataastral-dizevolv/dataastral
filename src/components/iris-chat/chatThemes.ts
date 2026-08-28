@@ -7,44 +7,60 @@ export interface ChatTheme {
   bubble: string;
   vibrant: string;
   vibrantFg: string;
+  /** Hex used only for the picker swatches */
+  bgHex: string;
+  bubbleHex: string;
+  vibrantHex: string;
 }
 
 export const CHAT_THEMES: ChatTheme[] = [
   {
     id: "verde-profundo",
-    label: "Paleta verde",
+    label: "Paleta verde escuro",
     group: "verde",
-    bg: "158 30% 92%",
-    bubble: "150 28% 86%",
-    vibrant: "145 40% 32%",
-    vibrantFg: "150 30% 97%",
+    bg: "158 60% 12%",
+    bubble: "150 28% 72%",
+    vibrant: "145 70% 42%",
+    vibrantFg: "0 0% 100%",
+    bgHex: "#0E3528",
+    bubbleHex: "#A8C6B2",
+    vibrantHex: "#22B664",
   },
   {
     id: "azul-profundo",
-    label: "Paleta azul",
+    label: "Paleta azul escuro",
     group: "azul",
-    bg: "215 40% 93%",
-    bubble: "215 32% 88%",
-    vibrant: "222 46% 32%",
-    vibrantFg: "213 70% 97%",
+    bg: "215 65% 12%",
+    bubble: "215 32% 72%",
+    vibrant: "222 100% 56%",
+    vibrantFg: "0 0% 100%",
+    bgHex: "#0B1D3A",
+    bubbleHex: "#A6B8D0",
+    vibrantHex: "#2563FF",
   },
   {
     id: "azul-menta",
-    label: "Paleta menta",
+    label: "Paleta azul claro",
     group: "azul",
-    bg: "172 30% 93%",
-    bubble: "160 28% 90%",
-    vibrant: "174 45% 28%",
-    vibrantFg: "160 30% 97%",
+    bg: "172 45% 28%",
+    bubble: "160 38% 78%",
+    vibrant: "174 80% 40%",
+    vibrantFg: "0 0% 100%",
+    bgHex: "#2A6B63",
+    bubbleHex: "#A8D8C4",
+    vibrantHex: "#14B8A6",
   },
   {
     id: "claro-offwhite",
     label: "Paleta off white",
     group: "claro",
-    bg: "38 22% 94%",
-    bubble: "43 33% 96%",
-    vibrant: "30 12% 22%",
+    bg: "38 22% 80%",
+    bubble: "43 33% 95%",
+    vibrant: "30 12% 18%",
     vibrantFg: "43 33% 97%",
+    bgHex: "#D4CCBC",
+    bubbleHex: "#F6F1E7",
+    vibrantHex: "#2B2620",
   },
 ];
 

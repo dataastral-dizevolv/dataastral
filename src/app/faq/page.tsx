@@ -6,8 +6,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const FAQ_ITEMS = [
   {
-    q: "A Consulta de Perguntas no site é feita pelo Data Astral?",
-    a: "Os créditos comprados para perguntas no site entregam o cálculo de sua previsão logo em seguida. É feito pelo Método exclusivo Data Astral, de acordo com a sua data de nascimento.",
+    q: "A Consulta de Perguntas no site é feita pelo Data Iris?",
+    a: "Os créditos comprados para perguntas no site entregam o cálculo de sua previsão logo em seguida. É feito pelo Método exclusivo Data Iris, de acordo com a sua data de nascimento.",
   },
   {
     q: "Quando devo fazer uma nova pergunta?",
@@ -19,7 +19,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Como funciona?",
-    a: "Você escolhe um tema, escolhe uma pergunta e informa seus dados de nascimento. O Método Data Astral estuda seu mapa e devolve uma resposta com datas exatas.",
+    a: "Você escolhe um tema, escolhe uma pergunta e informa seus dados de nascimento. O Método Data Iris estuda seu mapa e devolve uma resposta com datas exatas.",
   },
   {
     q: "Preciso pagar?",
@@ -40,12 +40,17 @@ export default function FaqPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="relative mx-auto max-w-2xl px-6 pt-20 pb-20 md:pt-24">
-        <h1 className="mb-8 font-jakarta text-3xl font-black text-foreground">Dúvidas frequentes</h1>
-        <Accordion type="single" collapsible className="space-y-2">
+        <h1 className="mb-2 font-ubuntu text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Suporte</h1>
+        <h2 className="mb-8 font-ubuntu text-3xl font-black tracking-tight text-foreground">Dúvidas frequentes</h2>
+        <Accordion type="single" collapsible className="space-y-0">
           {FAQ_ITEMS.map((item, i) => (
-            <AccordionItem key={item.q} value={`i-${i}`} className="border-b border-border">
-              <AccordionTrigger className="py-6 text-left hover:no-underline lg:py-8">{item.q}</AccordionTrigger>
-              <AccordionContent className="pb-6 text-sm text-muted-foreground lg:pb-8">{item.a}</AccordionContent>
+            <AccordionItem key={item.q} value={`i-${i}`} className="border-b border-border px-0">
+              <AccordionTrigger className="py-6 text-left font-jakarta text-base font-bold hover:no-underline lg:py-8">
+                {item.q}
+              </AccordionTrigger>
+              <AccordionContent className="pb-6 text-sm leading-relaxed text-muted-foreground lg:pb-8">
+                {item.a}
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>

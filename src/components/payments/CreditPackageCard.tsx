@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import type { CreditPackageItem } from "@/types/credits";
 
 export const CREDIT_PACKAGE_HOW_IT_WORKS = [
-  "Cada crédito equivale a uma pergunta no Data Astral. Você escolhe a pergunta e o app calcula, no seu mapa, a próxima e melhor data para o que você pede.",
+  "Cada crédito equivale a uma pergunta no Data Iris. Você escolhe a pergunta e o app calcula, no seu mapa, a próxima e melhor data para o que você pede.",
   "Essas datas são a posição dos astros que favorecem seus planejamentos. O resultado depende de cada pessoa. Não é adivinhação: são os melhores momentos para planejar a vida e os objetivos.",
   "As primeiras perguntas são gratuitas para você conhecer. Reembolsos ocorrem apenas dentro de 7 dias corridos após a compra, para créditos não utilizados.",
 ].join("\n\n");

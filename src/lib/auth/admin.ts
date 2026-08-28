@@ -1,6 +1,11 @@
+import { tryGetSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
 export async function requireAdminUser() {
+  if (!tryGetSupabaseConfig()) {
+    return { user: null, isAdmin: false };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

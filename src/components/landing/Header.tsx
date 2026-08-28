@@ -17,10 +17,10 @@ const Header = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => router.push("/")}
-              aria-label="Data Astral"
+              aria-label="Data Iris"
               className="transition-opacity duration-200 hover:opacity-80 flex items-center gap-2"
             >
-              <BrandIcon alt="Data Astral" variant="pastel" className="h-6 w-6 md:h-8 md:w-8" />
+              <BrandIcon alt="Data Iris" variant="pastel" className="h-6 w-6 md:h-8 md:w-8" />
             </button>
           </div>
 

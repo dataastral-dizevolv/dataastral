@@ -59,8 +59,8 @@ export function AdminSidebar({ userName, userEmail, onNavigate }: AdminSidebarPr
           className="inline-flex items-center gap-2.5 transition-opacity hover:opacity-80"
         >
           <Image
-            src="/brand/brand-star-pastel.png"
-            alt=""
+            src="/brand/iris-mark.png"
+            alt="Data Iris"
             width={28}
             height={28}
             className="h-7 w-7 object-contain"

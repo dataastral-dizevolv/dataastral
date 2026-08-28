@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 
 interface SignupGateModalProps {
   open: boolean;
@@ -33,7 +33,12 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
     }
 
     setLoading(true);
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      toast.error("Não foi possível conectar ao serviço de autenticação.");
+      setLoading(false);
+      return;
+    }
 
     if (mode === "signup") {
       const { error, data } = await supabase.auth.signUp({
@@ -70,7 +75,12 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
 
   const google = async () => {
     setLoading(true);
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      toast.error("Não foi possível conectar ao serviço de autenticação.");
+      setLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

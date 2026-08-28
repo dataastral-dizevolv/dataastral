@@ -6,6 +6,9 @@ export interface DashboardMeResponse {
   email: string;
   role: UserRole;
   credits: number;
+  freeQuestionsRemaining: number;
+  referralCode: string | null;
+  referralPoints: number;
   birthDate: string | null;
   birthTime: string | null;
   birthLocation: string | null;

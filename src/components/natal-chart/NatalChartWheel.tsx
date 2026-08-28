@@ -168,7 +168,7 @@ export function NatalChartWheel({
           : null}
 
         <image
-          href="/brand/app-logo.png"
+          href="/brand/iris-mark.png"
           x={-rInner * 0.25}
           y={-rInner * 0.25}
           width={rInner * 0.5}

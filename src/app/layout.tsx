@@ -22,9 +22,19 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Data Astral | Previsoes com Efemerides Reais",
+  title: "Data Iris | Previsões com Efemérides Reais",
   description:
-    "Faca sua pergunta, escolha um tema e receba previsoes astrologicas baseadas em efemerides reais.",
+    "Faça sua pergunta, escolha um tema e receba previsões astrológicas baseadas em efemérides reais.",
+  applicationName: "Data Iris",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/brand/favicon.png", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

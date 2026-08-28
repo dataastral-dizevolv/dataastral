@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 
 import { fetchDashboardUser } from "@/lib/auth/user";
-import { createClient } from "@/lib/supabase/server";
+import { tryCreateClient } from "@/lib/supabase/server";
 import type { DashboardMeResponse } from "@/types/dashboard";
 
 export async function GET() {
-  const supabase = await createClient();
+  const supabase = await tryCreateClient();
+  if (!supabase) {
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();

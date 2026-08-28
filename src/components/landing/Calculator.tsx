@@ -16,7 +16,7 @@ import type { StepUserDataFormState } from "@/components/calculator/StepUserData
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { themeToCategory } from "@/lib/calculator-categories";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 import type { CalcState, CalcStep, CalculatorQuestion, GeneratePredictionInput, PredictErrorResponse, PredictSuccessResponse, ThemeId } from "@/types/calculator";
 
 const PENDING_PREDICTION_STORAGE_KEY = "pending_prediction_payload";
@@ -186,14 +186,16 @@ export default function Calculator({ context = "landing", layout = "section" }: 
       }
     }
 
-    const supabase = createClient();
+    const supabase = tryCreateClient();
     let user: { id: string } | null = null;
 
     try {
-      const {
-        data: { user: authUser },
-      } = await supabase.auth.getUser();
-      user = authUser;
+      if (supabase) {
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser();
+        user = authUser;
+      }
     } catch (error) {
       console.warn("[calculator] Unable to read auth session before generate", {
         message: error instanceof Error ? error.message : String(error),
@@ -317,14 +319,16 @@ export default function Calculator({ context = "landing", layout = "section" }: 
       setSubmitErrorCode(null);
       setState("loading");
 
-      const supabase = createClient();
+      const supabase = tryCreateClient();
       let user: { id: string } | null = null;
 
       try {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
-        user = authUser;
+        if (supabase) {
+          const {
+            data: { user: authUser },
+          } = await supabase.auth.getUser();
+          user = authUser;
+        }
       } catch (error) {
         console.warn("[calculator] Unable to read auth session during resume", {
           message: error instanceof Error ? error.message : String(error),

@@ -63,6 +63,7 @@ interface PredictApiResponse {
   eventDate: string;
   eventDateIso: string;
   remainingCredits: number;
+  remainingFreeQuestions: number;
   cached: boolean;
   engineCode?: string;
   requestId: string;
@@ -72,7 +73,8 @@ interface PredictApiResponse {
 const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
 const CALIBRATION_THEMES = new Set<ThemeId>(["carreira", "saude", "familia", "viagens"]);
 const AUTH_REQUIRED_ERROR = "Entre na sua conta para continuar.";
-const INSUFFICIENT_CREDITS_ERROR = "Você não possui créditos suficientes para gerar esta previsão.";
+const INSUFFICIENT_CREDITS_ERROR =
+  "Você não possui perguntas grátis nem créditos suficientes para gerar esta previsão.";
 const ENGINE_TIMEOUT_MS = 20_000;
 
 function sanitizeErrorCode(value: string | undefined, fallback: string) {
@@ -361,13 +363,20 @@ export async function POST(request: NextRequest) {
     (row) => stableStringify(row.birth_data) === normalizedBirthDataKey,
   );
 
-  async function getRemainingCredits() {
-    const { data: profile } = await serviceClient.from("profiles").select("credits").eq("id", authUser.id).maybeSingle();
-    return profile?.credits ?? 0;
+  async function getRemainingQuota() {
+    const { data: profile } = await serviceClient
+      .from("profiles")
+      .select("credits, free_questions_remaining")
+      .eq("id", authUser.id)
+      .maybeSingle();
+    return {
+      remainingCredits: profile?.credits ?? 0,
+      remainingFreeQuestions: profile?.free_questions_remaining ?? 0,
+    };
   }
 
   if (cachedPrediction) {
-    const remainingCredits = await getRemainingCredits();
+    const { remainingCredits, remainingFreeQuestions } = await getRemainingQuota();
 
     await writeAuditLog({
       success: true,
@@ -392,6 +401,7 @@ export async function POST(request: NextRequest) {
       eventDate: cachedPrediction.event_date || "",
       eventDateIso: "",
       remainingCredits,
+      remainingFreeQuestions,
       cached: true,
       requestId,
       predictionId: cachedPrediction.id,
@@ -404,8 +414,8 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const creditsBeforeExecution = await getRemainingCredits();
-  if (creditsBeforeExecution <= 0) {
+  const quotaBeforeExecution = await getRemainingQuota();
+  if (quotaBeforeExecution.remainingCredits <= 0 && quotaBeforeExecution.remainingFreeQuestions <= 0) {
     await writeAuditLog({
       success: false,
       engineCode: "INSUFFICIENT_CREDITS",
@@ -420,7 +430,8 @@ export async function POST(request: NextRequest) {
       {
         error: INSUFFICIENT_CREDITS_ERROR,
         code: "INSUFFICIENT_CREDITS",
-        remainingCredits: creditsBeforeExecution,
+        remainingCredits: quotaBeforeExecution.remainingCredits,
+        remainingFreeQuestions: quotaBeforeExecution.remainingFreeQuestions,
         requestId,
       },
       { status: 402 },
@@ -646,7 +657,7 @@ export async function POST(request: NextRequest) {
         message: histRollback.error.message,
       });
     }
-    const remainingCredits = await getRemainingCredits();
+    const { remainingCredits, remainingFreeQuestions } = await getRemainingQuota();
 
     await writeAuditLog({
       success: false,
@@ -664,6 +675,7 @@ export async function POST(request: NextRequest) {
           error: INSUFFICIENT_CREDITS_ERROR,
           code: "INSUFFICIENT_CREDITS",
           remainingCredits,
+          remainingFreeQuestions,
           requestId,
         },
         { status: 402 },
@@ -684,6 +696,8 @@ export async function POST(request: NextRequest) {
     eventDate: enginePrediction.date ?? "",
   });
 
+  const quotaAfterDebit = await getRemainingQuota();
+
   const response = NextResponse.json({
     prediction: enrichedPrediction,
     prediction_text: enrichedPrediction,
@@ -691,7 +705,8 @@ export async function POST(request: NextRequest) {
     whatsapp_text: enginePrediction.whatsappText,
     eventDate: enginePrediction.date,
     eventDateIso: enginePrediction.dateIso,
-    remainingCredits: remainingAfterDebit,
+    remainingCredits: quotaAfterDebit.remainingCredits,
+    remainingFreeQuestions: quotaAfterDebit.remainingFreeQuestions,
     cached: false,
     engineCode: enginePrediction.code,
     requestId,

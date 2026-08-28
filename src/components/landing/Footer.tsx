@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Instagram, Mail, Linkedin, MessageCircle, LogOut, LogIn } from "lucide-react";
 import BrandIcon from "@/components/brand/BrandIcon";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 
 const Footer = ({
   extraSlot,
@@ -18,7 +18,11 @@ const Footer = ({
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setUserEmail(null);
+      return;
+    }
     supabase.auth.getUser().then(({ data }) => {
       setUserEmail(data.user?.email ?? null);
     });
@@ -30,8 +34,8 @@ const Footer = ({
 
   const handleAuthAction = async () => {
     if (userEmail) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      const supabase = tryCreateClient();
+      await supabase?.auth.signOut();
       router.push("/");
     } else {
       router.push("/login");
@@ -47,6 +51,9 @@ const Footer = ({
       onClick: handleAuthAction,
     },
     { label: "Começar", path: "/cadastro" },
+    { label: "Mapa Astral", path: "/mapa-astral" },
+    { label: "Painel Astral", path: "/painel-astral" },
+    { label: "Aulas", path: "/aula" },
     { label: "Calculadora", path: "/#calculadora" },
     { label: "Dashboard", path: "/dashboard" },
   ];
@@ -84,11 +91,11 @@ const Footer = ({
             <button
               onClick={() => go("/")}
               className="flex items-center gap-2 group self-start"
-              aria-label="Data Astral"
+              aria-label="Data Iris"
             >
-              <BrandIcon surface="light" tone="brand" className="h-7 w-7 select-none" alt="Data Astral" />
+              <BrandIcon surface="light" tone="brand" className="h-7 w-7 select-none" alt="Data Iris" />
               <span className="font-ubuntu font-bold text-[15px] tracking-[-0.01em] text-foreground group-hover:opacity-70 transition-opacity">
-                Data Astral
+                Data Iris
               </span>
             </button>
 
@@ -176,7 +183,7 @@ const Footer = ({
             ))}
           </nav>
           <p className="text-[11px]" style={{ color: "hsl(var(--text-tertiary))" }}>
-            © {currentYear} Data Astral · R. Pais Leme 215, São Paulo BR
+            © {currentYear} Data Iris · R. Pais Leme 215, São Paulo BR
           </p>
         </div>
       </div>

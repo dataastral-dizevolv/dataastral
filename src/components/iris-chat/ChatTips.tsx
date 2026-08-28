@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 
 import { TypewriterText } from "@/components/iris-chat/TypewriterText";
@@ -51,15 +52,18 @@ export function ChatTips() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button
+        <motion.button
           type="button"
-          className="flex items-center gap-2 rounded-2xl border border-border bg-bubble px-4 py-2.5 font-jakarta text-[13px] font-extrabold text-foreground transition-colors hover:bg-muted sm:text-sm"
+          whileHover={{ scale: 1.04, y: -2 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="flex cursor-pointer items-center gap-2 rounded-3xl border border-foreground/15 bg-bubble px-4 py-2.5 font-extrabold text-foreground shadow-[6px_8px_24px_-8px_hsl(0_0%_0%/0.12)] transition-shadow duration-300 hover:shadow-[8px_12px_32px_-6px_hsl(0_0%_0%/0.2)]"
         >
-          <Lightbulb className="size-4 shrink-0 text-iris" strokeWidth={1.5} />
-          Dicas
-        </button>
+          <Lightbulb className="size-4 shrink-0 text-iris" fill="currentColor" strokeWidth={1.5} />
+          <span className="font-jakarta text-[13px] font-extrabold tracking-[0.01em] sm:text-[14px]">Dicas</span>
+        </motion.button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" className="w-80 p-4">
+      <PopoverContent side="bottom" align="start" className="pointer-events-auto w-80 p-4">
         <p className="mb-3 text-[10px] font-semibold tracking-[0.22em] text-iris uppercase">Dicas</p>
         <TipsList tips={TIPS} />
       </PopoverContent>

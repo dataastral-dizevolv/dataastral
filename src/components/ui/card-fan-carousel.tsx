@@ -507,7 +507,7 @@ export default function CardFanCarousel({ items, onSelect, curve = "default" }: 
                 className="font-mono text-[10px] tracking-[0.25em] uppercase"
                 style={{ color: item.tone.meta }}
               >
-                {item.index} — Data Astral
+                {item.index} — Data Iris
               </span>
 
               <div className="flex flex-col gap-3">

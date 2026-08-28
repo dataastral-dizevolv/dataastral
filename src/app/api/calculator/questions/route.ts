@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { createClient } from "@/lib/supabase/server";
+import { tryCreateClient } from "@/lib/supabase/server";
 import { normalizeQuestionOptions } from "@/lib/calculator-questions";
 import { isCalculatorCategory } from "@/lib/calculator-categories";
 import type { CalculatorQuestion } from "@/types/calculator";
@@ -20,7 +20,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Tipo de pergunta inválido." }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = await tryCreateClient();
+  if (!supabase) {
+    return NextResponse.json({ items: [] });
+  }
+
   let query = supabase
     .from("calculator_questions")
     .select("id, category, label, field_name, type, options, order, is_required")

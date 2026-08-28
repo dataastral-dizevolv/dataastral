@@ -37,7 +37,7 @@ export function AdminLayoutClient({ userName, userEmail, children }: AdminLayout
             <Menu className="size-4" />
           </Button>
           <Link href="/admin/dashboard" className="inline-flex items-center gap-2">
-            <Image src="/brand/brand-star-pastel.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
+            <Image src="/brand/iris-mark.png" alt="Data Iris" width={24} height={24} className="h-6 w-6 object-contain" />
             <span className="font-ubuntu text-base font-bold tracking-tight text-foreground">Iris Admin</span>
           </Link>
         </header>

@@ -15,6 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { generateInsightPdf } from "@/lib/pdf/generate-insight-pdf";
 import { EVENT_TYPE_COLORS } from "@/lib/theme/event-colors";
 import type { EphemerisEvent, EphemerisEventType } from "@/types/dashboard";
 
@@ -127,7 +128,7 @@ export function PrevisaoDrawer({
       "",
       resumirPrevisao(previsao),
       "",
-      "Descobri no Data Astral.",
+      "Descobri no Data Iris.",
     ].join("\n");
 
     const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
@@ -199,44 +200,15 @@ export function PrevisaoDrawer({
     setPdfLoading(true);
 
     try {
-      const { jsPDF } = await import("jspdf");
-      const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 44;
-      const contentWidth = pageWidth - margin * 2;
-
-      doc.setFillColor(13, 12, 24);
-      doc.rect(0, 0, pageWidth, pageHeight, "F");
-
-      doc.setFillColor(95, 81, 205);
-      doc.circle(pageWidth - 70, 70, 120, "F");
-
-      doc.setTextColor(227, 223, 255);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("IRIS - DATA ASTRAL", margin, 42);
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(26);
-      doc.text("Insight Diário", margin, 90);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      doc.setTextColor(198, 193, 242);
-      doc.text(`${dataFormatada} - ${temaInsight}`, margin, 116);
-
-      doc.setDrawColor(95, 81, 205);
-      doc.line(margin, 132, pageWidth - margin, 132);
-
-      doc.setTextColor(241, 239, 255);
-      doc.setFontSize(12.5);
-      const linhas = doc.splitTextToSize(previsao, contentWidth) as string[];
-      doc.text(linhas, margin, 162, { maxWidth: contentWidth, lineHeightFactor: 1.65 });
-
       const fileDate = data.replace(/-/g, "");
-      doc.save(`iris-insight-${fileDate}.pdf`);
+      await generateInsightPdf({
+        dataFormatada,
+        temaInsight,
+        previsao,
+        eventos,
+        fileDate,
+      });
+      toast.success("PDF gerado com sucesso.");
     } catch {
       toast.error("Não foi possível gerar o PDF agora.");
     } finally {

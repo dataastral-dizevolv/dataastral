@@ -4,14 +4,23 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { signFromLongitude, type NatalPlanet } from "@/lib/astrology/natal-chart";
 import { DEFAULT_PLANET_COLORS } from "@/components/natal-chart/NatalChartWheel";
 
+export type PlanetAspectRow = {
+  name: string;
+  with: string;
+  orb: string;
+};
+
 interface PlanetInfoSheetProps {
   planet: NatalPlanet | null;
   onClose: () => void;
+  /** Aspectos opcionais (ex.: página mapa-astral). Não afeta o perfil. */
+  aspects?: PlanetAspectRow[];
 }
 
-export function PlanetInfoSheet({ planet, onClose }: PlanetInfoSheetProps) {
+export function PlanetInfoSheet({ planet, onClose, aspects }: PlanetInfoSheetProps) {
   const sign = planet ? signFromLongitude(planet.longitude) : null;
   const accent = planet ? (planet.color ?? DEFAULT_PLANET_COLORS[planet.id]) : undefined;
+  const minute = sign ? String(sign.minute).padStart(2, "0") : "00";
 
   return (
     <Sheet open={Boolean(planet)} onOpenChange={(open) => (!open ? onClose() : null)}>
@@ -30,7 +39,9 @@ export function PlanetInfoSheet({ planet, onClose }: PlanetInfoSheetProps) {
                   <SheetTitle className="font-jakarta text-lg font-black">{planet.label}</SheetTitle>
                   <SheetDescription className="tabular-nums">
                     <span className="font-medium text-foreground">{sign.name}</span>
-                    <span className="ml-2">{sign.degree}°</span>
+                    <span className="ml-2">
+                      {sign.degree}°{minute}′
+                    </span>
                   </SheetDescription>
                 </div>
               </div>
@@ -42,9 +53,26 @@ export function PlanetInfoSheet({ planet, onClose }: PlanetInfoSheetProps) {
               </div>
               <div className="flex justify-between py-3 text-sm">
                 <dt className="text-muted-foreground">Grau</dt>
-                <dd className="tabular-nums">{sign.degree}°</dd>
+                <dd className="tabular-nums">
+                  {sign.degree}°{minute}′
+                </dd>
               </div>
             </dl>
+            {aspects && aspects.length > 0 ? (
+              <div className="border-t border-border px-6 py-4">
+                <p className="mb-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Aspectos</p>
+                <ul className="divide-y divide-border">
+                  {aspects.map((a) => (
+                    <li key={`${a.name}-${a.with}`} className="flex items-center justify-between gap-3 py-2 text-sm">
+                      <span className="font-medium">
+                        {a.name} · {a.with}
+                      </span>
+                      <span className="tabular-nums text-muted-foreground">{a.orb}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </>
         ) : null}
       </SheetContent>

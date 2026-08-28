@@ -1,4 +1,4 @@
-# UI Integration QA — Lovable → Data Astral
+# UI Integration QA — Lovable → Data Iris
 
 Reusable checklist and multitask QA protocol for each screen ported from `ref/star-aligned-journey-main` into the Next.js app.
 

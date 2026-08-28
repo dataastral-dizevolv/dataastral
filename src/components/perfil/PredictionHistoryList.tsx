@@ -28,7 +28,7 @@ const fetcher = async (url: string) => {
   return (await response.json()) as PredictionHistoryItem[];
 };
 
-export function PredictionHistoryList() {
+export function PredictionHistoryList({ variant = "section" }: { variant?: "section" | "bubble" }) {
   const { mutate } = useSWRConfig();
   const { data, isLoading } = useSWR<PredictionHistoryItem[]>(HISTORY_KEY, fetcher, {
     revalidateOnFocus: true,
@@ -72,10 +72,18 @@ export function PredictionHistoryList() {
     }
   }
 
-  return (
-    <section className="border-t border-border">
-      <div className="flex items-center justify-between py-5">
-        <p className="text-[12px] font-black tracking-[0.22em] text-foreground uppercase">03 · Histórico de perguntas</p>
+  const content = (
+    <>
+      <div className={variant === "section" ? "flex items-center justify-between py-5" : "flex items-center justify-between"}>
+        <p
+          className={
+            variant === "bubble"
+              ? "font-jakarta text-[12px] font-black uppercase tracking-[0.22em] text-current sm:text-[13px]"
+              : "text-[12px] font-black tracking-[0.22em] text-foreground uppercase"
+          }
+        >
+          {variant === "bubble" ? "06 · Histórico de perguntas" : "03 · Histórico de perguntas"}
+        </p>
         {history.length > 0 ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -102,18 +110,26 @@ export function PredictionHistoryList() {
         ) : null}
       </div>
 
-      {isLoading ? <p className="pb-5 text-sm text-muted-foreground">Carregando histórico…</p> : null}
+      {isLoading ? <p className="pb-5 text-sm font-normal text-muted-foreground">Carregando histórico…</p> : null}
 
       {!isLoading && history.length === 0 ? (
-        <p className="pb-5 text-sm text-muted-foreground">Nenhuma pergunta ainda.</p>
+        <p className={variant === "section" ? "pb-5 text-sm text-muted-foreground" : "text-sm font-normal text-muted-foreground"}>
+          Nenhuma pergunta ainda.
+        </p>
       ) : null}
 
       {history.length > 0 ? (
-        <div className="divide-y divide-border border-y border-border">
+        <div className={variant === "bubble" ? "divide-y divide-foreground/10 border-y border-foreground/10" : "divide-y divide-border border-y border-border"}>
           {history.map((item) => (
             <details key={item.id} className="py-3">
-              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm">
-                <span className="min-w-0 flex-1 truncate rounded-full border border-border bg-muted/40 px-3 py-1.5">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-normal">
+                <span
+                  className={
+                    variant === "bubble"
+                      ? "mr-3 min-w-0 flex-1 truncate"
+                      : "min-w-0 flex-1 truncate rounded-full border border-border bg-muted/40 px-3 py-1.5"
+                  }
+                >
                   {item.question}
                 </span>
                 <button
@@ -129,11 +145,17 @@ export function PredictionHistoryList() {
                   <Trash2 className="size-4" />
                 </button>
               </summary>
-              <p className="mt-3 whitespace-pre-wrap text-xs text-muted-foreground">{item.prediction}</p>
+              <p className="mt-3 whitespace-pre-wrap text-xs font-normal text-muted-foreground">{item.prediction}</p>
             </details>
           ))}
         </div>
       ) : null}
-    </section>
+    </>
   );
+
+  if (variant === "bubble") {
+    return content;
+  }
+
+  return <section className="border-t border-border">{content}</section>;
 }

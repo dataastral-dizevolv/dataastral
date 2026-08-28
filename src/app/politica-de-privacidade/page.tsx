@@ -13,7 +13,7 @@ export default function PrivacyPage() {
         <div className="mt-6 rounded-2xl border border-border bg-powder-blue/15 p-5 text-sm text-foreground shadow-card-soft">
           <p className="font-medium">Compromisso com sua privacidade</p>
           <p className="mt-2 text-muted-foreground">
-            Data Astral trata dados pessoais de acordo com a LGPD (Lei nº 13.709/2018), coletando apenas o necessário
+            Data Iris trata dados pessoais de acordo com a LGPD (Lei nº 13.709/2018), coletando apenas o necessário
             para autenticação, cálculo astrológico e histórico de previsões.
           </p>
         </div>

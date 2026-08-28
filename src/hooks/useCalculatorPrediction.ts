@@ -7,7 +7,7 @@ import { useSWRConfig } from "swr";
 import type { StepUserDataFormState } from "@/components/calculator/StepUserData";
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
 import { themeToCategory } from "@/lib/calculator-categories";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 import type {
   CalcState,
   CalcStep,
@@ -124,6 +124,7 @@ export function useCalculatorPrediction(context: CalculatorContext) {
   const [userDataFormState, setUserDataFormState] = useState<StepUserDataFormState>(INITIAL_USER_DATA_FORM_STATE);
   const [isAuthenticated, setIsAuthenticated] = useState(context === "app");
   const [credits, setCredits] = useState<number | null>(null);
+  const [freeQuestionsRemaining, setFreeQuestionsRemaining] = useState<number | null>(null);
 
   const clearResumeQueryParam = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -148,15 +149,17 @@ export function useCalculatorPrediction(context: CalculatorContext) {
       setSubmitError(null);
       setSubmitErrorCode(null);
 
-      const supabase = createClient();
+      const supabase = tryCreateClient();
       let user: { id: string } | null = null;
 
       try {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
-        user = authUser;
-        setIsAuthenticated(Boolean(authUser));
+        if (supabase) {
+          const {
+            data: { user: authUser },
+          } = await supabase.auth.getUser();
+          user = authUser;
+          setIsAuthenticated(Boolean(authUser));
+        }
       } catch {
         user = null;
         setIsAuthenticated(false);
@@ -223,6 +226,7 @@ export function useCalculatorPrediction(context: CalculatorContext) {
             whatsappText: successPayload.whatsapp_text ?? successPayload.prediction,
             audioText: successPayload.audio_text ?? successPayload.prediction,
           });
+          setFreeQuestionsRemaining(successPayload.remainingFreeQuestions ?? null);
           setState("result");
         } catch {
           setSubmitError("Falha de conexão ao gerar a previsão.");
@@ -271,12 +275,13 @@ export function useCalculatorPrediction(context: CalculatorContext) {
           eventDateIso: toIsoDate(successPayload.eventDate, successPayload.eventDateIso),
           engineCode: successPayload.engineCode ?? null,
           remainingCredits: successPayload.remainingCredits,
-          remainingFreeQuestions: null,
+          remainingFreeQuestions: successPayload.remainingFreeQuestions ?? null,
           predictionId: successPayload.predictionId ?? null,
           whatsappText: successPayload.whatsapp_text ?? successPayload.prediction,
           audioText: successPayload.audio_text ?? successPayload.prediction,
         });
         setCredits(successPayload.remainingCredits);
+        setFreeQuestionsRemaining(successPayload.remainingFreeQuestions ?? null);
         setState("result");
         clearPendingPayload();
 
@@ -314,14 +319,16 @@ export function useCalculatorPrediction(context: CalculatorContext) {
       setSubmitError(null);
       setSubmitErrorCode(null);
 
-      const supabase = createClient();
+      const supabase = tryCreateClient();
       let user: { id: string } | null = null;
       try {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
-        user = authUser;
-        setIsAuthenticated(Boolean(authUser));
+        if (supabase) {
+          const {
+            data: { user: authUser },
+          } = await supabase.auth.getUser();
+          user = authUser;
+          setIsAuthenticated(Boolean(authUser));
+        }
       } catch {
         user = null;
       }
@@ -354,8 +361,16 @@ export function useCalculatorPrediction(context: CalculatorContext) {
     let cancelled = false;
 
     const run = async () => {
-      const supabase = createClient();
+      const supabase = tryCreateClient();
       try {
+        if (!supabase) {
+          if (!cancelled) {
+            setIsAuthenticated(false);
+            setCredits(null);
+            setFreeQuestionsRemaining(null);
+          }
+          return;
+        }
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -363,15 +378,28 @@ export function useCalculatorPrediction(context: CalculatorContext) {
         setIsAuthenticated(Boolean(user));
         if (!user) {
           setCredits(null);
+          setFreeQuestionsRemaining(null);
           return;
         }
 
         const response = await fetch("/api/dashboard/me", { credentials: "include" });
         if (!response.ok) return;
-        const payload = (await response.json()) as { credits?: number; birthDate?: string | null; birthTime?: string | null; birthLocation?: string | null; birthTimezone?: string | null; birthLat?: number | null; birthLng?: number | null };
+        const payload = (await response.json()) as {
+          credits?: number;
+          freeQuestionsRemaining?: number;
+          birthDate?: string | null;
+          birthTime?: string | null;
+          birthLocation?: string | null;
+          birthTimezone?: string | null;
+          birthLat?: number | null;
+          birthLng?: number | null;
+        };
         if (cancelled) return;
         if (typeof payload.credits === "number") {
           setCredits(payload.credits);
+        }
+        if (typeof payload.freeQuestionsRemaining === "number") {
+          setFreeQuestionsRemaining(payload.freeQuestionsRemaining);
         }
         setUserDataFormState((previous) => {
           if (previous.date || previous.birthLocation) return previous;
@@ -509,6 +537,7 @@ export function useCalculatorPrediction(context: CalculatorContext) {
     setUserDataFormState,
     isAuthenticated,
     credits,
+    freeQuestionsRemaining,
     handleGenerate,
     reset,
     handleStepNavigation,

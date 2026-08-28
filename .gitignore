@@ -18,6 +18,28 @@
 /playwright/.cache/
 /e2e/.auth/
 
+# local QA / scratch (never commit)
+.qa-artifacts/
+tmp/
+scripts/_qa-*.mjs
+repomix-output.xml
+
+# Lovable reference export — local comparison only (large; not product source)
+/ref/
+
+# internal reports & briefings (root)
+/briefing-*.html
+/parecer-*.html
+/Relatorio_*.html
+
+# internal working notes (transcripts, dossiers)
+/*Transcri*.md
+/*DOSSI*.md
+
+# local IDE / agent tooling
+.claude/
+.cursor/
+
 # next.js
 /.next/
 /out/

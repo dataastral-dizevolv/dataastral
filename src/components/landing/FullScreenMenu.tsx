@@ -15,7 +15,7 @@ import {
   LogIn,
 } from "lucide-react";
 import BrandIcon from "@/components/brand/BrandIcon";
-import { createClient } from "@/lib/supabase/client";
+import { tryCreateClient } from "@/lib/supabase/client";
 
 interface FullScreenMenuProps {
   open: boolean;
@@ -28,7 +28,11 @@ const FullScreenMenu = ({ open, onClose }: FullScreenMenuProps) => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setUserEmail(null);
+      return;
+    }
     supabase.auth.getUser().then(({ data }) => {
       setUserEmail(data.user?.email ?? null);
     });
@@ -69,21 +73,56 @@ const FullScreenMenu = ({ open, onClose }: FullScreenMenuProps) => {
   const handleAuthAction = async () => {
     onClose();
     if (userEmail) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      const supabase = tryCreateClient();
+      await supabase?.auth.signOut();
       router.push("/");
     } else {
       router.push("/login");
     }
   };
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!userEmail) {
+      setIsAdmin(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    fetch("/api/dashboard/me", { credentials: "include" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { role?: string } | null) => {
+        if (!cancelled) {
+          setIsAdmin(data?.role === "admin");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setIsAdmin(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userEmail]);
+
   const items: { label: string; path: string; authAction?: boolean }[] = [
     { label: "Começar previsão", path: "/previsao-com-data" },
-    { label: "Calculadora", path: "/#calculadora" },
+    { label: "Mapa Astral", path: "/mapa-astral" },
+    { label: "Painel Astral", path: "/painel-astral" },
+    { label: "Aulas", path: "/aula" },
+    { label: "Relacionamentos", path: "/mapa-astral" },
+    { label: "Calculadora", path: "/calculadora" },
     { label: "Dashboard", path: "/dashboard" },
     { label: "Calendário", path: "/calendario" },
+    { label: "Financeiro", path: "/financeiro" },
     { label: "Perfil", path: "/perfil" },
     { label: "Planos", path: "/precos" },
+
+    ...(isAdmin ? [{ label: "Admin", path: "/admin" }] : []),
     {
       label: userEmail ? "Deslogar" : "Fazer login",
       path: userEmail ? "/" : "/login",
@@ -116,7 +155,7 @@ const FullScreenMenu = ({ open, onClose }: FullScreenMenuProps) => {
 
             <button
               onClick={() => go("/")}
-              aria-label="Data Astral"
+              aria-label="Data Iris"
               className="transition-opacity hover:opacity-70"
             >
               <BrandIcon className="h-16 w-16 sm:h-20 sm:w-20" surface="dark" tone="brand" />
@@ -244,13 +283,13 @@ const FullScreenMenu = ({ open, onClose }: FullScreenMenuProps) => {
             <div className="w-full flex items-center justify-between pt-1">
               <div className="flex flex-col leading-tight">
                 <span className="font-jakarta font-black text-[13px] tracking-[-0.01em] text-white">
-                  Data Astral
+                  Data Iris
                 </span>
                 <span
                   className="font-ubuntu font-thin text-[10px] tracking-[0.14em] uppercase mt-0.5"
                   style={{ color: "hsl(var(--blue-chambray))" }}
                 >
-                  DATA ASTRAL Astro planner agent
+                  DATA IRIS Astro planner agent
                 </span>
               </div>
             </div>

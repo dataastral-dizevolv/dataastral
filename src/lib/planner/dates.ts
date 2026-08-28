@@ -60,3 +60,40 @@ export function capitalizeMonth(date: Date): string {
   const raw = new Intl.DateTimeFormat("pt-BR", { month: "long" }).format(date);
   return raw.charAt(0).toUpperCase() + raw.slice(1);
 }
+
+/** Sunday-start week helpers (planner grid). */
+export function startOfWeek(date: Date, weekStartsOn = 0): Date {
+  const day = startOfDay(date);
+  const diff = (day.getDay() - weekStartsOn + 7) % 7;
+  return addDays(day, -diff);
+}
+
+export function endOfWeek(date: Date, weekStartsOn = 0): Date {
+  return endOfDay(addDays(startOfWeek(date, weekStartsOn), 6));
+}
+
+export function startOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+export function endOfMonth(date: Date): Date {
+  return endOfDay(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+export function isSameMonth(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+}
+
+export function differenceInCalendarDays(later: Date, earlier: Date): number {
+  const a = startOfDay(later).getTime();
+  const b = startOfDay(earlier).getTime();
+  return Math.round((a - b) / DAY_MS);
+}
+
+export function dayOfMonth(date: Date): number {
+  return date.getDate();
+}

@@ -16,7 +16,7 @@ export default function TermosPage() {
           <section className="rounded-2xl border border-border bg-card/50 p-5 shadow-card-soft">
             <h2 className="mb-3 font-jakarta text-base font-bold text-foreground">1. Aceitação dos Termos</h2>
             <p>
-              Ao acessar e utilizar o Data Astral, você concorda em estar vinculado a estes Termos de Uso. Se não
+              Ao acessar e utilizar o Data Iris, você concorda em estar vinculado a estes Termos de Uso. Se não
               concorda, não deve utilizar nossos serviços.
             </p>
           </section>

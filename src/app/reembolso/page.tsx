@@ -4,13 +4,17 @@ import { AuthLoginGate } from "@/components/auth/AuthLoginGate";
 import Footer from "@/components/landing/Footer";
 import Header from "@/components/landing/Header";
 import { RefundRequestForm } from "@/components/refund/RefundRequestForm";
+import { tryGetSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ReembolsoPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+
+  if (tryGetSupabaseConfig()) {
+    const supabase = await createClient();
+    const session = await supabase.auth.getUser();
+    user = session.data.user;
+  }
 
   return (
     <div className="min-h-screen bg-background">

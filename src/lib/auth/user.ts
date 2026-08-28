@@ -8,6 +8,9 @@ export interface DashboardUser {
   email: string;
   role: UserRole;
   credits: number;
+  freeQuestionsRemaining: number;
+  referralCode: string | null;
+  referralPoints: number;
   birthDate: string | null;
   birthTime: string | null;
   birthLocation: string | null;
@@ -28,6 +31,9 @@ interface DashboardUserProfileRow {
 interface DashboardProfileRow {
   full_name?: string | null;
   credits?: number | null;
+  free_questions_remaining?: number | null;
+  referral_code?: string | null;
+  referral_points?: number | null;
   birth_date?: string | null;
   birth_time?: string | null;
   birth_location?: string | null;
@@ -102,6 +108,9 @@ export function buildDashboardUser(
     email: user.email ?? "",
     role: profile?.role === "admin" ? "admin" : "user",
     credits: profileData?.credits ?? 0,
+    freeQuestionsRemaining: profileData?.free_questions_remaining ?? 0,
+    referralCode: profileData?.referral_code ?? null,
+    referralPoints: profileData?.referral_points ?? 0,
     birthDate: profileData?.birth_date ?? null,
     birthTime: profileData?.birth_time ?? null,
     birthLocation: profileData?.birth_location ?? null,
@@ -123,7 +132,7 @@ export async function fetchDashboardUser(supabase: unknown, user: User): Promise
     client
       .from("profiles")
       .select(
-        "credits, full_name, birth_date, birth_time, birth_location, birth_timezone, birth_lat, birth_lng, phone, phone_country, whatsapp",
+        "credits, free_questions_remaining, referral_code, referral_points, full_name, birth_date, birth_time, birth_location, birth_timezone, birth_lat, birth_lng, phone, phone_country, whatsapp",
       )
       .eq("id", user.id)
       .maybeSingle(),

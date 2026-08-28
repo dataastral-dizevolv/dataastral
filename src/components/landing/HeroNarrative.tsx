@@ -27,9 +27,9 @@ const HERO_FAN_ITEMS: FanCardItem[] = [
 ].map((item, i) => ({ ...item, tone: HERO_FAN_TONES[i % HERO_FAN_TONES.length] }));
 
 const HERO_FAN_ACTIONS: Record<string, (navigate: (path: string) => void) => void> = {
-  sinastria: (navigate) => navigate("/cadastro"),
-  precos: (navigate) => navigate("/cadastro"),
-  faq: (navigate) => navigate("/login"),
+  sinastria: (navigate) => navigate("/mapa-astral"),
+  precos: (navigate) => navigate("/precos"),
+  faq: (navigate) => navigate("/faq"),
   "ceu-agora": () => document.getElementById("sky-header")?.scrollIntoView({ behavior: "smooth", block: "start" }),
   planner: (navigate) => navigate("/calendario"),
   mentoria: () => window.open("https://wa.me/5511982028588", "_blank", "noopener,noreferrer"),
@@ -67,7 +67,7 @@ const PHRASES = [
   "É a pessoa ao saber o momento certo, que constrói o seu futuro. Preserva energia, e vive melhor.",
   "Receba as boas vindas no único sistema de astrologia...",
   "que entrega o que você precisa: a data exata para suas decisões.",
-  "Data Astral é feito por inteligência humana, responsável e ética.",
+  "Data Iris é feito por inteligência humana, responsável e ética.",
   "São 20 anos anotando o que acontece nas datas, em mais de 53 mil escutas de vidas reais!",
 ];
 
@@ -464,7 +464,7 @@ const HeroNarrative: React.FC = () => {
                   color: "hsl(var(--muted-foreground))",
                 }}
               >
-                Data Astral é o app feito com sensibilidade humana. Em respeito à matemática da natureza, entrega a data exata da previsão personalizada pelo mapa astral. Saiba o momento certo para suas decisões e realização de seus objetivos!
+                Data Iris é o app feito com sensibilidade humana. Em respeito à matemática da natureza, entrega a data exata da previsão personalizada pelo mapa astral. Saiba o momento certo para suas decisões e realização de seus objetivos!
               </motion.p>
 
 
@@ -477,7 +477,7 @@ const HeroNarrative: React.FC = () => {
                 className="group inline-flex items-center gap-2 rounded-3xl bg-[hsl(var(--blue-chambray))] px-6 py-3 text-[13px] sm:text-[15px] font-bold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_2px_12px_-2px_hsl(var(--blue-chambray)/0.45)] transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_20px_-4px_hsl(var(--blue-chambray)/0.55)]"
                 style={{ fontFamily: "var(--font-ubuntu-fallback), var(--font-jakarta-fallback), Inter, system-ui, sans-serif" }}
               >
-                Data Astral
+                Data Iris
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.5} />
               </motion.button>
 
@@ -488,7 +488,7 @@ const HeroNarrative: React.FC = () => {
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 1.1, ease: [0.25, 0.1, 0.25, 1] }}
               >
-                O método exclusivo <span className="text-azure-glow">Data Astral</span> é baseado na escuta de <span className="text-azure-glow">vidas reais</span>. A primeira astrologia com dados de nosso tempo! Conheça mais!
+                O método exclusivo <span className="text-azure-glow">Data Iris</span> é baseado na escuta de <span className="text-azure-glow">vidas reais</span>. A primeira astrologia com dados de nosso tempo! Conheça mais!
               </motion.h2>
 
               <motion.div

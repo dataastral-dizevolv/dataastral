@@ -34,7 +34,7 @@ async function sendTwilioWhatsApp(phone: string, code: string) {
   const body = new URLSearchParams({
     To: `whatsapp:${phone}`,
     From: from.startsWith("whatsapp:") ? from : `whatsapp:${from}`,
-    Body: `Data Astral · seu código de verificação é ${code}. Expira em 10 minutos.`,
+    Body: `Data Iris · seu código de verificação é ${code}. Expira em 10 minutos.`,
   });
 
   const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
