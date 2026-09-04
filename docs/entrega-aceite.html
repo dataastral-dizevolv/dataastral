@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documento de Entrega e Aceite — Data Iris / Data Astral — 3 de setembro de 2026</title>
+  <style>
+    :root {
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #d6d3d1;
+      --paper: #fafaf9;
+      --card: #ffffff;
+      --accent: #1e3a4c;
+      --ok: #14532d;
+      --ok-bg: #ecfdf3;
+      --warn: #92400e;
+      --warn-bg: #fff7ed;
+      --pend: #9f1239;
+      --pend-bg: #fff1f2;
+      --ato: #334155;
+      --ato-bg: #f1f5f9;
+      --ev: #1e40af;
+      --ev-bg: #eff6ff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 15.5px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 210mm; margin: 0 auto; padding: 28px 28px 72px; }
+    header.capa {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 36px 40px 32px;
+      margin-bottom: 28px;
+    }
+    .kicker {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    h1, h2, h3, h4 {
+      font-family: "Palatino Linotype", Palatino, Georgia, serif;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.25;
+    }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    h2 {
+      font-size: 20px;
+      margin: 36px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    h3 { font-size: 16.5px; margin: 22px 0 8px; color: var(--ink); }
+    h4 { font-size: 14.5px; margin: 16px 0 6px; color: var(--ink); }
+    p { margin: 0 0 10px; }
+    a { color: var(--accent); }
+    .meta { color: var(--muted); font-size: 13.5px; margin-top: 18px; }
+    .meta dt {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .meta dd { margin: 2px 0 0; }
+    .aviso {
+      border-left: 3px solid var(--accent);
+      background: #f4f1ee;
+      padding: 12px 14px;
+      margin: 18px 0 0;
+      font-size: 13.5px;
+    }
+    .callout {
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      margin: 12px 0 16px;
+      background: var(--card);
+      font-size: 14px;
+    }
+    .callout.warn { border-left: 3px solid var(--warn); background: var(--warn-bg); }
+    .callout.ok { border-left: 3px solid var(--ok); background: var(--ok-bg); }
+    .callout.info { border-left: 3px solid var(--ev); background: var(--ev-bg); }
+    nav.toc {
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 18px 22px;
+      margin-bottom: 8px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 4px 0; }
+    nav.toc a { text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.4;
+      background: var(--card);
+      margin: 10px 0 16px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 7px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #ece8e4;
+      font-weight: 650;
+      color: var(--accent);
+    }
+    code, .path {
+      font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      background: #f3f1ee;
+      padding: 0.05em 0.35em;
+    }
+    ul, ol { margin: 6px 0 12px; padding-left: 22px; }
+    li { margin: 3px 0; }
+    .badge {
+      display: inline-block;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 10.5px;
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .badge.ok { color: var(--ok); background: var(--ok-bg); border-color: #bbf7d0; }
+    .badge.ev { color: var(--ev); background: var(--ev-bg); border-color: #bfdbfe; }
+    .badge.warn { color: var(--warn); background: var(--warn-bg); border-color: #fed7aa; }
+    .badge.pend { color: var(--pend); background: var(--pend-bg); border-color: #fecdd3; }
+    .badge.ato { color: var(--ato); background: var(--ato-bg); border-color: #cbd5e1; }
+    .small { font-size: 13px; color: var(--muted); }
+    footer.docfoot {
+      margin-top: 40px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .wrap { padding: 16px 14px 48px; }
+      header.capa { padding: 22px 18px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 22px; }
+    }
+    @media print {
+      body { background: #fff; font-size: 11.5pt; }
+      .wrap { max-width: none; padding: 0; }
+      header.capa, nav.toc, table, .callout, .aviso { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      h2 { break-after: avoid; }
+      nav.toc a::after { content: none; }
+      footer.docfoot { position: running(footer); }
+      @page { size: A4; margin: 16mm 14mm 18mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="capa" id="capa">
+      <p class="kicker">Entrega / Aceite contratual</p>
+      <h1>Documento de entrega e aceite</h1>
+      <p>Catálogo de evidências das cláusulas <strong>vi</strong>, <strong>xxi</strong>, <strong>xxii</strong>, <strong>xvi</strong>, <strong>xviii</strong> e <strong>xxiii</strong>, extraído do código-fonte inspecionado. Destinado a contratante e assessoria jurídica: o que foi entregue, onde validar, e o que permanece pendente ou é ato externo.</p>
+      <dl class="meta">
+        <dt>Produto (marca na interface)</dt>
+        <dd>Data Iris</dd>
+        <dt>Nome do repositório / pacote npm</dt>
+        <dd>dataastral (<code>package.json</code> name: <code>dataastral</code>, version <code>0.1.0</code>, private)</dd>
+        <dt>Natureza deste artefato</dt>
+        <dd>Documento de entrega e aceite — não é wiki interna de engenharia, não é cessão de propriedade intelectual e não transfere acessos.</dd>
+        <dt>Data da inspeção</dt>
+        <dd>3 de setembro de 2026 (revisão no mesmo dia: README de manutenção e evidência HTTPS em <code>dataastral.vercel.app</code>)</dd>
+        <dt>Repositório remoto observado</dt>
+        <dd><code>https://github.com/dataastral-dizevolv/dataastral</code> (organização GitHub: <code>dataastral-dizevolv</code>)</dd>
+        <dt>Commit HEAD no momento da inspeção</dt>
+        <dd><code>1f3a50149545404cd85d619d00f7019e695baa8c</code> (28 de agosto de 2026). A inspeção leu a <strong>árvore de trabalho corrente</strong>, inclusive arquivos modificados e não commitados. Em caso de divergência entre este HTML e o código, prevalece o código.</dd>
+      </dl>
+      <div class="aviso">
+        <strong>Fonte da verdade.</strong> Este documento descreve o estado do software conforme inspeção local. Não inventa endpoints, certificados, domínios em produção nem valores de segredos. Variáveis de ambiente são citadas apenas pelos <em>nomes</em>. Arquivos <code>.env.local</code> e <code>.env.e2e.local</code> existem no disco e estão no <code>.gitignore</code>; o conteúdo não foi reproduzido.
+      </div>
+    </header>
+
+    <nav class="toc" id="sumario">
+      <p class="kicker">Sumário</p>
+      <ol>
+        <li><a href="#executivo">Sumário executivo das cláusulas</a></li>
+        <li><a href="#metodologia">Metodologia e limites da inspeção</a></li>
+        <li><a href="#xvi">Cláusula xvi — Reembolsos CDC</a></li>
+        <li><a href="#xviii">Cláusula xviii — SSL/TLS</a></li>
+        <li><a href="#vi">Cláusula vi — Documentação dos endpoints</a></li>
+        <li><a href="#xxi">Cláusula xxi — Organização e documentação do repositório</a></li>
+        <li><a href="#xxii">Cláusula xxii — README técnico de manutenção</a></li>
+        <li><a href="#xxiii">Cláusula xxiii — Acessos e propriedade intelectual (ato, não código)</a></li>
+        <li><a href="#pendencias">Pendências e limitações</a></li>
+        <li><a href="#evidencias">Índice de evidências (caminhos)</a></li>
+        <li><a href="#declaracao">Declaração</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="executivo">1. Sumário executivo</h2>
+    <p>Status segundo a terminologia do aceite: <span class="badge ok">Implementado</span> no produto; <span class="badge ev">Evidência no repositório</span> a apontar; <span class="badge warn">Parcial</span>; <span class="badge pend">Pendência</span>; <span class="badge ato">Ato externo</span> (ato, não código). Este HTML é o pacote para cliente e jurídico. Manutenção e mapa do repo também estão em <code>README.md</code>.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Cláusula</th>
+          <th>Item</th>
+          <th>Status neste pacote</th>
+          <th>Tipo de trabalho</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>vi</td>
+          <td>Documentação dos endpoints</td>
+          <td><span class="badge ev">Evidência no repositório</span> + catálogo neste artefato</td>
+          <td>As rotas existem no código. O catálogo HTTP está neste HTML (secção 5). O <code>README.md</code> aponta para cá. Não há OpenAPI gerado das rotas Next (não exigido se o catálogo escrito basta).</td>
+        </tr>
+        <tr>
+          <td>xxi</td>
+          <td>Organização e documentação do repositório</td>
+          <td><span class="badge ev">Evidência no repositório</span> — mapa em <code>README.md</code> e neste HTML</td>
+          <td>Pastas já eram navegáveis. O mapa escrito está no README (e repetido abaixo). Sem LICENSE/CONTRIBUTING (não bloqueia o mapa pedido na cláusula).</td>
+        </tr>
+        <tr>
+          <td>xxii</td>
+          <td>README técnico de manutenção</td>
+          <td><span class="badge ev">Evidência no repositório</span> — <code>README.md</code></td>
+          <td>README técnico de manutenção na raiz (como subir, env, deploy, banco, e2e, mapa). Este HTML permanece o pacote de aceite. Runbook de RLS: <code>docs/security/rls-apply-runbook.md</code>.</td>
+        </tr>
+        <tr>
+          <td>xvi</td>
+          <td>Reembolsos CDC</td>
+          <td><span class="badge ok">Implementado</span> — <span class="badge ev">evidência apontada</span></td>
+          <td>Canal público, formulário, API, migration com menção ao CDC art. 49. Janela de 7 dias na copy, não no POST. Sem tela admin de aprovação.</td>
+        </tr>
+        <tr>
+          <td>xviii</td>
+          <td>SSL/TLS</td>
+          <td><span class="badge ev">Evidência apontada</span> — hostname Vercel em HTTPS</td>
+          <td>Produção atual: <code>https://dataastral.vercel.app/</code> (TLS da Vercel). Cookies <code>Secure</code> no código. Domínio próprio da cliente ainda não apontado. Sem HSTS no <code>next.config.ts</code>.</td>
+        </tr>
+        <tr>
+          <td>xxiii</td>
+          <td>Entrega formal de acessos e propriedade intelectual</td>
+          <td><span class="badge ato">Ato externo</span> — ato, não código</td>
+          <td>Este HTML não transfere contas nem cede PI. Origin GitHub observado; sem LICENSE; segredos fora do git.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="metodologia">2. Metodologia</h2>
+    <h3>O que foi inspecionado</h3>
+    <ul>
+      <li>Todos os 30 arquivos <code>src/app/api/**/route.ts</code> (métodos HTTP, autenticação, corpos e códigos de erro presentes no código).</li>
+      <li>Rota complementar <code>src/app/auth/callback/route.ts</code>.</li>
+      <li>Funções edge <code>supabase/functions/iris-predict</code> e <code>supabase/functions/iris-ephemerides</code>.</li>
+      <li>Motor Python <code>api/engine.py</code> e <code>requirements.txt</code>.</li>
+      <li>Páginas públicas <code>/reembolso</code>, <code>/faq</code>, <code>/termos-de-uso</code>, <code>/politica-de-privacidade</code>, <code>/precos</code> e ligação em <code>/financeiro</code>.</li>
+      <li>Migration <code>supabase/migrations/20260821_create_refund_requests.sql</code>, tipos em <code>src/types/</code>, formulário <code>RefundRequestForm</code>, e2e <code>e2e/smoke.public.spec.ts</code>.</li>
+      <li>Flags de cookie <code>secure</code>, <code>next.config.ts</code>, <code>vercel.json</code>, <code>middleware.ts</code>, metadados locais <code>.vercel/project.json</code>.</li>
+      <li>Nomes de variáveis em <code>.env.example</code> e <code>.env.e2e.example</code> (não os valores de arquivos locais).</li>
+      <li><code>package.json</code>, lockfiles, <code>playwright.config.ts</code>, <code>docs/security/rls-apply-runbook.md</code>, <code>.gitignore</code>, remote git, ausência de LICENSE/CONTRIBUTING.</li>
+      <li>Arquivo interno <code>AGENT.md</code> (gitignored): apenas para constatar que está desatualizado e <strong>não</strong> faz parte da entrega.</li>
+    </ul>
+    <h3>O que esta inspeção não fez</h3>
+    <ul>
+      <li>Hostname Vercel <code>https://dataastral.vercel.app/</code>: GET HTTPS devolveu o HTML da landing Data Iris; HEAD HTTPS a partir deste ambiente recebeu 403 após o handshake TLS (proteção de borda). Não é SSL Labs nem captura de cadeado no browser.</li>
+      <li>Não se afirma que um domínio próprio da cliente (nem <code>datairis.com.br</code>) está no ar. A string <code>datairis.com.br</code> no PDF é marca. O hostname comprovado nesta revisão é o da Vercel, abaixo.</li>
+      <li>Não foram lidos nem copiados conteúdos de <code>.env.local</code> / <code>.env.e2e.local</code>.</li>
+      <li>Não se executou a suíte e2e nesta inspeção; apenas se leu a configuração e o spec de smoke público.</li>
+      <li>Não se auditou o painel Stripe, Supabase ou Vercel além dos arquivos no disco.</li>
+    </ul>
+    <div class="callout info">
+      Termos técnicos usados uma vez: <strong>route handler</strong> — função HTTP do Next.js em <code>route.ts</code>; <strong>RLS</strong> — Row Level Security do PostgreSQL/Supabase; <strong>edge function</strong> — função Deno hospedada no Supabase; <strong>webhook</strong> — callback HTTP autenticado por assinatura; <strong>artefato</strong> — evidência material no produto ou no repositório; <strong>evidência apontada</strong> — ligação cláusula → arquivo/rota, sem feature nova.
+    </div>
+
+    <h2 id="xvi">3. Cláusula xvi — Reembolsos CDC</h2>
+    <p><span class="badge ok">Implementado</span> no produto. Trabalho de aceite: <strong>apontar evidência</strong>. Política visível: créditos não utilizados, 7 dias corridos após a compra, CDC art. 49 quando aplicável; créditos já consumidos em previsões não são reembolsáveis.</p>
+
+    <h3>Política na interface (copy)</h3>
+    <table>
+      <thead>
+        <tr><th>Superfície</th><th>Caminho / artefato</th><th>O que o texto afirma</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Página pública</td>
+          <td><code>/reembolso</code> — <code>src/app/reembolso/page.tsx</code></td>
+          <td>Créditos não utilizados reembolsáveis em até 7 dias corridos após a compra, nos termos do CDC art. 49, quando aplicável. Créditos já consumidos não são reembolsáveis. Formulário exige login.</td>
+        </tr>
+        <tr>
+          <td>Formulário</td>
+          <td><code>src/components/refund/RefundRequestForm.tsx</code></td>
+          <td>Usuário autenticado informa quantidade e motivo opcional (máx. 1000 caracteres). Texto: “CDC art. 49 garante reembolso em até 7 dias.” Consome GET/POST <code>/api/refunds</code>.</td>
+        </tr>
+        <tr>
+          <td>FAQ</td>
+          <td><code>/faq</code> — <code>src/app/faq/page.tsx</code></td>
+          <td>“O reembolso acontece apenas para créditos não utilizados, dentro de 7 dias corridos após a compra.”</td>
+        </tr>
+        <tr>
+          <td>Termos</td>
+          <td><code>/termos-de-uso</code> — cláusula 4</td>
+          <td>Pagamentos e reembolsos remetem a <code>/reembolso</code>.</td>
+        </tr>
+        <tr>
+          <td>Preços</td>
+          <td><code>/precos</code> via <code>PricingCatalog.tsx</code> e <code>CreditPackageCard.tsx</code></td>
+          <td>Stripe + “7 dias para reembolso conforme CDC”; cartão: reembolsos só em 7 dias corridos, créditos não utilizados.</td>
+        </tr>
+        <tr>
+          <td>Financeiro (área logada)</td>
+          <td><code>src/app/(dashboard)/financeiro/page.tsx</code></td>
+          <td>Mesma menção CDC e ligação para <code>/reembolso</code>.</td>
+        </tr>
+        <tr>
+          <td>Rodapé</td>
+          <td><code>src/components/landing/Footer.tsx</code></td>
+          <td>Link legal “Reembolso” → <code>/reembolso</code>.</td>
+        </tr>
+        <tr>
+          <td>Perfil</td>
+          <td><code>src/components/perfil/ProfileCreditsBubble.tsx</code></td>
+          <td>Link “Reembolso”.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Artefatos de persistência e API</h3>
+    <table>
+      <thead>
+        <tr><th>Artefato</th><th>Onde</th><th>O que prova</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>API</td>
+          <td>GET e POST <code>/api/refunds</code> — <code>src/app/api/refunds/route.ts</code></td>
+          <td>Sessão obrigatória (401 se anônimo). GET devolve saldo e até 20 pedidos. POST cria pedido <code>pending</code> sem debitar créditos. Código de erro <code>NO_CREDITS</code> se saldo ≤ 0.</td>
+        </tr>
+        <tr>
+          <td>Tipos</td>
+          <td><code>src/types/refunds.ts</code></td>
+          <td>Corpo: <code>amount</code>, <code>reason</code>. Status: <code>pending</code> | <code>approved</code> | <code>rejected</code>.</td>
+        </tr>
+        <tr>
+          <td>Banco</td>
+          <td><code>supabase/migrations/20260821_create_refund_requests.sql</code></td>
+          <td>Tabela <code>refund_requests</code>. Comentário SQL: pedidos de créditos não utilizados (CDC art. 49); a criação não debita; aprovação é administrativa. RLS: usuário insere/lê os próprios; admin pode SELECT/UPDATE; service_role all.</td>
+        </tr>
+        <tr>
+          <td>Teste e2e</td>
+          <td><code>e2e/smoke.public.spec.ts</code></td>
+          <td>Visita <code>/reembolso</code> e exige heading /Reembolso/i e texto “Data Iris”.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <strong>Limite da evidência (não omitir no aceite).</strong> A janela de 7 dias corridos está na copy das páginas e do formulário. O POST de <code>/api/refunds</code> valida autenticação, quantidade inteira ≥ 1 e quantidade ≤ saldo; <strong>não</strong> consulta data da compra nem rejeita pedidos fora de 7 dias. O pedido permanece <code>pending</code>. Não existe, nesta árvore, tela administrativa Next.js nem route handler de aprovação/rejeição (busca por UI de reembolso no admin: ausente). As policies SQL permitem que um administrador autenticado atualize a tabela no banco; isso não substitui um fluxo de produto documentado. Para CDC, o canal + a política visível costumam ser o artefato; o aceite não deve ler “enforcement automático de 7 dias” neste código.
+    </div>
+
+    <h2 id="xviii">4. Cláusula xviii — SSL/TLS</h2>
+    <p><span class="badge ev">Evidência apontada</span> no hostname de deploy atual. <span class="badge pend">Pendência da cliente</span>: domínio próprio ainda não enviado para apontamento DNS.</p>
+
+    <table>
+      <thead>
+        <tr><th>Evidência</th><th>Onde</th><th>O que prova — e o que não prova</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HTTPS live (Vercel)</td>
+          <td><code>https://dataastral.vercel.app/</code></td>
+          <td>Em 3 de setembro de 2026, GET HTTPS retornou a landing Data Iris (“Data Iris | Previsões com Efemérides Reais”). HEAD HTTPS neste ambiente concluiu TLS e recebeu 403 (proteção da borda), o que ainda indica certificado na terminação Vercel. Não substitui print do cadeado nem relatório SSL Labs, se o aceite os exigir. <strong>Não</strong> é domínio customizado da cliente.</td>
+        </tr>
+        <tr>
+          <td>Vínculo Vercel</td>
+          <td><code>.vercel/project.json</code> (gitignored); <code>README.md</code></td>
+          <td>Projeto local nomeado <code>dataastral</code>. Alinhado ao hostname <code>*.vercel.app</code> acima.</td>
+        </tr>
+        <tr>
+          <td>Cookie Secure (convidado)</td>
+          <td><code>src/app/api/predict-public/route.ts</code></td>
+          <td>Cookie <code>guest_id</code>: <code>httpOnly</code>, <code>sameSite: lax</code>, <code>secure</code> quando <code>NODE_ENV === "production"</code> ou <code>VERCEL_ENV === "production"</code>.</td>
+        </tr>
+        <tr>
+          <td>Cookie Secure (indicação)</td>
+          <td><code>src/app/auth/callback/route.ts</code>, <code>src/app/api/referrals/attribute/route.ts</code>, <code>src/components/auth/AuthForm.tsx</code></td>
+          <td>Limpeza do cookie <code>da_ref</code> usa <code>secure: process.env.NODE_ENV === "production"</code>. No browser, o cookie de indicação ganha flag Secure se <code>window.location.protocol === "https:"</code>.</td>
+        </tr>
+        <tr>
+          <td>URLs iCal</td>
+          <td><code>src/lib/planner/safeIcalUrl.ts</code></td>
+          <td>Aceita apenas protocolos <code>https:</code> ou <code>http:</code> (webcal é reescrito para https). Bloqueia hosts privados. A API de feeds exige “URL iCal pública válida (https)” na mensagem de erro do POST.</td>
+        </tr>
+        <tr>
+          <td>Pagamentos</td>
+          <td><code>src/app/api/credits/buy/route.ts</code>, webhook <code>src/app/api/webhooks/stripe/route.ts</code></td>
+          <td>Checkout Stripe. Em produção, o return_url deve usar o hostname HTTPS efetivo (hoje o <code>vercel.app</code>, até haver domínio próprio).</td>
+        </tr>
+        <tr>
+          <td>HSTS</td>
+          <td><code>next.config.ts</code></td>
+          <td><strong>Ausente</strong> na aplicação. A Vercel ainda serve o site em HTTPS. Não se afirma “HSTS habilitado no Next”.</td>
+        </tr>
+        <tr>
+          <td>Domínio no PDF</td>
+          <td><code>src/lib/pdf/generate-insight-pdf.ts</code></td>
+          <td>Rodapé: “Gerado em Data Iris · datairis.com.br”. String de marca. A cliente ainda não enviou domínio para apontar; este pacote <strong>não</strong> prova DNS desse nome.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout info">
+      <strong>Domínio da cliente.</strong> Enquanto não houver hostname próprio, a evidência live de TLS é o deploy Vercel. Depois do apontamento, repetir a verificação no domínio novo e atualizar Stripe webhook / <code>NEXT_PUBLIC_APP_URL</code>.
+    </div>
+    <div class="callout warn">
+      Chamada <em>server-side</em> de efemérides: se <code>PYTHON_ENGINE_URL</code> estiver vazio e <code>VERCEL_URL</code> estiver definido, o Next monta a base como <code>http://</code> + <code>VERCEL_URL</code> (HTTP, não HTTPS). Isso é fetch interno da aplicação, não o TLS visto pelo navegador. Não foi inspecionado se, no deploy atual, <code>PYTHON_ENGINE_URL</code> está preenchido.
+    </div>
+
+    <h2 id="vi">5. Cláusula vi — Documentação dos endpoints</h2>
+    <p><span class="badge ev">Evidência no repositório</span>: 30 route handlers Next em <code>src/app/api/</code>. Catálogo neste HTML. <code>README.md</code> aponta para esta secção. Não existe arquivo OpenAPI das rotas Next (o dump local <code>public_openapi_schema.json</code> é PostgREST, gitignored). <code>AGENT.md</code> (gitignored) descreve rotas que <strong>não existem</strong> nesta árvore (<code>previsao/route.ts</code>, <code>stripe/checkout/route.ts</code>, entre outras). Extraído do código em 3 de setembro de 2026.</p>
+    <p>Autenticação, em linguagem comum: <strong>anônimo</strong> — sem sessão; <strong>sessão</strong> — cookie de usuário Supabase via <code>getUser()</code>; <strong>admin</strong> — sessão + RPC <code>is_admin</code> (<code>src/lib/auth/admin.ts</code>); <strong>assinatura Stripe</strong> — header <code>stripe-signature</code> + <code>STRIPE_WEBHOOK_SECRET</code>; <strong>token interno</strong> — header <code>x-internal-engine-token</code> comparado a <code>ENGINE_INTERNAL_TOKEN</code>.</p>
+    <p>O <code>middleware.ts</code> protege páginas <code>/dashboard</code>, <code>/calculadora</code>, <code>/calendario</code>, <code>/financeiro</code>, <code>/perfil</code> e prefixo <code>/admin</code>. As rotas <code>/api/*</code> <strong>não</strong> são bloqueadas pelo middleware; cada handler aplica a própria regra.</p>
+
+    <h3>5.1 Previsão e calculadora</h3>
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Auth</th><th>Finalidade</th><th>Corpo / query (provados no código)</th><th>Status / códigos relevantes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/predict</code></td>
+          <td>Sessão</td>
+          <td>Gera previsão autenticada, consome crédito ou pergunta grátis, persiste histórico.</td>
+          <td>JSON: <code>theme</code> (amor, carreira, financas, saude, familia, viagens), <code>question</code>, <code>birthDate</code>, <code>birthTime</code>, <code>gender</code>, <code>birthLocation</code>, <code>birthTimezone</code>, <code>birthLat</code>, <code>birthLng</code>, <code>placeQuery</code>, <code>targetBirthDate</code>, <code>targetBirthTime</code>, <code>targetBirthTimezone</code>, <code>conflictDate</code>, <code>dynamicAnswers</code>.</td>
+          <td>400 INVALID_THEME, INVALID_QUESTION, INVALID_BIRTH_DATE, INVALID_BIRTH_TIMEZONE; 422 THEME_IN_CALIBRATION (carreira, saude, familia, viagens); 401 AUTH_REQUIRED; 403 ACCOUNT_DISABLED; 402 INSUFFICIENT_CREDITS; 500 SERVER_MISCONFIGURED, ENGINE_NOT_CONFIGURED, PREDICTION_ENGINE_FAILED, ENGINE_TIMEOUT, PREDICTION_PERSIST_FAILED, CREDIT_DEBIT_FAILED. Sucesso 200 com prediction, créditos restantes, <code>requestId</code>, etc.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/predict-public</code></td>
+          <td>Anônimo (cookie <code>guest_id</code>)</td>
+          <td>Leituras gratuitas de convidado, com limite e rate limit em memória.</td>
+          <td>JSON: <code>theme</code>, <code>question</code> (máx. 300), <code>birthDate</code> (YYYY-MM-DD), <code>birthTime</code> (HH:mm ou vazio), <code>gender</code>, <code>birthLocation</code>, <code>birthTimezone</code>, <code>birthLat</code>, <code>birthLng</code>, <code>placeQuery</code>, <code>dynamicAnswers</code>.</td>
+          <td>429 RATE_LIMIT_EXCEEDED (12 req / 10 min por IP, por processo); 400 INVALID_*; 422 THEME_IN_CALIBRATION; 403 FREE_LIMIT_REACHED; 500 FREE_LIMIT_CHECK_FAILED, ENGINE_NOT_CONFIGURED, PREDICTION_ENGINE_FAILED, ENGINE_TIMEOUT.</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/calculator/questions</code></td>
+          <td>Anônimo</td>
+          <td>Lista perguntas ativas da calculadora.</td>
+          <td>Query: <code>category</code> (temas oficiais), <code>kind</code> (dynamic, prompt, all — outros valores → 400).</td>
+          <td>400 categoria/tipo inválido; 500 falha de carga; 200 <code>{ items }</code>. Sem config Supabase: <code>{ items: [] }</code>.</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/predictions/history</code></td>
+          <td>Sessão</td>
+          <td>Histórico de previsões do usuário.</td>
+          <td>Query: <code>limit</code> (1–100, default 20), <code>withCount=1</code>, <code>startDate</code>/<code>endDate</code> ISO.</td>
+          <td>401; 500. Com withCount: <code>{ items, total }</code>; senão array.</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td><code>/api/predictions/history</code></td>
+          <td>Sessão</td>
+          <td>Exclui um item ou todo o histórico.</td>
+          <td>Query: <code>id</code> (UUID) ou <code>all=1</code>.</td>
+          <td>401; 400 se faltar id/all ou UUID inválido; 500; 200 <code>{ success: true }</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.2 Conta, perfil e dashboard</h3>
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Auth</th><th>Finalidade</th><th>Corpo / query</th><th>Status / códigos</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/dashboard/me</code></td>
+          <td>Sessão</td>
+          <td>Perfil resumido da área logada (créditos, nascimento, indicação, exclusão pendente).</td>
+          <td>—</td>
+          <td>401; 200 conforme <code>DashboardMeResponse</code>.</td>
+        </tr>
+        <tr>
+          <td>PATCH</td>
+          <td><code>/api/profile</code></td>
+          <td>Sessão</td>
+          <td>Atualiza nome, nascimento, telefone e WhatsApp.</td>
+          <td>JSON: <code>fullName</code>, <code>birthDate</code>, <code>birthTime</code>, <code>birthLocation</code>, <code>birthTimezone</code>, <code>birthLat</code>, <code>birthLng</code>, <code>phone</code>, <code>phoneCountry</code>, <code>whatsapp</code>.</td>
+          <td>401; 400 validação; 409 celular duplicado (Postgres 23505); 500; 200 <code>{ success: true }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/profile/delete-request</code></td>
+          <td>Sessão</td>
+          <td>Agenda exclusão de conta em 7 dias e dispara OTP de e-mail.</td>
+          <td>—</td>
+          <td>401; 400 sem e-mail; 500; 202 se o pedido gravou mas o e-mail falhou; 200 com <code>scheduledFor</code>.</td>
+        </tr>
+        <tr>
+          <td>DELETE</td>
+          <td><code>/api/profile/delete-request</code></td>
+          <td>Sessão</td>
+          <td>Cancela exclusão pendente.</td>
+          <td>—</td>
+          <td>401; 500; 200 <code>{ success: true }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/referrals/attribute</code></td>
+          <td>Sessão</td>
+          <td>Atribui código de indicação (corpo ou cookie <code>da_ref</code>).</td>
+          <td>JSON opcional: <code>code</code>.</td>
+          <td>401; 400 missing_code; 500 reason error; 200 <code>{ success, reason, pointsAwarded }</code> (razões no código: attributed, already_attributed, invalid_code, self_referral, etc.).</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/auth/callback</code></td>
+          <td>OAuth code (query <code>code</code>)</td>
+          <td>Troca código Supabase por sessão e aplica indicação do cookie.</td>
+          <td>Query: <code>code</code>, <code>next</code> (apenas path relativo seguro).</td>
+          <td>Redirect para login em falha; redirect para <code>next</code> ou <code>/dashboard</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.3 Créditos, Stripe e reembolsos</h3>
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Auth</th><th>Finalidade</th><th>Corpo / query</th><th>Status / códigos</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/credits/packages</code></td>
+          <td>Anônimo (exige config servidor)</td>
+          <td>Catálogo público de pacotes ativos (sem Stripe Price ID).</td>
+          <td>—</td>
+          <td>503 se faltar Supabase/service role; 500; 200 array <code>id, label, credits, priceCents, badge</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/credits/buy</code></td>
+          <td>Sessão</td>
+          <td>Cria Checkout Stripe hosted ou embedded.</td>
+          <td>JSON: <code>packageId</code>, <code>uiMode</code> (embedded|hosted). Query <code>mode</code> também aceita esses valores. Default hosted.</td>
+          <td>503 STRIPE_SECRET_MISSING; 401 UNAUTHENTICATED; 400 pacote inválido / STRIPE_PRICE_MISSING; 500.</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/credits/transactions</code></td>
+          <td>Sessão</td>
+          <td>Extrato de créditos.</td>
+          <td>Query: <code>limit</code> (1–100, default 20).</td>
+          <td>401; 500; 200 array.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/webhooks/stripe</code></td>
+          <td>Assinatura Stripe</td>
+          <td>Entrega créditos em <code>checkout.session.completed</code> pago; idempotente por descrição da transação.</td>
+          <td>Corpo bruto da Stripe + header <code>stripe-signature</code>.</td>
+          <td>500 webhook não configurado; 400 assinatura ausente/inválida; 200 received/ignored/duplicated/delivered; 500 falha ao creditar.</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/refunds</code></td>
+          <td>Sessão</td>
+          <td>Saldo e pedidos do usuário.</td>
+          <td>—</td>
+          <td>401; 500; 200 <code>{ credits, requests }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/refunds</code></td>
+          <td>Sessão</td>
+          <td>Abre pedido pending; não debita.</td>
+          <td>JSON: <code>amount</code> (≥ 1, ≤ saldo), <code>reason</code> (até 1000).</td>
+          <td>401; 400 (quantidade / NO_CREDITS / acima do saldo); 500; 200 <code>{ ok: true, request }</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.4 Calendário, áudio, WhatsApp</h3>
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Auth</th><th>Finalidade</th><th>Corpo / query</th><th>Status / códigos</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/astrology/ephemerides</code></td>
+          <td>Sessão</td>
+          <td>Efemérides do mês a partir do natal no perfil; chama motor Python <code>/api/ephemerides</code>.</td>
+          <td>Query: <code>year</code> (1900–2200), <code>month</code> (1–12).</td>
+          <td>401; 400; 422 MISSING_BIRTH_DATA; 500 ENGINE_NOT_CONFIGURED, ENGINE_TIMEOUT, EPHEMERIDES_FAILED. Sucesso: array de eventos.</td>
+        </tr>
+        <tr>
+          <td>GET / POST / DELETE</td>
+          <td><code>/api/calendar/feeds</code></td>
+          <td>Sessão</td>
+          <td>CRUD de feeds iCal do usuário.</td>
+          <td>POST JSON: <code>label</code> (1–80), <code>url</code>, <code>color</code> (preset). DELETE query <code>id</code> UUID.</td>
+          <td>401; 400; 500; POST 200 feed; DELETE <code>{ success: true }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/calendar/ical-proxy</code></td>
+          <td>Sessão</td>
+          <td>Baixa ICS de URL já cadastrada na conta (máx. 2&nbsp;MB).</td>
+          <td>JSON: <code>url</code>.</td>
+          <td>401; 400; 403 agenda não da conta; 413; 422 não é VCALENDAR; 502; 200 <code>{ ics }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/tts</code></td>
+          <td>Sessão</td>
+          <td>Narração ElevenLabs, cache em bucket <code>astral-audio</code>, URL assinada 1h.</td>
+          <td>JSON: <code>audio_text</code> ou <code>text</code>, e <code>predictionId</code> <em>ou</em> (<code>eventId</code> + <code>eventDate</code>).</td>
+          <td>400 INVALID_TTS_*; 401 AUTH_REQUIRED; 500 TTS_MISCONFIGURED / storage; 503 STORAGE_UNAVAILABLE; 429 TTS_QUOTA_EXCEEDED; 502 TTS_PROVIDER_FAILED / TTS_EMPTY_AUDIO. 200 <code>{ audioUrl, cached, key }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/export/audio</code></td>
+          <td>Desabilitado</td>
+          <td>Intencionalmente fora de serviço (comentário F-04 no arquivo).</td>
+          <td>Payload ignorado.</td>
+          <td><strong>404</strong> <code>{ error: "Not found" }</code>. Evidência: <code>src/app/api/export/audio/route.ts</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/whatsapp/send</code></td>
+          <td>Sessão</td>
+          <td>Prepara mensagem; registra auditoria. Resposta declara <code>provider: "zapi_mock"</code> (não envia operador real neste handler).</td>
+          <td>JSON: <code>predictionId</code> e/ou <code>text</code>, <code>phone</code> opcional.</td>
+          <td>400 INVALID_WHATSAPP_INPUT, INVALID_PREDICTION_ID, EMPTY_WHATSAPP_MESSAGE; 401 AUTH_REQUIRED; 404 PREDICTION_NOT_FOUND; 500; 200 WHATSAPP_READY.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/whatsapp/send-code</code></td>
+          <td>Sessão</td>
+          <td>Gera código de verificação; envia via Twilio se as três variáveis Twilio estiverem definidas; senão <code>delivery: "mock"</code>.</td>
+          <td>JSON: <code>phone</code> (E.164 Brasil).</td>
+          <td>401 AUTH_REQUIRED; 429 RATE_LIMITED (5 / 10 min por usuário, memória); 400 INVALID_PHONE; 500 VERIFY_STORE_FAILED; 502 TWILIO_SEND_FAILED; 200 <code>{ success, delivery }</code>.</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/whatsapp/verify-code</code></td>
+          <td>Sessão</td>
+          <td>Confere código (6 dígitos, máx. 5 tentativas, TTL 10 min) e marca WhatsApp ready.</td>
+          <td>JSON: <code>phone</code>, <code>code</code>, <code>message</code>, <code>predictionId</code> opcionais após o código.</td>
+          <td>401; 400 INVALID_PHONE/CODE, CODE_NOT_FOUND, CODE_EXPIRED, CODE_MISMATCH; 429 TOO_MANY_ATTEMPTS; 404 PREDICTION_NOT_FOUND; 500; 200 WHATSAPP_READY.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.5 Administração</h3>
+    <p>Todas as rotas abaixo usam <code>requireAdminUser()</code>. Sem admin: <strong>403</strong> “Acesso negado.” Páginas admin no App Router: <code>/admin/dashboard</code>, <code>/admin/usuarios</code>, <code>/admin/logs</code>, <code>/admin/precos</code>, <code>/admin/perguntas</code> (<code>/admin</code> redireciona ao dashboard). A sidebar lista só dashboard, usuários e logs.</p>
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Finalidade</th><th>Corpo / query</th><th>Erros além de 403</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/admin/dashboard/metrics</code></td>
+          <td>Indicadores (receita bruta por somatório de purchases, cadastros, créditos).</td>
+          <td>Query <code>range</code>: 7d | 30d | 90d (default 7d).</td>
+          <td>500</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/admin/users</code></td>
+          <td>Lista perfis paginada.</td>
+          <td><code>page</code>, <code>pageSize</code> (5–100), <code>startDate</code>, <code>endDate</code>.</td>
+          <td>500</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/admin/users/credits</code></td>
+          <td>Bônus administrativo de créditos (1–1000).</td>
+          <td>JSON: <code>userId</code>, <code>amount</code>.</td>
+          <td>400 (parâmetros / usuário desativado); 500</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td><code>/api/admin/users/deactivate</code></td>
+          <td>Desativa usuário (não permite auto-desativação).</td>
+          <td>JSON: <code>userId</code>.</td>
+          <td>400; 500</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/admin/logs</code></td>
+          <td>Logs do motor, com sanitização de telefone e payloads.</td>
+          <td><code>page</code>, <code>pageSize</code>, <code>startDate</code>, <code>endDate</code>.</td>
+          <td>500</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td><code>/api/admin/credit-packages</code></td>
+          <td>Pacotes inclusive inativos e <code>stripePriceId</code>.</td>
+          <td>—</td>
+          <td>500</td>
+        </tr>
+        <tr>
+          <td>PATCH</td>
+          <td><code>/api/admin/credit-packages/[id]</code></td>
+          <td>Atualiza preço (centavos BRL) e ativo; se o preço muda, cria Price Stripe.</td>
+          <td>JSON: <code>priceCents</code> (&gt; 0), <code>isActive</code> (true para ativo).</td>
+          <td>400; 404; 500 sync Stripe; 502 falha Stripe</td>
+        </tr>
+        <tr>
+          <td>GET / POST</td>
+          <td><code>/api/admin/calculator-questions</code></td>
+          <td>Lista (inclui inativas não deletadas) e cria pergunta.</td>
+          <td>GET query <code>category</code>. POST: <code>category</code>, <code>label</code>, <code>type</code> (select|text|checkbox), <code>options</code>, <code>order</code>, <code>isRequired</code>, <code>isActive</code>.</td>
+          <td>400; 409 identificador único; 500</td>
+        </tr>
+        <tr>
+          <td>PATCH / DELETE</td>
+          <td><code>/api/admin/calculator-questions/[id]</code></td>
+          <td>Edita ou soft-delete (<code>deleted_at</code>).</td>
+          <td>PATCH mesmo corpo do POST. Path id inteiro positivo.</td>
+          <td>400; 404; 500</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.6 Funções edge Supabase</h3>
+    <table>
+      <thead>
+        <tr><th>Função</th><th>Arquivo</th><th>Método</th><th>Auth no código</th><th>Notas</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>iris-predict</td>
+          <td><code>supabase/functions/iris-predict/index.ts</code></td>
+          <td>POST</td>
+          <td>Token interno: header <code>x-internal-engine-token</code> deve igualar <code>ENGINE_INTERNAL_TOKEN</code>. Sem token esperado ou mismatch → 401 UNAUTHORIZED.</td>
+          <td>Corpo: theme, question, birthDate, birthTime, birthTimezone, targetBirth*, conflictDate. 405 se não POST. As rotas Next <code>/api/predict</code> e <code>/api/predict-public</code> chamam, por omissão, <code>{NEXT_PUBLIC_SUPABASE_URL}/functions/v1/iris-predict</code>, salvo <code>PYTHON_ENGINE_URL</code>.</td>
+        </tr>
+        <tr>
+          <td>iris-ephemerides</td>
+          <td><code>supabase/functions/iris-ephemerides/index.ts</code></td>
+          <td>POST</td>
+          <td>Neste arquivo <strong>não há</strong> verificação de <code>x-internal-engine-token</code>. Apenas rejeita método ≠ POST (405).</td>
+          <td>Corpo: year, month, birthDate, birthTime, birthTimezone. A rota Next de efemérides <strong>não</strong> chama esta função. Em <code>src/app/api/astrology/ephemerides/route.ts</code> a base é <code>PYTHON_ENGINE_URL</code> com sufixo <code>/api/engine</code> removido, se presente; se essa variável não existir, usa <code>http://{VERCEL_URL}</code> quando <code>VERCEL_URL</code> está definido, senão <code>http://localhost:5000</code>. Em seguida faz POST para <code>{base}/api/ephemerides</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.7 Motor Python (<code>api/engine.py</code>)</h3>
+    <p>Flask. Token interno nas rotas de cálculo: ausência ou mismatch respondem <strong>404</strong> <code>NOT_FOUND</code> (não 401), inclusive se o token de produção não estiver configurado. GET de saúde não exige token.</p>
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Auth</th><th>Finalidade</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>POST</td><td><code>/api/engine</code></td><td>Token interno</td><td>Motor de previsão (espelho local/legado do iris-predict).</td></tr>
+        <tr><td>GET</td><td><code>/api/engine</code></td><td>Nenhuma no código</td><td>Health: <code>{ ok: true, service: "python-engine" }</code>.</td></tr>
+        <tr><td>POST</td><td><code>/api/ephemerides</code></td><td>Token interno</td><td>Varredura mensal de aspectos.</td></tr>
+        <tr><td>GET</td><td><code>/api/sky-now</code></td><td>Token interno</td><td>Céu atual; query <code>lat</code>, <code>lon</code>.</td></tr>
+      </tbody>
+    </table>
+    <p><code>vercel.json</code> reescreve <code>/api/engine</code>, <code>/api/ephemerides</code> e <code>/api/sky-now</code> para <code>/api/engine.py</code>. Em desenvolvimento, <code>next.config.ts</code> faz fallback de <code>/api/:path*</code> não atendido pelo Next para <code>http://127.0.0.1:5000</code>.</p>
+    <p>Não existem, nesta árvore, handlers Next em <code>/api/previsao</code> nem <code>/api/stripe/checkout</code>.</p>
+
+    <h2 id="xxi">6. Cláusula xxi — Organização e documentação do repositório</h2>
+    <p><span class="badge ev">Evidência no repositório</span>: pastas navegáveis; mapa escrito em <code>README.md</code> (secção “Mapa do repositório”) e nesta secção. Sem LICENSE nem CONTRIBUTING — residual documental, não impede o mapa pedido na cláusula.</p>
+
+    <h3>Mapa (fonte do produto)</h3>
+    <table>
+      <thead>
+        <tr><th>Caminho</th><th>Papel</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>README.md</code></td><td>Manutenção técnica e mapa do repositório (cláusulas xxii e xxi).</td></tr>
+        <tr><td><code>src/components/</code></td><td>UI por domínio (landing, iris-chat, payments, refund, admin, planner, etc.).</td></tr>
+        <tr><td><code>src/lib/</code></td><td>Supabase, Stripe, créditos, planner, WhatsApp, astrologia, PDF, auth.</td></tr>
+        <tr><td><code>src/types/</code></td><td>Contratos TypeScript da API de aplicação (não confundir com OpenAPI PostgREST).</td></tr>
+        <tr><td><code>src/hooks/</code></td><td>Hooks de cliente (auth, calculadora, localização).</td></tr>
+        <tr><td><code>supabase/migrations/</code></td><td>16 arquivos SQL versionados (incluindo refunds, WhatsApp, RLS, referrals).</td></tr>
+        <tr><td><code>supabase/functions/</code></td><td>iris-predict, iris-ephemerides.</td></tr>
+        <tr><td><code>e2e/</code></td><td>Playwright: smoke público, gates de auth, navegação, calculadora mock, admin; setup de sessão.</td></tr>
+        <tr><td><code>docs/</code></td><td>Este aceite; QA de UI; runbook e scripts SQL de RLS. Mapa e manutenção também em <code>README.md</code>.</td></tr>
+        <tr><td><code>public/</code></td><td>Marca, ícones, assets estáticos.</td></tr>
+        <tr><td><code>middleware.ts</code></td><td>Gates de página (não substitui auth das APIs).</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Fonte versus ruído / legado</h3>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Observação</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Lockfiles duplos</td><td><code>package-lock.json</code> e <code>pnpm-lock.yaml</code> coexistem. <code>package.json</code> não declara <code>packageManager</code>. Risco de instalações divergentes.</td></tr>
+        <tr><td><code>api/engine.py</code> + <code>requirements.txt</code></td><td>Motor Flask legado/local; ainda referenciado por efemérides Next e por rewrites Vercel.</td></tr>
+        <tr><td><code>ref/</code></td><td>Export Lovable; <code>.gitignore</code> descreve como comparação local, não fonte do produto. <code>docs/ui-integration-qa.md</code> é protocolo interno de port.</td></tr>
+        <tr><td><code>AGENT.md</code></td><td>Gitignored. Desatualizado: afirma Next.js 14 (o pacote usa Next ^16.3.1), tema escuro (produto inspecionado é Data Iris em layout claro/pastel), rotas e páginas admin que não existem. <strong>Não é documento de entrega.</strong></td></tr>
+        <tr><td><code>AGENTS.md</code> / <code>CLAUDE.md</code></td><td>Notas de agente Next.js (bloco gerado pelo <code>next dev</code>). Não substituem README de manutenção.</td></tr>
+        <tr><td><code>public_openapi_schema.json</code></td><td>Gitignored. Schema PostgREST, não API Next.</td></tr>
+        <tr><td><code>.vercel/</code>, <code>.env*</code> locais, <code>e2e/.auth/</code></td><td>Gitignored — correto para segredos e artefatos locais.</td></tr>
+      </tbody>
+    </table>
+    <p>Ausências que não fazem parte do pedido original de mapa: nenhum LICENSE; nenhum CONTRIBUTING. O README descreve o ruído (lockfiles duplos, <code>api/engine.py</code>, <code>ref/</code>).</p>
+
+    <h3>Páginas de aplicação (rotas de UI observadas)</h3>
+    <p>Públicas: <code>/</code>, <code>/precos</code>, <code>/faq</code>, <code>/termos-de-uso</code>, <code>/politica-de-privacidade</code>, <code>/reembolso</code>, <code>/previsao-com-data</code>, <code>/mapa-astral</code>, <code>/painel-astral</code>, <code>/aula</code>, <code>/login</code>, <code>/cadastro</code>, <code>/checkout/return</code>. Área logada (middleware): <code>/dashboard</code>, <code>/calculadora</code>, <code>/calendario</code>, <code>/financeiro</code>, <code>/perfil</code>. Admin: conforme secção 5.5. Redirects em <code>next.config.ts</code>: <code>/auth</code>→<code>/login</code>, <code>/profile</code>→<code>/perfil</code>, <code>/planner</code>→<code>/calendario</code>, vários aliases de compra → <code>/precos</code>.</p>
+
+    <h2 id="xxii">7. Cláusula xxii — Manutenção técnica</h2>
+    <p><span class="badge ev">Evidência no repositório</span>: <code>README.md</code> na raiz descreve stack, mapa, como subir, variáveis (nomes), scripts, deploy Vercel, migrations, e2e e limites conhecidos. Este HTML continua o pacote de aceite. O runbook <code>docs/security/rls-apply-runbook.md</code> cobre um subconjunto (RLS).</p>
+
+    <h3>Como executar (scripts em <code>package.json</code>)</h3>
+    <table>
+      <thead>
+        <tr><th>Script</th><th>Comando</th><th>Efeito</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>dev</td><td><code>next dev</code></td><td>Servidor de desenvolvimento.</td></tr>
+        <tr><td>build</td><td><code>next build</code></td><td>Build de produção.</td></tr>
+        <tr><td>start</td><td><code>next start</code></td><td>Sobe o build.</td></tr>
+        <tr><td>lint</td><td><code>eslint</code></td><td>Lint.</td></tr>
+        <tr><td>assets:lovable</td><td><code>node scripts/download-lovable-assets.mjs</code></td><td>Download de assets de referência.</td></tr>
+        <tr><td>test:e2e</td><td><code>playwright test</code></td><td>E2E. Config: <code>playwright.config.ts</code> (baseURL default <code>http://localhost:3000</code>, sobe <code>next dev</code> se necessário).</td></tr>
+        <tr><td>test:e2e:ui</td><td><code>playwright test --ui</code></td><td>UI do Playwright.</td></tr>
+      </tbody>
+    </table>
+    <p>Stack declarada no pacote (versões de dependência, não “o que o AGENT.md diz”): Next <code>^16.3.1</code>, React 19.2.3, TypeScript 5, Tailwind 4, Supabase JS 2, Stripe 22, Playwright 1.62, OpenAI SDK, ElevenLabs, Swiss Eph, Framer Motion, etc. Motor Python: Flask 3.1.3 e pyswisseph em <code>requirements.txt</code>.</p>
+    <p>Copiar <code>.env.example</code> para <code>.env.local</code> (não versionar). E2E: copiar <code>.env.e2e.example</code> para <code>.env.e2e.local</code>. Playwright carrega <code>.env.e2e.local</code>.</p>
+
+    <h3>Nomes de variáveis — <code>.env.example</code></h3>
+    <p>Somente nomes (e comentários de propósito no próprio example). Valores reais não constam deste documento.</p>
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Papel (segundo o example / o código)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td>URL pública do projeto Supabase.</td></tr>
+        <tr><td><code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code></td><td>Chave publicável (anon). O código também aceita <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY</code>.</td></tr>
+        <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Somente servidor. Admin API, pacotes, proxy.</td></tr>
+        <tr><td><code>ENGINE_INTERNAL_TOKEN</code></td><td>Comentado no example. Segredo compartilhado com o motor / edge.</td></tr>
+        <tr><td><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td><td>Stripe.js / Embedded Checkout.</td></tr>
+        <tr><td><code>STRIPE_SECRET_KEY</code></td><td>Servidor: criar session e webhook.</td></tr>
+        <tr><td><code>STRIPE_WEBHOOK_SECRET</code></td><td>Verificação da assinatura do webhook.</td></tr>
+        <tr><td><code>NEXT_PUBLIC_APP_URL</code></td><td>Comentado. return/success URL do Stripe; fallback à origin do request. Código também lê <code>APP_URL</code>.</td></tr>
+      </tbody>
+    </table>
+    <p><code>.env.e2e.example</code> acrescenta os nomes <code>E2E_ADMIN_EMAIL</code>, <code>E2E_ADMIN_PASSWORD</code>, <code>PLAYWRIGHT_BASE_URL</code>, além das chaves Stripe já citadas.</p>
+
+    <h3>Nomes usados no código e <strong>não</strong> listados em <code>.env.example</code></h3>
+    <p>Nomes usados no código e ainda não repetidos em <code>.env.example</code> (já listados no <code>README.md</code>): <code>PYTHON_ENGINE_URL</code>, <code>VERCEL_ENV</code>, <code>VERCEL_URL</code>, <code>NEXT_PUBLIC_SITE_URL</code>, <code>OPENROUTER_API_KEY</code>, <code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code>, <code>TWILIO_WHATSAPP_FROM</code>, <code>ELEVENLABS_API_KEY</code> (ou <code>ELEVEN_LABS_API_KEY</code>), <code>ELEVENLABS_VOICE_ID</code>, <code>STRIPE_PRODUCT_ID</code> e <code>STRIPE_PRODUCT_ID_&lt;PACOTE&gt;</code>, <code>SUPABASE_URL</code> (Python). Plataforma: <code>NODE_ENV</code>, <code>CI</code>.</p>
+
+    <h3>Deploy e banco</h3>
+    <ul>
+      <li>Deploy atual documentado: <code>https://dataastral.vercel.app/</code> (HTTPS). <code>vercel.json</code> no git com rewrites do motor Python. Metadados <code>.vercel/project.json</code> gitignored.</li>
+      <li>Migrations: <code>supabase/migrations/</code>. Aplicação em produção é operação de banco (ver runbook RLS para um subconjunto).</li>
+      <li>RLS: <code>docs/security/rls-apply-runbook.md</code> e SQL <code>rls-precheck.sql</code>, <code>rls-postcheck.sql</code>, <code>rls-rollback-template.sql</code>.</li>
+      <li>e2e autenticado depende de <code>E2E_ADMIN_EMAIL</code> / <code>E2E_ADMIN_PASSWORD</code> e grava estado em <code>e2e/.auth/</code> (gitignored).</li>
+    </ul>
+    <div class="callout warn">
+      Enriquecimento de texto (<code>src/lib/enrichText.ts</code>) chama OpenRouter se <code>OPENROUTER_API_KEY</code> existir; caso contrário devolve o texto original. WhatsApp de envio ao usuário, no handler <code>/api/whatsapp/send</code>, está em modo mock. Códigos de verificação podem ir pelo Twilio se configurado.
+    </div>
+
+    <h2 id="xxiii">8. Cláusula xxiii — Acessos e propriedade intelectual</h2>
+    <p><span class="badge ato">Ato externo</span>. Esta cláusula é <strong>ato, não código</strong>: assinatura, troca de owners e cessão de PI. Este HTML não realiza a entrega formal.</p>
+    <h3>Observações atuais no repositório (não substituem o ato)</h3>
+    <ul>
+      <li>Remote origin: organização GitHub <code>dataastral-dizevolv</code>, repositório <code>dataastral</code>. O nome da organização é o observado; não se especula sobre contrato societário além disso.</li>
+      <li>Não há LICENSE no repositório inspecionado — a titularidade de PI não está declarada por arquivo de licença neste git.</li>
+      <li>Segredos: padrão <code>.env*</code> ignorado, com exceção dos examples. <code>.env.local</code> e <code>.env.e2e.local</code> presentes no disco, não versionados neste documento.</li>
+      <li>Vercel: vínculo local gitignored em <code>.vercel/project.json</code>.</li>
+    </ul>
+    <h3>Checklist do ato (a cumprir fora do git)</h3>
+    <table>
+      <thead>
+        <tr><th>Conta / ativo</th><th>Ato típico</th><th>Este HTML</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>GitHub (org/repo)</td><td>Transferência de ownership ou convite admin + revogação do prestador</td><td>Não executa</td></tr>
+        <tr><td>Vercel</td><td>Transferência do projeto / team. Deploy atual: <code>https://dataastral.vercel.app/</code>. Depois, apontar o domínio da cliente quando ela enviar.</td><td>Não executa</td></tr>
+        <tr><td>Supabase</td><td>Owner do projeto, chaves rotacionadas</td><td>Não executa</td></tr>
+        <tr><td>Stripe</td><td>Conta live/test, webhook, produtos/prices</td><td>Não executa</td></tr>
+        <tr><td>Twilio / ElevenLabs / OpenRouter (se em uso)</td><td>Titularidade e rotação de chaves</td><td>Não executa</td></tr>
+        <tr><td>DNS / domínio público</td><td>Registrar e zona; <code>datairis.com.br</code> não foi comprovado live aqui</td><td>Não executa</td></tr>
+        <tr><td>PI / código</td><td>Instrumento de cessão ou licença assinado</td><td>Não substitui</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="pendencias">9. Pendências e limitações</h2>
+    <ol>
+      <li>Domínio próprio da cliente ainda não apontado (HTTPS comprovado só em <code>dataastral.vercel.app</code>). Sem HSTS no Next. Fallback interno de efemérides para <code>http://{VERCEL_URL}</code> se faltar <code>PYTHON_ENGINE_URL</code>.</li>
+      <li>Cláusula xxiii permanece ato formal externo (acessos e PI) — ver secção 8; o README apenas lembra isso.</li>
+      <li>Não há OpenAPI gerado das rotas Next; o catálogo da cláusula vi é este HTML.</li>
+      <li>Sem LICENSE e sem CONTRIBUTING (não eram o núcleo de xxi; o mapa está no README).</li>
+      <li>Lockfiles npm e pnpm simultâneos (higiene; README registra o fato).</li>
+      <li>Reembolso CDC: 7 dias na copy; POST não enforce; sem UI admin de aprovação (policies SQL de admin existem). Fora do pedido original de “apontar evidência”.</li>
+      <li><code>iris-ephemerides</code> sem token interno no código da edge function; a app Next usa o Python para efemérides, não essa função.</li>
+      <li><code>/api/export/audio</code> desabilitado (404).</li>
+      <li><code>/api/whatsapp/send</code> em mock; envio real de previsão por WhatsApp não está comprovado neste handler.</li>
+      <li>Temas carreira, saude, familia, viagens em calibração (422) em predict autenticado e público.</li>
+      <li>Rate limit de <code>/api/predict-public</code> e de send-code é por processo.</li>
+      <li>Variáveis usadas no código ainda ausentes de <code>.env.example</code> (listadas no README e na secção xxii).</li>
+      <li><code>AGENT.md</code> interno desatualizado — não usar como entrega.</li>
+    </ol>
+
+    <h2 id="evidencias">10. Índice de evidências</h2>
+    <p>Caminhos relativos à raiz do repositório. Todos foram verificados como existentes no disco na data da inspeção (exceto LICENSE/CONTRIBUTING/docs/api.md, cuja ausência é a evidência).</p>
+    <table>
+      <thead>
+        <tr><th>Cláusula</th><th>Caminhos</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>vi</td>
+          <td><code>src/app/api/**/route.ts</code> (30 arquivos); <code>src/app/auth/callback/route.ts</code>; <code>src/types/*.ts</code>; <code>supabase/functions/iris-predict/index.ts</code>; <code>supabase/functions/iris-ephemerides/index.ts</code>; <code>api/engine.py</code>; <code>vercel.json</code>; <code>next.config.ts</code>; <code>middleware.ts</code>; <code>README.md</code> (ponte para este catálogo). Ausente: OpenAPI das rotas Next.</td>
+        </tr>
+        <tr>
+          <td>xvi</td>
+          <td><code>src/app/reembolso/page.tsx</code>; <code>src/components/refund/RefundRequestForm.tsx</code>; <code>src/app/api/refunds/route.ts</code>; <code>src/types/refunds.ts</code>; <code>supabase/migrations/20260821_create_refund_requests.sql</code>; <code>src/app/faq/page.tsx</code>; <code>src/app/termos-de-uso/page.tsx</code>; <code>src/components/payments/PricingCatalog.tsx</code>; <code>src/components/payments/CreditPackageCard.tsx</code>; <code>src/app/(dashboard)/financeiro/page.tsx</code>; <code>src/components/landing/Footer.tsx</code>; <code>e2e/smoke.public.spec.ts</code>.</td>
+        </tr>
+        <tr>
+          <td>xviii</td>
+          <td><code>https://dataastral.vercel.app/</code> (HTTPS, 3 set 2026); <code>README.md</code>; <code>src/app/api/predict-public/route.ts</code>; <code>src/app/auth/callback/route.ts</code>; <code>src/app/api/referrals/attribute/route.ts</code>; <code>src/components/auth/AuthForm.tsx</code>; <code>src/lib/planner/safeIcalUrl.ts</code>; <code>next.config.ts</code>; <code>src/lib/pdf/generate-insight-pdf.ts</code>; <code>src/app/api/credits/buy/route.ts</code>.</td>
+        </tr>
+        <tr>
+          <td>xxi</td>
+          <td><code>README.md</code> (mapa); árvore <code>src/</code>, <code>supabase/</code>, <code>e2e/</code>, <code>docs/</code>, <code>public/</code>; <code>package-lock.json</code>; <code>pnpm-lock.yaml</code>; <code>api/engine.py</code>; <code>.gitignore</code>.</td>
+        </tr>
+        <tr>
+          <td>xxii</td>
+          <td><code>README.md</code>; <code>package.json</code>; <code>.env.example</code>; <code>.env.e2e.example</code>; <code>playwright.config.ts</code>; <code>e2e/*.spec.ts</code>; <code>docs/security/rls-apply-runbook.md</code>; <code>supabase/migrations/</code>; <code>requirements.txt</code>; este arquivo <code>docs/entrega-aceite.html</code>.</td>
+        </tr>
+        <tr>
+          <td>xxiii</td>
+          <td>Remote git; <code>.gitignore</code> (<code>.env*</code>, <code>.vercel</code>); ausência de LICENSE. Nenhum artefato git constitui cessão.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="declaracao">11. Declaração</h2>
+    <p>Este documento descreve o estado do software Data Iris / repositório dataastral conforme inspeção da árvore de trabalho em 3 de setembro de 2026 (com revisão do README e do hostname Vercel no mesmo dia). É um <strong>documento de entrega e aceite técnico-documental</strong>.</p>
+    <p>Não constitui cessão de propriedade intelectual, transferência de titularidade de contas, procuração, nem atestado de conformidade jurídica com o CDC além do que o código e a copy demonstram. Não prova domínio próprio da cliente.</p>
+    <p>A cláusula xxiii permanece um <strong>ato, não código</strong> (secção 8). xvi e xviii têm artefato; evidência apontada acima (xviii no hostname <code>dataastral.vercel.app</code>). vi, xxi e xxii estão em <code>README.md</code> e neste HTML.</p>
+    <p>Em conflito entre este texto e o repositório, prevalece o repositório na data em que for novamente inspecionado.</p>
+
+    <footer class="docfoot">
+      Data Iris / dataastral — Documento de Entrega e Aceite — versão 1.2 — inspeção 3 de setembro de 2026 — artefato <code>docs/entrega-aceite.html</code>
+    </footer>
+  </div>
+</body>
+</html>
