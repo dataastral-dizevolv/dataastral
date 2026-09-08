@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getEngineRequestHeaders } from "@/lib/engine/request-headers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { enrichText } from "@/lib/enrichText";
@@ -485,11 +486,7 @@ export async function POST(request: NextRequest) {
     const timeout = setTimeout(() => controller.abort(), ENGINE_TIMEOUT_MS);
     const edgeResponse = await fetch(engineUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-request-id": requestId,
-        "x-internal-engine-token": internalEngineToken,
-      },
+      headers: getEngineRequestHeaders(requestId),
       body: JSON.stringify(edgeRequestPayload),
       signal: controller.signal,
     }).finally(() => clearTimeout(timeout));

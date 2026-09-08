@@ -22,7 +22,7 @@ setup("authenticate as admin", async ({ page }) => {
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
 
   await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Boa (tarde|dia|noite)/, {
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Bom dia|Boa tarde|Boa noite/, {
     timeout: 20_000,
   });
   await expect(page.getByText("Créditos disponíveis").or(page.getByText("01 · Saldo e atividade"))).toBeVisible();

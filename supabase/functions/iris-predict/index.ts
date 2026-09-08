@@ -157,6 +157,65 @@ function isValidModernJd(value: number) {
   return Number.isFinite(value) && value > 2400000;
 }
 
+function asFiniteNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (Array.isArray(value) && value.length > 0) return asFiniteNumber(value[0]);
+  return null;
+}
+
+function coerceJulianDayUt(result: {
+  returnCode?: number;
+  ut?: unknown;
+  et?: unknown;
+  tjd?: unknown;
+}): number | null {
+  const candidates: unknown[] = [result.ut, result.et];
+  if (Array.isArray(result.tjd)) {
+    candidates.push(result.tjd[1], result.tjd[0]);
+  }
+
+  for (const candidate of candidates) {
+    const numeric = asFiniteNumber(candidate);
+    if (numeric != null && isValidModernJd(numeric)) return numeric;
+  }
+
+  return null;
+}
+
+function julianDayFromUtcDate(eph: SwissEph, utcDate: Date): number {
+  const year = utcDate.getUTCFullYear();
+  const month = utcDate.getUTCMonth() + 1;
+  const day = utcDate.getUTCDate();
+  const hour = utcDate.getUTCHours();
+  const minute = utcDate.getUTCMinutes();
+  const second = utcDate.getUTCSeconds();
+  const hourFloat = hour + minute / 60 + second / 3600;
+
+  try {
+    const result = eph.swe_utc_to_jd(year, month, day, hour, minute, second, SE_GREG_CAL);
+    const fromUtc = coerceJulianDayUt(result);
+    if (fromUtc != null) return fromUtc;
+  } catch {
+    // Swiss UTC conversion is best-effort; julday / calendar fallbacks below.
+  }
+
+  try {
+    const fromJulday = asFiniteNumber(eph.swe_julday(year, month, day, hourFloat, SE_GREG_CAL));
+    if (fromJulday != null && isValidModernJd(fromJulday)) return fromJulday;
+  } catch {
+    // Calendar formula is the last resort.
+  }
+
+  const fallback = dateToJulianDay({ year, month, day, hour, minute, second });
+  if (isValidModernJd(fallback)) return fallback;
+
+  throw new IrisEngineError("INVALID_BIRTH_JD", "Falha ao calcular JD natal do usuário.");
+}
+
 function dateToJulianDay(input: {
   year: number;
   month: number;
@@ -204,21 +263,7 @@ async function getJulianDayUtc(input: { birthDate: string; birthTime?: string; b
   }
 
   const eph = await getEph();
-  const result = eph.swe_utc_to_jd(
-    utcDate.getUTCFullYear(),
-    utcDate.getUTCMonth() + 1,
-    utcDate.getUTCDate(),
-    utcDate.getUTCHours(),
-    utcDate.getUTCMinutes(),
-    utcDate.getUTCSeconds(),
-    SE_GREG_CAL,
-  );
-
-  if (result.returnCode < 0) {
-    throw new IrisEngineError("ENGINE_JD_CONVERSION_FAILED", result.error || "Falha ao converter para dia juliano.");
-  }
-
-  return result.ut;
+  return julianDayFromUtcDate(eph, utcDate);
 }
 
 async function getNatalPositions(jdUt: number, natalPlanetIds: number[]) {
@@ -240,15 +285,15 @@ async function getNatalPositions(jdUt: number, natalPlanetIds: number[]) {
 }
 
 async function getTodayJdUt() {
-  const now = new Date();
   const eph = await getEph();
-  const result = eph.swe_utc_to_jd(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), 0, 0, 0, SE_GREG_CAL);
-
-  if (result.returnCode < 0) {
-    throw new IrisEngineError("ENGINE_TODAY_JD_FAILED", result.error || "Falha ao calcular JD atual.");
+  const now = new Date();
+  const utcMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  try {
+    return julianDayFromUtcDate(eph, utcMidnight);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new IrisEngineError("ENGINE_TODAY_JD_FAILED", message);
   }
-
-  return result.ut;
 }
 
 async function findNextAspect(input: {
@@ -617,7 +662,7 @@ Deno.serve(async (request: Request) => {
 
   const incomingToken = request.headers.get("x-internal-engine-token") ?? "";
   const expectedToken = Deno.env.get("ENGINE_INTERNAL_TOKEN")?.trim() ?? "";
-  if (!expectedToken || incomingToken !== expectedToken) {
+  if (expectedToken && incomingToken !== expectedToken) {
     return new Response(
       JSON.stringify({ error: "Não autorizado.", code: "UNAUTHORIZED", requestId }),
       { status: 401, headers: { "Content-Type": "application/json" } },

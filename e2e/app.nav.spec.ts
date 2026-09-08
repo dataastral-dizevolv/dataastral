@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("navegação app (admin logado)", () => {
   test("dashboard mostra resumo", async ({ page }) => {
     await page.goto("/dashboard");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Boa (tarde|dia|noite)/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Bom dia|Boa tarde|Boa noite/);
     await expect(page.getByText("01 · Saldo e atividade")).toBeVisible();
     await page.getByRole("button", { name: "Abrir menu" }).click();
     await expect(page.getByText("Admin")).toBeVisible();

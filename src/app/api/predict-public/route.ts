@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getEngineRequestHeaders } from "@/lib/engine/request-headers";
 import { FREE_QUESTIONS_LIMIT, GUEST_ID_COOKIE } from "@/lib/guest/constants";
 import { enrichText } from "@/lib/enrichText";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -298,11 +299,7 @@ export async function POST(request: NextRequest) {
     const timeout = setTimeout(() => controller.abort(), ENGINE_TIMEOUT_MS);
     const edgeResponse = await fetch(engineUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-request-id": requestId,
-        "x-internal-engine-token": internalEngineToken,
-      },
+      headers: getEngineRequestHeaders(requestId),
       body: JSON.stringify(edgeRequestPayload),
       signal: controller.signal,
     }).finally(() => clearTimeout(timeout));
