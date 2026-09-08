@@ -58,7 +58,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
   const body = (await request.json().catch(() => ({}))) as UpdateCreditPackageBody;
   const priceCents = toPriceCents(body.priceCents);
   if (priceCents === null) {
-    return NextResponse.json({ error: "priceCents inválido." }, { status: 400 });
+    return NextResponse.json({ error: "Informe um valor válido em reais." }, { status: 400 });
   }
 
   const isActive = body.isActive === true;

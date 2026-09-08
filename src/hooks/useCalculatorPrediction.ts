@@ -7,6 +7,7 @@ import { useSWRConfig } from "swr";
 import type { StepUserDataFormState } from "@/components/calculator/StepUserData";
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
 import { themeToCategory } from "@/lib/calculator-categories";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 import { tryCreateClient } from "@/lib/supabase/client";
 import type {
   CalcState,
@@ -197,7 +198,10 @@ export function useCalculatorPrediction(context: CalculatorContext) {
             if (errorPayload.code === "FREE_LIMIT_REACHED") {
               storePendingPayload({ theme: themeToUse, question: questionToUse, input });
               setSubmitError(
-                errorPayload.error || "Você já usou suas 3 leituras gratuitas. Entre ou crie uma conta para continuar.",
+                toUserFacingMessage(
+                  errorPayload,
+                  "Você já usou suas 3 leituras gratuitas. Entre ou crie uma conta para continuar.",
+                ),
               );
               setSubmitErrorCode(errorPayload.code ?? null);
               setAuthNextPath(`${pathname}?resumePrediction=1`);
@@ -207,7 +211,12 @@ export function useCalculatorPrediction(context: CalculatorContext) {
               return;
             }
 
-            setSubmitError(errorPayload.error || "Não foi possível gerar sua previsão agora. Tente novamente em instantes.");
+            setSubmitError(
+              toUserFacingMessage(
+                errorPayload,
+                "Não foi possível gerar sua previsão agora. Tente novamente em instantes.",
+              ),
+            );
             setSubmitErrorCode(errorPayload.code ?? null);
             setState("flow");
             setStep(3);
@@ -261,7 +270,12 @@ export function useCalculatorPrediction(context: CalculatorContext) {
             return;
           }
 
-          setSubmitError(errorPayload.error || "Não foi possível gerar sua previsão agora. Tente novamente em instantes.");
+          setSubmitError(
+            toUserFacingMessage(
+              errorPayload,
+              "Não foi possível gerar sua previsão agora. Tente novamente em instantes.",
+            ),
+          );
           setSubmitErrorCode(errorPayload.code ?? null);
           setState("flow");
           setStep(3);

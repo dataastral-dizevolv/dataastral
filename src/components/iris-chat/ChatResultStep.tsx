@@ -24,6 +24,7 @@ import { PredictionBentoGrid } from "@/components/iris-chat/PredictionBentoGrid"
 import { WhatsAppVerifyFlow } from "@/components/iris-chat/WhatsAppVerifyFlow";
 import type { PredictionResult } from "@/hooks/useCalculatorPrediction";
 import { Button } from "@/components/ui/button";
+import { USER_MESSAGES, toUserFacingMessage } from "@/lib/errors/user-facing";
 import { cn } from "@/lib/utils";
 
 interface ChatResultStepProps {
@@ -158,12 +159,13 @@ export function ChatResultStep({
         return;
       }
       if (!response.ok || !payload.audioUrl) {
-        throw new Error(payload.error || "Narração indisponível no momento.");
+        toast.error(toUserFacingMessage(payload, USER_MESSAGES.listenFailed));
+        return;
       }
       const audio = new Audio(payload.audioUrl);
       await audio.play();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível escutar agora.");
+    } catch {
+      toast.error(USER_MESSAGES.listenFailed);
     } finally {
       setListening(false);
     }

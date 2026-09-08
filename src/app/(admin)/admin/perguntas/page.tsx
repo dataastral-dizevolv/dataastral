@@ -16,6 +16,7 @@ import {
   CALCULATOR_CATEGORY_VALUES,
   type CalculatorCategory,
 } from "@/lib/calculator-categories";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 import type { AdminCalculatorQuestion, AdminCalculatorQuestionType } from "@/types/admin";
 
 interface AdminCalculatorQuestionsResponse {
@@ -165,7 +166,7 @@ export default function AdminPerguntasPage() {
 
       const body = (await response.json()) as { error?: string };
       if (!response.ok) {
-        toast.error(body.error ?? "Falha ao salvar pergunta.");
+        toast.error(toUserFacingMessage(body, "Não foi possível salvar a pergunta."));
         return;
       }
 
@@ -189,7 +190,7 @@ export default function AdminPerguntasPage() {
       const body = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        toast.error(body.error ?? "Falha ao remover pergunta.");
+        toast.error(toUserFacingMessage(body, "Não foi possível remover a pergunta."));
         return;
       }
 

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { USER_MESSAGES, toUserFacingMessage } from "@/lib/errors/user-facing";
 import type { ICalFeed } from "@/types/calendar";
 
 interface ICalFeedManagerProps {
@@ -31,7 +32,7 @@ export function ICalFeedManager({ onFeedsChange }: ICalFeedManagerProps) {
   const load = useCallback(async () => {
     const response = await fetch("/api/calendar/feeds", { credentials: "include" });
     if (!response.ok) {
-      toast.error("Erro ao carregar agendas");
+      toast.error(USER_MESSAGES.calendarLoad);
       return;
     }
     const list = (await response.json()) as ICalFeed[];
@@ -56,7 +57,7 @@ export function ICalFeedManager({ onFeedsChange }: ICalFeedManagerProps) {
       });
       const payload = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) {
-        toast.error(payload.error ?? "Não foi possível salvar");
+        toast.error(toUserFacingMessage(payload, USER_MESSAGES.calendarSave));
         return;
       }
       setLabel("");
@@ -71,7 +72,7 @@ export function ICalFeedManager({ onFeedsChange }: ICalFeedManagerProps) {
   async function remove(id: string) {
     const response = await fetch(`/api/calendar/feeds?id=${id}`, { method: "DELETE", credentials: "include" });
     if (!response.ok) {
-      toast.error("Erro ao remover");
+      toast.error(USER_MESSAGES.calendarRemove);
       return;
     }
     await load();

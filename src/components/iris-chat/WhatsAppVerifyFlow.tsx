@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { USER_MESSAGES, toUserFacingMessage } from "@/lib/errors/user-facing";
 
 interface WhatsAppVerifyFlowProps {
   predictionText: string;
@@ -37,7 +38,8 @@ export function WhatsAppVerifyFlow({ predictionText, predictionId, onAuthRequire
       }
 
       if (!response.ok || !payload.success) {
-        throw new Error(payload.error || "Falha ao enviar");
+        toast.error(toUserFacingMessage(payload, USER_MESSAGES.whatsappSendCode));
+        return;
       }
 
       if (payload.delivery === "mock") {
@@ -48,7 +50,8 @@ export function WhatsAppVerifyFlow({ predictionText, predictionId, onAuthRequire
         });
         const sendPayload = (await sendResponse.json()) as { error?: string; message?: string };
         if (!sendResponse.ok) {
-          throw new Error(sendPayload.error || "Falha ao preparar o envio");
+          toast.error(toUserFacingMessage(sendPayload, "Não foi possível enviar a previsão agora."));
+          return;
         }
         toast.success(sendPayload.message || "Previsão pronta para envio no WhatsApp.");
         setStage("done");
@@ -57,8 +60,8 @@ export function WhatsAppVerifyFlow({ predictionText, predictionId, onAuthRequire
 
       toast.success("Código enviado pelo WhatsApp.");
       setStage("code");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar código");
+    } catch {
+      toast.error(USER_MESSAGES.whatsappSendCode);
     } finally {
       setLoading(false);
     }
@@ -84,13 +87,14 @@ export function WhatsAppVerifyFlow({ predictionText, predictionId, onAuthRequire
       }
 
       if (!response.ok || !payload.success) {
-        throw new Error(payload.error || "Código inválido");
+        toast.error(toUserFacingMessage(payload, USER_MESSAGES.whatsappVerify));
+        return;
       }
 
       toast.success(payload.message || "Previsão enviada para o seu WhatsApp!");
       setStage("done");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro na verificação");
+    } catch {
+      toast.error(USER_MESSAGES.whatsappVerify);
     } finally {
       setLoading(false);
     }

@@ -128,7 +128,7 @@ function getFriendlyErrorMessage(code: string, details: string): string {
   }
 
   if (normalizedCode === "CREDIT_DEBIT_FAILED" || normalizedCode === "SERVER_MISCONFIGURED") {
-    return "Erro interno. Tente novamente em instantes.";
+    return "Não foi possível concluir sua previsão agora. Tente novamente em instantes.";
   }
 
   if (normalizedCode === "PREDICTION_PERSIST_FAILED") {

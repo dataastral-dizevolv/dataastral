@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { AUTH_MESSAGES, getSignupPasswordError, mapLoginError, mapSignupError } from "@/lib/auth/messages";
 import { tryCreateClient } from "@/lib/supabase/client";
 
 interface SignupGateModalProps {
@@ -23,8 +24,13 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
   const [loading, setLoading] = useState(false);
 
   const submit = async () => {
-    if (!email || password.length < 6) {
-      toast.error("Email válido e senha de 6+ caracteres.");
+    if (!email) {
+      toast.error("Informe um e-mail válido para continuar.");
+      return;
+    }
+    const passwordError = getSignupPasswordError(password);
+    if (passwordError) {
+      toast.error(passwordError);
       return;
     }
     if (mode === "signup" && nome.trim().length === 0) {
@@ -35,7 +41,7 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
     setLoading(true);
     const supabase = tryCreateClient();
     if (!supabase) {
-      toast.error("Não foi possível conectar ao serviço de autenticação.");
+      toast.error(AUTH_MESSAGES.authUnavailable);
       setLoading(false);
       return;
     }
@@ -48,7 +54,7 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
       });
       setLoading(false);
       if (error) {
-        toast.error("Não foi possível criar sua conta agora.");
+        toast.error(mapSignupError(error));
         return;
       }
       if (!data.session) {
@@ -65,7 +71,7 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast.error("Não foi possível entrar. Verifique suas credenciais.");
+      toast.error(mapLoginError(error));
       return;
     }
     toast.success("Bem-vindo de volta!");
@@ -77,7 +83,7 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
     setLoading(true);
     const supabase = tryCreateClient();
     if (!supabase) {
-      toast.error("Não foi possível conectar ao serviço de autenticação.");
+      toast.error(AUTH_MESSAGES.authUnavailable);
       setLoading(false);
       return;
     }
@@ -88,7 +94,7 @@ export function SignupGateModal({ open, onOpenChange, onSuccess, nextPath }: Sig
       },
     });
     if (error) {
-      toast.error("Não foi possível entrar com Google.");
+      toast.error(AUTH_MESSAGES.googleFailed);
       setLoading(false);
     }
   };

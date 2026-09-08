@@ -15,6 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { USER_MESSAGES, toUserFacingMessage } from "@/lib/errors/user-facing";
 import { generateInsightPdf } from "@/lib/pdf/generate-insight-pdf";
 import { EVENT_TYPE_COLORS } from "@/lib/theme/event-colors";
 import type { EphemerisEvent, EphemerisEventType } from "@/types/dashboard";
@@ -164,13 +165,13 @@ export function PrevisaoDrawer({
 
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as { error?: string; code?: string };
-        toast.error(payload.error ?? "Não foi possível gerar áudio agora.");
+        toast.error(toUserFacingMessage(payload, USER_MESSAGES.listenFailed));
         return;
       }
 
       const payload = (await response.json()) as { audioUrl?: string; cached?: boolean };
       if (!payload.audioUrl) {
-        toast.error("Resposta inválida do serviço de narração.");
+        toast.error("Não foi possível reproduzir o áudio agora.");
         return;
       }
 

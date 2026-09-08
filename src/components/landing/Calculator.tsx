@@ -16,6 +16,7 @@ import type { StepUserDataFormState } from "@/components/calculator/StepUserData
 import { DASHBOARD_ME_KEY } from "@/components/dashboard/DashboardUserContext";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { themeToCategory } from "@/lib/calculator-categories";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 import { tryCreateClient } from "@/lib/supabase/client";
 import type { CalcState, CalcStep, CalculatorQuestion, GeneratePredictionInput, PredictErrorResponse, PredictSuccessResponse, ThemeId } from "@/types/calculator";
 
@@ -154,7 +155,12 @@ export default function Calculator({ context = "landing", layout = "section" }: 
         if (!response.ok) {
           const errorPayload = payload as PredictErrorResponse;
           if (errorPayload.code === "FREE_LIMIT_REACHED") {
-            setSubmitError(errorPayload.error || "Você já usou suas 3 leituras gratuitas. Entre ou crie uma conta para continuar.");
+            setSubmitError(
+              toUserFacingMessage(
+                errorPayload,
+                "Você já usou suas 3 leituras gratuitas. Entre ou crie uma conta para continuar.",
+              ),
+            );
             setSubmitErrorCode(errorPayload.code ?? null);
             setAuthNextPath(buildAuthNextPath());
             setAuthModalOpen(true);
@@ -163,7 +169,12 @@ export default function Calculator({ context = "landing", layout = "section" }: 
             return;
           }
 
-          setSubmitError(errorPayload.error || "Não foi possível gerar sua previsão agora. Tente novamente em instantes.");
+          setSubmitError(
+            toUserFacingMessage(
+              errorPayload,
+              "Não foi possível gerar sua previsão agora. Tente novamente em instantes.",
+            ),
+          );
           setSubmitErrorCode(errorPayload.code ?? null);
           setState("flow");
           setStep(3);
@@ -267,7 +278,12 @@ export default function Calculator({ context = "landing", layout = "section" }: 
           return;
         }
 
-        setSubmitError(errorPayload.error || "Não foi possível gerar sua previsão agora. Tente novamente em instantes.");
+        setSubmitError(
+          toUserFacingMessage(
+            errorPayload,
+            "Não foi possível gerar sua previsão agora. Tente novamente em instantes.",
+          ),
+        );
         setSubmitErrorCode(errorPayload.code ?? null);
         setState("flow");
         setStep(3);

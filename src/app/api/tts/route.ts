@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
 
   if (predictionIdRaw && !predictionId) {
     return NextResponse.json(
-      { error: "predictionId inválido.", code: "INVALID_TTS_PREDICTION_ID" },
+      { error: "Não foi possível gerar a narração desta previsão.", code: "INVALID_TTS_PREDICTION_ID" },
       { status: 400 },
     );
   }
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       return NextResponse.json(
-        { error: "Falha ao salvar áudio no cache.", code: "STORAGE_UPLOAD_FAILED" },
+        { error: "Não foi possível gerar a narração agora.", code: "STORAGE_UPLOAD_FAILED" },
         { status: 500 },
       );
     }
@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
 
     if (signedError || !signedData?.signedUrl) {
       return NextResponse.json(
-        { error: "Áudio gerado, mas não foi possível obter link.", code: "STORAGE_SIGNED_URL_FAILED" },
+        { error: "Não foi possível gerar a narração agora.", code: "STORAGE_SIGNED_URL_FAILED" },
         { status: 500 },
       );
     }

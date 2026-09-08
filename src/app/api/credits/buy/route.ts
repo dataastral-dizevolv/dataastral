@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
   if (!stripeSecretKey) {
     return NextResponse.json(
-      { error: "Servidor sem configuração de pagamento (Stripe).", code: "STRIPE_SECRET_MISSING" },
+      { error: "Pagamentos indisponíveis no momento. Tente novamente em instantes.", code: "STRIPE_SECRET_MISSING" },
       { status: 503 },
     );
   }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
   if (!stripePriceId) {
     return NextResponse.json(
       {
-        error: "Pacote sem stripe_price_id configurado. Configure o Price ID no admin.",
+        error: "Este pacote não está disponível para compra agora.",
         code: "STRIPE_PRICE_MISSING",
       },
       { status: 400 },

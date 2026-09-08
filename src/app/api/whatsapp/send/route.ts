@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
   if (predictionIdRaw && !predictionId) {
     return NextResponse.json(
-      { error: "predictionId inválido.", code: "INVALID_PREDICTION_ID" },
+      { error: "Não foi possível enviar esta previsão. Gere novamente e tente de novo.", code: "INVALID_PREDICTION_ID" },
       { status: 400 },
     );
   }

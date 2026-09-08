@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 import type { AdminUserRow } from "@/types/admin";
 
 interface AdminUsersResponse {
@@ -73,7 +74,7 @@ export default function AdminUsersPage() {
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        toast.error(payload.error ?? "Não foi possível adicionar créditos.");
+        toast.error(toUserFacingMessage(payload, "Não foi possível adicionar créditos."));
         return;
       }
 
@@ -99,7 +100,7 @@ export default function AdminUsersPage() {
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        toast.error(payload.error ?? "Não foi possível desativar usuário.");
+        toast.error(toUserFacingMessage(payload, "Não foi possível desativar usuário."));
         return;
       }
 

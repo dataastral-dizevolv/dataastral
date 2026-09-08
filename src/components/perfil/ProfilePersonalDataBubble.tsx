@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocationSearch } from "@/hooks/useLocationSearch";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 import { createClient } from "@/lib/supabase/client";
 import type { LocationData } from "@/types/calculator";
 
@@ -142,7 +143,7 @@ export function ProfilePersonalDataBubble() {
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        toast.error(payload.error ?? "Não foi possível salvar seu perfil agora.");
+        toast.error(toUserFacingMessage(payload, "Não foi possível salvar seu perfil agora."));
         return;
       }
 

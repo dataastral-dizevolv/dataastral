@@ -120,7 +120,7 @@ async function completeSend({
   let sourcePrediction: UserPredictionRow | null = null;
 
   if (predictionIdRaw && !predictionId) {
-    return NextResponse.json({ success: false, error: "predictionId inválido.", code: "INVALID_PREDICTION_ID" }, { status: 400 });
+    return NextResponse.json({ success: false, error: "Não foi possível enviar esta previsão. Gere novamente e tente de novo.", code: "INVALID_PREDICTION_ID" }, { status: 400 });
   }
 
   if (predictionId) {
@@ -143,7 +143,7 @@ async function completeSend({
 
   const messageText = (messageRaw || sourcePrediction?.prediction_text || "").trim();
   if (!messageText) {
-    return NextResponse.json({ success: false, error: "Mensagem vazia para WhatsApp.", code: "EMPTY_WHATSAPP_MESSAGE" }, { status: 400 });
+    return NextResponse.json({ success: false, error: "Não há texto para enviar no WhatsApp.", code: "EMPTY_WHATSAPP_MESSAGE" }, { status: 400 });
   }
 
   const logError = await recordWhatsAppReady({

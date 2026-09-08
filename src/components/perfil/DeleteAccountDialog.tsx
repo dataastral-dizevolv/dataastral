@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import type { DashboardUser } from "@/lib/auth/user";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 
 interface DeleteAccountDialogProps {
   user: DashboardUser;
@@ -38,7 +39,7 @@ export function DeleteAccountDialog({ user, variant = "section", backLink }: Del
       });
       const payload = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok && response.status !== 202) {
-        toast.error(payload.error ?? "Não foi possível iniciar a exclusão.");
+        toast.error(toUserFacingMessage(payload, "Não foi possível iniciar a exclusão."));
         return;
       }
       toast.success("Link de confirmação enviado para o seu e-mail");

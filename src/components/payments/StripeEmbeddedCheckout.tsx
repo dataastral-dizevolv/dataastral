@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 
+import { USER_MESSAGES, toUserFacingMessage } from "@/lib/errors/user-facing";
 import { getStripe, isStripePublishableConfigured } from "@/lib/stripe/client";
 
 interface Props {
@@ -14,9 +15,7 @@ export function StripeEmbeddedCheckout({ packageId, onFatalError }: Props) {
   if (!isStripePublishableConfigured()) {
     return (
       <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-        Stripe ainda não configurado (faltam chaves). Defina{" "}
-        <code className="font-mono text-xs text-foreground">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code>{" "}
-        e configure o Price ID do pacote no admin.
+        Pagamentos indisponíveis no momento. Tente novamente em instantes.
       </div>
     );
   }
@@ -55,10 +54,7 @@ function StripeEmbeddedCheckoutReady({
     };
 
     if (!response.ok || !payload.clientSecret) {
-      const message =
-        payload.code === "STRIPE_PRICE_MISSING"
-          ? "Pacote sem Price ID — configure no admin."
-          : (payload.error ?? "Falha ao criar checkout");
+      const message = toUserFacingMessage(payload, USER_MESSAGES.checkoutFailed);
       setErrorMessage(message);
       onFatalErrorRef.current?.(message, payload.code);
       throw new Error(message);
@@ -70,7 +66,7 @@ function StripeEmbeddedCheckoutReady({
   if (!stripePromise) {
     return (
       <div className="rounded-2xl border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-        Stripe ainda não configurado (faltam chaves)
+        Pagamentos indisponíveis no momento. Tente novamente em instantes.
       </div>
     );
   }

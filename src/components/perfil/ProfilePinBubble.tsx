@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ChatBubble } from "@/components/iris-chat/ChatBubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getSignupPasswordError, mapPasswordUpdateError } from "@/lib/auth/messages";
 import { createClient } from "@/lib/supabase/client";
 
 function SectionLabel({ index, title }: { index: string; title: string }) {
@@ -21,8 +22,9 @@ export function ProfilePinBubble() {
   const [saving, setSaving] = useState(false);
 
   async function changePassword() {
-    if (newPassword.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres.");
+    const passwordError = getSignupPasswordError(newPassword);
+    if (passwordError) {
+      toast.error(passwordError);
       return;
     }
 
@@ -32,7 +34,7 @@ export function ProfilePinBubble() {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
 
       if (error) {
-        toast.error(error.message);
+        toast.error(mapPasswordUpdateError(error));
         return;
       }
 

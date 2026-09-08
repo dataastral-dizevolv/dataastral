@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AUTH_MESSAGES, getSignupPasswordError, mapLoginError, mapSignupError } from "@/lib/auth/messages";
 import { isValidReferralCodeFormat, REFERRAL_COOKIE } from "@/lib/referrals";
 import { tryCreateClient } from "@/lib/supabase/client";
 
@@ -38,12 +39,6 @@ const copyByMode = {
     googleLabel: "Cadastrar com Google",
   },
 } as const;
-
-const AUTH_MESSAGES = {
-  loginFailed: "Não foi possível entrar. Verifique suas credenciais e tente novamente.",
-  signupFailed: "Não foi possível criar sua conta agora. Tente novamente em instantes.",
-  googleFailed: "Não foi possível entrar com Google. Tente novamente.",
-};
 
 const tapFx = "transition-all active:scale-[0.98] active:opacity-80 duration-150";
 
@@ -164,21 +159,31 @@ export function AuthForm({ mode }: AuthFormProps) {
     const email = String(formData.get("email") ?? "").trim();
     const senha = String(formData.get("senha") ?? "");
     const confirmarSenha = String(formData.get("confirmarSenha") ?? "");
-    const supabase = tryCreateClient();
-    if (!supabase) {
-      setError(mode === "login" ? AUTH_MESSAGES.loginFailed : AUTH_MESSAGES.signupFailed);
-      setLoading(false);
-      return;
-    }
 
     if (mode === "cadastro" && senha !== confirmarSenha) {
-      setError("As senhas precisam ser iguais para continuar.");
+      setError(AUTH_MESSAGES.passwordMismatch);
       setLoading(false);
       return;
     }
 
     if (mode === "cadastro" && nome.length === 0) {
-      setError("Informe seu nome completo para criar a conta.");
+      setError(AUTH_MESSAGES.nameRequired);
+      setLoading(false);
+      return;
+    }
+
+    if (mode === "cadastro") {
+      const passwordError = getSignupPasswordError(senha);
+      if (passwordError) {
+        setError(passwordError);
+        setLoading(false);
+        return;
+      }
+    }
+
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setError(mode === "login" ? AUTH_MESSAGES.loginFailed : AUTH_MESSAGES.signupFailed);
       setLoading(false);
       return;
     }
@@ -193,7 +198,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       });
 
       if (signInError) {
-        setError(AUTH_MESSAGES.loginFailed);
+        setError(mapLoginError(signInError));
         setLoading(false);
         return;
       }
@@ -216,7 +221,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     });
 
     if (signUpError) {
-      setError(AUTH_MESSAGES.signupFailed);
+      setError(mapSignupError(signUpError));
       setLoading(false);
       return;
     }
@@ -318,7 +323,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               name="senha"
               type="password"
               required
-              placeholder="••••••••"
+              placeholder={mode === "cadastro" ? "Mínimo de 6 caracteres" : "••••••••"}
               className="mt-1.5 h-10 bg-background"
             />
           </div>

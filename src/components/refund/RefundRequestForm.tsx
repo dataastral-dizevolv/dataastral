@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toUserFacingMessage } from "@/lib/errors/user-facing";
 import type { CreateRefundResponse, RefundsMeResponse } from "@/types/refunds";
 
 const REFUNDS_KEY = "/api/refunds";
@@ -51,7 +52,7 @@ export function RefundRequestForm() {
       const payload = (await response.json().catch(() => ({}))) as CreateRefundResponse | { error?: string };
 
       if (!response.ok) {
-        toast.error(("error" in payload && payload.error) || "Não foi possível enviar o pedido.");
+        toast.error(toUserFacingMessage(payload, "Não foi possível enviar o pedido."));
         return;
       }
 

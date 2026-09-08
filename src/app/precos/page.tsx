@@ -36,7 +36,7 @@ function PrecosPageContent() {
 
   function openCheckout(packageId: string) {
     if (!isStripePublishableConfigured()) {
-      toast.error("Stripe ainda não configurado (faltam chaves).");
+      toast.error("Pagamentos indisponíveis no momento. Tente novamente em instantes.");
       return;
     }
     setCheckoutPackageId(packageId);
