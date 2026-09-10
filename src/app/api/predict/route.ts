@@ -2,30 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { getEngineRequestHeaders } from "@/lib/engine/request-headers";
+import { RATE_LIMITS, consumeRateLimit, rateLimitJson } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { enrichText } from "@/lib/enrichText";
-import type { ThemeId } from "@/types/calculator";
+import { parseApiBody } from "@/lib/validation/parse-body";
+import { CALIBRATION_THEMES, predictBodySchema, type PredictBody } from "@/lib/validation/predict";
 
 export const runtime = "nodejs";
 
-interface PredictRequestBody {
-  theme?: string;
-  question?: string;
-  birthDate?: string;
-  birthTime?: string;
-  gender?: string | null;
-  birthLocation?: string;
-  birthTimezone?: string | null;
-  birthLat?: number | null;
-  birthLng?: number | null;
-  placeQuery?: string;
-  targetBirthDate?: string;
-  targetBirthTime?: string;
-  targetBirthTimezone?: string | null;
-  conflictDate?: string;
-  dynamicAnswers?: Record<string, unknown>;
-}
 
 interface StoredPrediction {
   id: string;
@@ -71,8 +56,6 @@ interface PredictApiResponse {
   predictionId?: string;
 }
 
-const VALID_THEMES: ThemeId[] = ["amor", "carreira", "financas", "saude", "familia", "viagens"];
-const CALIBRATION_THEMES = new Set<ThemeId>(["carreira", "saude", "familia", "viagens"]);
 const AUTH_REQUIRED_ERROR = "Entre na sua conta para continuar.";
 const INSUFFICIENT_CREDITS_ERROR =
   "Você não possui perguntas grátis nem créditos suficientes para gerar esta previsão.";
@@ -139,9 +122,6 @@ function getFriendlyErrorMessage(code: string, details: string): string {
   return "Não foi possível gerar sua previsão agora. Tente novamente em instantes.";
 }
 
-function isValidTheme(value: string): value is ThemeId {
-  return VALID_THEMES.includes(value as ThemeId);
-}
 
 function getStartOfTodayUtcIso() {
   const now = new Date();
@@ -164,20 +144,17 @@ function stableStringify(input: unknown): string {
   return JSON.stringify(input);
 }
 
-function buildBirthData(body: PredictRequestBody, birthDate: string, birthTime: string, birthTimezone: string) {
-  const dynamicAnswers =
-    body.dynamicAnswers && typeof body.dynamicAnswers === "object" && !Array.isArray(body.dynamicAnswers)
-      ? body.dynamicAnswers
-      : null;
+function buildBirthData(body: PredictBody, birthDate: string, birthTime: string, birthTimezone: string) {
+  const dynamicAnswers = body.dynamicAnswers;
 
   return {
     birthDate,
     birthTime,
-    gender: body.gender || null,
+    gender: body.gender,
     birthTimezone,
     birthLocation: body.birthLocation || null,
-    birthLat: typeof body.birthLat === "number" && Number.isFinite(body.birthLat) ? body.birthLat : null,
-    birthLng: typeof body.birthLng === "number" && Number.isFinite(body.birthLng) ? body.birthLng : null,
+    birthLat: body.birthLat,
+    birthLng: body.birthLng,
     placeQuery: body.placeQuery || null,
     targetBirthDate: body.targetBirthDate || null,
     targetBirthTime: body.targetBirthTime || null,
@@ -190,14 +167,15 @@ function buildBirthData(body: PredictRequestBody, birthDate: string, birthTime: 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID();
   const requestStartedAtMs = Date.now();
-  const body = (await request.json().catch(() => ({}))) as PredictRequestBody;
-  const theme = body.theme;
-  const question = body.question?.trim();
-  const birthDate = body.birthDate;
-  const birthTime = body.birthTime?.trim() || "";
-  const birthTimezone = typeof body.birthTimezone === "string" ? body.birthTimezone.trim() : "";
+  const parsed = parseApiBody(predictBodySchema, await request.json().catch(() => ({})));
+  const body = parsed.ok ? parsed.data : null;
+  const theme = body?.theme;
+  const question = body?.question;
+  const birthDate = body?.birthDate;
+  const birthTime = body?.birthTime ?? "";
+  const birthTimezone = body?.birthTimezone ?? "";
 
-  console.info("[predict] Incoming request", { requestId, theme, hasBody: Object.keys(body).length > 0 });
+  console.info("[predict] Incoming request", { requestId, theme, hasBody: Boolean(body) });
 
   function errorResponse(
     status: number,
@@ -225,24 +203,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!theme || !isValidTheme(theme)) {
-    return errorResponse(400, "INVALID_THEME", `theme recebido: ${String(theme ?? "")}`);
+  if (!parsed.ok || !body || !theme || !question || !birthDate || !birthTimezone) {
+    return errorResponse(400, parsed.ok ? "INVALID_BODY" : parsed.code, parsed.ok ? "Dados inválidos." : parsed.error, parsed.ok ? undefined : parsed.error);
   }
 
   if (CALIBRATION_THEMES.has(theme)) {
     return errorResponse(422, "THEME_IN_CALIBRATION", `Tema ${theme} em calibração.`, "Este tema está em calibração e será liberado em breve. Nenhum crédito foi cobrado.");
-  }
-
-  if (!question) {
-    return errorResponse(400, "INVALID_QUESTION", "question ausente ou vazia.");
-  }
-
-  if (!birthDate) {
-    return errorResponse(400, "INVALID_BIRTH_DATE", "birthDate ausente.");
-  }
-
-  if (!birthTimezone) {
-    return errorResponse(400, "INVALID_BIRTH_TIMEZONE", "birthTimezone ausente ou vazio.");
   }
 
   const { supabaseUrl, supabasePublishableKey } = getSupabaseConfig();
@@ -269,6 +235,12 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return errorResponse(401, "AUTH_REQUIRED", "Usuário não autenticado na rota /api/predict.", AUTH_REQUIRED_ERROR);
+  }
+
+  if (
+    !(await consumeRateLimit(`predict:user:${user.id}`, RATE_LIMITS.predict.max, RATE_LIMITS.predict.windowMs))
+  ) {
+    return rateLimitJson("RATE_LIMIT_EXCEEDED", requestId);
   }
 
   const authUser = user;
@@ -444,15 +416,13 @@ export async function POST(request: NextRequest) {
     question,
     birthDate,
     birthTime,
-    gender: body.gender || null,
+    gender: body.gender,
     birthTimezone,
     ...(body.targetBirthDate ? { targetBirthDate: body.targetBirthDate } : {}),
     ...(body.targetBirthTime ? { targetBirthTime: body.targetBirthTime } : {}),
     ...(body.targetBirthTimezone ? { targetBirthTimezone: body.targetBirthTimezone } : {}),
     ...(body.conflictDate ? { conflictDate: body.conflictDate } : {}),
-    ...(body.dynamicAnswers && typeof body.dynamicAnswers === "object" && !Array.isArray(body.dynamicAnswers)
-      ? { dynamicAnswers: body.dynamicAnswers }
-      : {}),
+    ...(body.dynamicAnswers ? { dynamicAnswers: body.dynamicAnswers } : {}),
   };
 
   console.info("[predict] Sending request to engine", {

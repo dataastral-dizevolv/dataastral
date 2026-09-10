@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { RATE_LIMITS, consumeRateLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { generateVerificationCode, hashVerificationCode, toE164Brazil } from "@/lib/whatsapp";
@@ -7,19 +8,9 @@ import { generateVerificationCode, hashVerificationCode, toE164Brazil } from "@/
 export const runtime = "nodejs";
 
 const CODE_TTL_MS = 10 * 60 * 1000;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
-const sendAttempts = new Map<string, number[]>();
 
 interface SendCodeBody {
   phone?: string;
-}
-
-function pruneAttempts(userId: string) {
-  const now = Date.now();
-  const current = (sendAttempts.get(userId) ?? []).filter((stamp) => now - stamp < RATE_LIMIT_WINDOW_MS);
-  sendAttempts.set(userId, current);
-  return current;
 }
 
 async function sendTwilioWhatsApp(phone: string, code: string) {
@@ -63,8 +54,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Não autenticado.", code: "AUTH_REQUIRED" }, { status: 401 });
   }
 
-  const attempts = pruneAttempts(user.id);
-  if (attempts.length >= RATE_LIMIT_MAX) {
+  const allowed = await consumeRateLimit(
+    `whatsapp-send-code:user:${user.id}`,
+    RATE_LIMITS.whatsappSendCode.max,
+    RATE_LIMITS.whatsappSendCode.windowMs,
+  );
+  if (!allowed) {
     return NextResponse.json(
       { success: false, error: "Muitas tentativas. Aguarde alguns minutos.", code: "RATE_LIMITED" },
       { status: 429 },
@@ -110,7 +105,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  sendAttempts.set(user.id, [...attempts, Date.now()]);
   const twilio = await sendTwilioWhatsApp(phone, code);
 
   if (twilio.error) {

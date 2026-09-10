@@ -21,6 +21,7 @@ const BY_CODE: Record<string, string> = {
   STRIPE_CHECKOUT_CREATE_FAILED: USER_MESSAGES.checkoutFailed,
   INVALID_PHONE: "Número inválido. Use DDD + número.",
   RATE_LIMITED: "Muitas tentativas. Aguarde alguns minutos.",
+  RATE_LIMIT_EXCEEDED: "Muitas tentativas em pouco tempo. Aguarde alguns minutos.",
   TWILIO_SEND_FAILED: USER_MESSAGES.whatsappSendCode,
   VERIFY_STORE_FAILED: USER_MESSAGES.whatsappSendCode,
   INVALID_CODE: "O código tem 6 dígitos.",

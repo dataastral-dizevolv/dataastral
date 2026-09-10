@@ -1,27 +1,31 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireAdminUser } from "@/lib/auth/admin";
+import { RATE_LIMITS, consumeRateLimit, rateLimitJson } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-interface AddCreditsBody {
-  userId?: string;
-  amount?: number;
-}
+import { adminAddCreditsBodySchema } from "@/lib/validation/credits";
+import { parseApiBody } from "@/lib/validation/parse-body";
 
 export async function POST(request: NextRequest) {
-  const { isAdmin } = await requireAdminUser();
+  const { user, isAdmin } = await requireAdminUser();
 
-  if (!isAdmin) {
+  if (!isAdmin || !user) {
     return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as AddCreditsBody;
-  const userId = body.userId?.trim() ?? "";
-  const amount = Number(body.amount ?? 0);
-
-  if (!userId || !Number.isFinite(amount) || amount <= 0 || amount > 1000) {
-    return NextResponse.json({ error: "Parâmetros inválidos para crédito." }, { status: 400 });
+  if (
+    !(await consumeRateLimit(`admin-credits:user:${user.id}`, RATE_LIMITS.adminMutation.max, RATE_LIMITS.adminMutation.windowMs))
+  ) {
+    return rateLimitJson("RATE_LIMIT_EXCEEDED");
   }
+
+  const parsed = parseApiBody(adminAddCreditsBodySchema, await request.json().catch(() => ({})));
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error, code: parsed.code }, { status: 400 });
+  }
+
+  const userId = parsed.data.userId;
+  const amount = parsed.data.amount;
 
   const admin = createAdminClient();
   const { data: targetUser } = await admin.from("user_profiles").select("active").eq("id", userId).maybeSingle();

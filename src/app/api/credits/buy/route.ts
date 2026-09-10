@@ -2,25 +2,23 @@ import { NextResponse, type NextRequest } from "next/server";
 import Stripe from "stripe";
 
 import { getCreditPackageById } from "@/lib/credits/packages";
+import { RATE_LIMITS, consumeRateLimit, rateLimitJson } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { parseApiBody } from "@/lib/validation/parse-body";
+import { buyCreditsBodySchema } from "@/lib/validation/credits";
 import type { BuyCreditsResponse, CheckoutUiMode } from "@/types/credits";
 
 export const runtime = "nodejs";
 
-interface BuyCreditsRequestBody {
-  packageId?: string;
-  uiMode?: CheckoutUiMode;
-}
-
-function resolveUiMode(request: NextRequest, body: BuyCreditsRequestBody): CheckoutUiMode {
+function resolveUiMode(request: NextRequest, uiMode?: CheckoutUiMode): CheckoutUiMode {
   const queryMode = request.nextUrl.searchParams.get("mode")?.trim().toLowerCase();
   if (queryMode === "embedded" || queryMode === "hosted") {
     return queryMode;
   }
 
-  if (body.uiMode === "embedded" || body.uiMode === "hosted") {
-    return body.uiMode;
+  if (uiMode === "embedded" || uiMode === "hosted") {
+    return uiMode;
   }
 
   return "hosted";
@@ -46,9 +44,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Não autenticado.", code: "UNAUTHENTICATED" }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as BuyCreditsRequestBody;
-  const uiMode = resolveUiMode(request, body);
-  const packageId = typeof body.packageId === "string" ? body.packageId.trim().toLowerCase() : "";
+  if (!(await consumeRateLimit(`credits-buy:user:${user.id}`, RATE_LIMITS.creditsBuy.max, RATE_LIMITS.creditsBuy.windowMs))) {
+    return rateLimitJson("RATE_LIMIT_EXCEEDED", requestId);
+  }
+
+  const parsed = parseApiBody(buyCreditsBodySchema, await request.json().catch(() => ({})));
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error, code: parsed.code }, { status: 400 });
+  }
+
+  const uiMode = resolveUiMode(request, parsed.data.uiMode);
+  const packageId = parsed.data.packageId;
   let selectedPackage;
   try {
     selectedPackage = await getCreditPackageById(packageId, { onlyActive: true });
